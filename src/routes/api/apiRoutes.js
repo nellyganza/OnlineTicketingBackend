@@ -1,0 +1,28 @@
+import express from 'express';
+import user from './users/userRoutes';
+import permission from './permissions/permissionRoutes';
+import role from './roles/roleRoutes';
+import rolePerm from './rolepermissions/rolepermissions';
+import contact from './contacts/contactrouter';
+import event from './events/eventRouters';
+import eventPayment from './events/eventPaymentRouter';
+import eventPaymentMethod from './events/eventPaymentMethodRouter';
+import eventSittingPlace from './events/eventSittingPlaceRouter';
+import ticket from './tickets/ticketRouter';
+import card from './cards/cardRouter';
+import transactions from './transactions/transactionRouter';
+
+const router = express.Router();
+router.use('/users', user);
+router.use('/permissions', permission);
+router.use('/roles', role);
+router.use('/rolesPermissions', rolePerm);
+router.use('/contacts', contact);
+router.use('/events', event);
+router.use('/events/eventPayment', eventPayment);
+router.use('/events/eventPaymentMethod', eventPaymentMethod);
+router.use('/events/eventSittingPlaces', eventSittingPlace);
+router.use('/events/tickets', ticket);
+router.use('/cards',card);
+router.use('/transactions',transactions);
+export default router;
