@@ -4,7 +4,9 @@
   "description": "Nezerwa Project, we want everyone to be happy with buying event ticket online.",
   "main": "index.js",
   "scripts": {
-    "start": "npm run db:seed:undo:all && npm run db:seed &&  nodemon --exec ./node_modules/.bin/babel-node ./src/index.js",
+    "build":"babel src -s -d dist --ignore './src/public'",
+    "start":"npm run db:migrate && node dist/index.js",
+    "app:start": "npm run db:seed:undo:all && npm run db:seed &&  nodemon --exec ./node_modules/.bin/babel-node ./src/index.js",
     "lint": "eslint src/ --fix",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo:all": "sequelize db:migrate:undo:all",
