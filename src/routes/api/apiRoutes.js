@@ -23,6 +23,6 @@ router.use('/events/eventPayment', eventPayment);
 router.use('/events/eventPaymentMethod', eventPaymentMethod);
 router.use('/events/eventSittingPlaces', eventSittingPlace);
 router.use('/events/tickets', ticket);
-router.use('/cards',card);
-router.use('/transactions',transactions);
+router.use('/cards', card);
+router.use('/transactions', transactions);
 export default router;

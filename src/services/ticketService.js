@@ -1,5 +1,6 @@
+import { Op } from 'sequelize';
 import models from '../models';
-import {Op} from 'sequelize';
+
 const { Ticket } = models;
 /**
  * @exports
@@ -38,15 +39,16 @@ class TicketService {
       where: prop,
     });
   }
-  static findByUserANDEvent(prop){
+
+  static findByUserANDEvent(prop) {
     return Ticket.findAll({
-      where :{
-        [Op.and]:[
-          {userId:prop.userId},
-          {eventId:prop.eventId}
-        ]
-      }
-    })
+      where: {
+        [Op.and]: [
+          { userId: prop.userId },
+          { eventId: prop.eventId },
+        ],
+      },
+    });
   }
 
   static findByCardNumber(prop) {

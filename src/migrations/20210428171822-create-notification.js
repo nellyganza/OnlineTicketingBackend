@@ -1,4 +1,3 @@
-'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Notifications', {
@@ -6,19 +5,19 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       receiver: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       userId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       eventId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       message: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       isRead: {
         allowNull: false,
@@ -27,15 +26,15 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Notifications');
-  }
+  },
 };

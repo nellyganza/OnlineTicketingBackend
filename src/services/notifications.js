@@ -21,13 +21,13 @@ class Notificationervice {
     return Notification.findAll({
       where: {
         receiver: email,
-      }
+      },
     });
   }
 
   static getOne(notification) {
     return Notification.findOne({
-      where: notification
+      where: notification,
     });
   }
 

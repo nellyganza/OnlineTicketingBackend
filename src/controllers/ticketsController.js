@@ -19,18 +19,15 @@ export default class ticketController {
       transaction_ref: pay.tx_ref,
       order_id: pay.order_id,
       event: eventId,
-      user: id
-    }
+      user: id,
+    };
     try {
       const savedTransacrion = await transactionService.createTransaction(transaction);
       util.setSuccess(200, 'Transaction Saved', savedTransacrion);
-
     } catch (error) {
       util.setError(400, error);
       return util.send(res);
     }
-
-
 
     const { buyer } = req.body;
     const { attender } = req.body;
@@ -172,19 +169,20 @@ export default class ticketController {
     util.setError(400, 'Please, If you know that you have bought the ticket , Contact the Administrators');
     return util.send(res);
   }
+
   static async paymentVerificationWebhook(request, response) {
-    console.log(request+"  "+response)
-    var hash = request.headers["verif-hash"];
+    console.log(`${request}  ${response}`);
+    const hash = request.headers['verif-hash'];
 
     if (!hash) {
-      // discard the request,only a post with the right Flutterwave signature header gets our attention 
+      // discard the request,only a post with the right Flutterwave signature header gets our attention
     }
     const secret_hash = process.env.MY_HASH;
     if (hash !== secret_hash) {
       // silently exit, or check that you are passing the right hash on your server.
     }
-    var request_json = JSON.parse(request.body);
-    console.log(request_json)
+    const request_json = JSON.parse(request.body);
+    console.log(request_json);
     return response.send(200);
     // return res.status(200).send();
   }

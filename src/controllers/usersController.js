@@ -5,8 +5,8 @@ import { newJwtToken } from '../helpers/tokenGenerator';
 import Util from '../helpers/utils';
 import userService from '../services/userService';
 import AuthTokenHelper from '../helpers/AuthTokenHelper';
-import {nexmo} from '../config/nexmo';
-import {sendSMS} from '../helpers/notifications/smsNotification';
+import { nexmo } from '../config/nexmo';
+import { sendSMS } from '../helpers/notifications/smsNotification';
 import {
   sendPasswordResetLink,
 } from '../utils/sendPasswordLInk';
@@ -300,56 +300,57 @@ export default class user {
       return util.send(res);
     }
   }
-  static async sendVerificationCode(req, res){
-      // We verify that the client has included the `number` property in their JSON body
-      if (!req.body.number) {
-          util.setError(400,"You must supply a `number` prop to send the request to");
-          util.send(res);
-          return;
-      }
-      // Send the request to Vonage's servers
-      nexmo.verify.request({
-          number: req.body.number,
-          // You can customize this to show the name of your company
-          brand: 'Intercore Events',
-          // We could put `'6'` instead of `'4'` if we wanted a longer verification code
-          code_length: '4'
-      }, (err, result) => {
-          if (err) {
-              // If there was an error, return it to the client
-              util.setError(500, err.error_text);
-              util.send(res);
-              return;
-          }
-          // Otherwise, send back the request id. This data is integral to the next step
-          const requestId = result.request_id;
-          util.setSuccess(200, "Please Verfication code sent to your phon number, submit to verify your phone number",result);
-          util.send(res);
-      });
-  }
 
-  static async verifyPhoneNumber(req, res){
-     // We require clients to submit a request id (for identification) and a code (to check)
-     if (!req.body.requestId || !req.body.code) {
-      util.setError(400,"You must supply a `code` and `request_id` prop to send the request to")
+  static async sendVerificationCode(req, res) {
+    // We verify that the client has included the `number` property in their JSON body
+    if (!req.body.number) {
+      util.setError(400, 'You must supply a `number` prop to send the request to');
       util.send(res);
       return;
+    }
+    // Send the request to Vonage's servers
+    nexmo.verify.request({
+      number: req.body.number,
+      // You can customize this to show the name of your company
+      brand: 'Intercore Events',
+      // We could put `'6'` instead of `'4'` if we wanted a longer verification code
+      code_length: '4',
+    }, (err, result) => {
+      if (err) {
+        // If there was an error, return it to the client
+        util.setError(500, err.error_text);
+        util.send(res);
+        return;
       }
-      // const info  = await sendSMS(req.body.number,"You have ticket to attend apr and rayon sport match");
-      // util.setSuccess(200, "Message Sent",{info});
-      // util.send(res);
-      // Run the check against Vonage's servers
-      nexmo.verify.check({
-          request_id: req.body.requestId,
-          code: req.body.code
-      }, (err, result) => {
-          if (err) {
-              util.setError(500,err.error_text)
-              util.send(res);
-              return;
-          }
-          util.setSuccess(200, "Phone Number Verified Success",{result});
-          util.send(res);
-      });
+      // Otherwise, send back the request id. This data is integral to the next step
+      const requestId = result.request_id;
+      util.setSuccess(200, 'Please Verfication code sent to your phon number, submit to verify your phone number', result);
+      util.send(res);
+    });
+  }
+
+  static async verifyPhoneNumber(req, res) {
+    // We require clients to submit a request id (for identification) and a code (to check)
+    if (!req.body.requestId || !req.body.code) {
+      util.setError(400, 'You must supply a `code` and `request_id` prop to send the request to');
+      util.send(res);
+      return;
+    }
+    // const info  = await sendSMS(req.body.number,"You have ticket to attend apr and rayon sport match");
+    // util.setSuccess(200, "Message Sent",{info});
+    // util.send(res);
+    // Run the check against Vonage's servers
+    nexmo.verify.check({
+      request_id: req.body.requestId,
+      code: req.body.code,
+    }, (err, result) => {
+      if (err) {
+        util.setError(500, err.error_text);
+        util.send(res);
+        return;
+      }
+      util.setSuccess(200, 'Phone Number Verified Success', { result });
+      util.send(res);
+    });
   }
 }

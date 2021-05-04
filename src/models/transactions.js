@@ -1,7 +1,7 @@
-'use strict';
 const {
-  Model
+  Model,
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class Transactions extends Model {
     /**
@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       //   onDelete: 'CASCADE',
       // });
     }
-  };
+  }
   Transactions.init({
     transaction_ref: DataTypes.STRING,
     order_id: DataTypes.STRING,
@@ -25,8 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     user: DataTypes.INTEGER,
     status: {
       type: DataTypes.STRING,
-      defaultValue: "PENDING"
-    }
+      defaultValue: 'PENDING',
+    },
   }, {
     sequelize,
     modelName: 'Transactions',

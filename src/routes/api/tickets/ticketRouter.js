@@ -18,6 +18,6 @@ router.get('/byUser', isAuthenticated, allowedRoles([4, 5]), ticketController.ge
 router.post('/newTicket/payment/cardpay/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, verfiyCardNumbers, pay, ticketController.saveTicket);
 router.post('/newTicket/payment/momopay/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, verfiyCardNumbers, rwMobileMoney, ticketController.saveTicket);
 router.get('/newTicket/payment/webhook', ticketController.paymentVerificationWebhook);
-router.get('/newTicket/failed/payment/webhook',ticketController.paymentVerificationWebhook);
+router.get('/newTicket/failed/payment/webhook', ticketController.paymentVerificationWebhook);
 router.put('/checkup/payment/:eventId', ticketController.entrance);
 export default router;

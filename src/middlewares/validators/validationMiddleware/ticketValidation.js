@@ -27,14 +27,14 @@ export const newTicketValidation = async (req, res, next) => {
       const errors = [];
       Object.keys(attender).forEach((attend) => {
         const { error } = newTicketAttender.validate(attender[attend]);
-        console.log("in error"+error)
+        console.log(`in error${error}`);
         if (error) {
           const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
           errors.push(Error);
         }
       });
       if (errors.length > 0) {
-        console.log("outers   "+errors);
+        console.log(`outers   ${errors}`);
         util.setError(400, errors);
         util.send(res);
         return false;

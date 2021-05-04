@@ -30,7 +30,7 @@ export const getAndUpdateSittingPlace = async (eventId, type, numberofTickets, a
     const Sitting = await EventSittingPlaceService.findByName({ eventId, name: data.dataValues.name });
     const sitting = { ...Sitting['0'] };
     for (let i = 0; i < sitting.dataValues.placeAvailable.length; i++) {
-      if(sitting.dataValues.placeAvailable[i][0]==undefined){
+      if (sitting.dataValues.placeAvailable[i][0] === undefined) {
         continue;
       }
       const start = sitting.dataValues.placeAvailable[i][0].value;
@@ -62,7 +62,7 @@ export const getAndUpdateSittingPlace = async (eventId, type, numberofTickets, a
     const sitting = { ...Sitting['0'] };
     const place = sitting.dataValues.placeAvailable;
     for (let i = 0; i < sitting.dataValues.placeAvailable.length; i++) {
-      if(sitting.dataValues.placeAvailable[i][0]==undefined){
+      if (sitting.dataValues.placeAvailable[i][0] === undefined) {
         continue;
       }
       const start = sitting.dataValues.placeAvailable[i][0].value;

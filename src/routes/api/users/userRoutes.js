@@ -8,7 +8,6 @@ import { getProvider } from '../../../helpers/socialProvider';
 import verification from '../../../middlewares/verifications/verification';
 import authorizationValidator from '../../../middlewares/validators/isAuthenticated';
 import { isAuthenticated, allowedRoles } from '../../../middlewares/authorization';
-import user from '../../../controllers/usersController';
 
 const router = express.Router();
 
@@ -18,8 +17,8 @@ const {
 router.get('/me/:token', usersController.myCredintials);
 router.post('/signup', signupValidate, usersController.signupWithEmail);
 router.get('/verify/:token', verifyEmail, usersController.verifyEmail);
-router.post('/request/phoneNumber',usersController.sendVerificationCode);
-router.post('/verify/phoneNumber',usersController.verifyPhoneNumber);
+router.post('/request/phoneNumber', usersController.sendVerificationCode);
+router.post('/verify/phoneNumber', usersController.verifyPhoneNumber);
 router.post('/login', createUserValidation, usersController.login);
 router.get('/login/:provider', getProvider);
 router.post('/logout', authorizationValidator.isTokenExist, authorizationValidator.isTokenValid, authorizationValidator.isUserExists, usersController.userLogout);

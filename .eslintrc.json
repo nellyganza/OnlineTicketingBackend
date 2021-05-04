@@ -24,7 +24,9 @@
         "no-await-in-loop":"off",
         "consistent-return":"off",
         "no-return-await":"off",
+        "no-prototype-builtins":"off",
         "max-len":"off",
+        "no-param-reassign":"off",
         "import/prefer-default-export": "off",
         "prefer-destructuring":"off"
     }

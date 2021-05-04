@@ -1,2 +1,3 @@
-import {newCardShemas} from './validateCard';
-export {newCardShemas}
+import { newCardShemas } from './validateCard';
+
+export { newCardShemas };

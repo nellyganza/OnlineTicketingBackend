@@ -12,7 +12,7 @@ export const signupValidateSchema = joi.object({
   confirmPassword: joi.string().valid(joi.ref('password')).required(),
   firstName: joi.string().required().min(4).max(16),
   lastName: joi.string().required().min(4).max(16),
-  phoneNumber: joi.string().required().pattern(/^\+(?:[0-9] ?){6,14}[0-9]$/)
+  phoneNumber: joi.string().required().pattern(/^\+(?:[0-9] ?){6,14}[0-9]$/),
 });
 
 export const passwordResetSchema = joi.object({
