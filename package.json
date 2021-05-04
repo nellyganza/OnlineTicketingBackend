@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build":"babel src -s -d dist --ignore './src/public'",
-    "start": "npm run db:seed:undo:all && npm run db:seed &&  nodemon --exec ./node_modules/.bin/babel-node  dist/index.js",
+    "start": "npm run db:migrate && npm run db:seed:undo:all && npm run db:seed &&  nodemon --exec ./node_modules/.bin/babel-node  dist/index.js",
     "lint": "eslint src/ --fix",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo:all": "sequelize db:migrate:undo:all",
