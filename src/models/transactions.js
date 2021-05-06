@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'NO ACTION'
       });
       models.Transactions.hasMany(models.TransactionTickets,{
-        foreignKey: 'transaction_ref'
+        foreignKey: 'transactionId'
       })
     }
   }

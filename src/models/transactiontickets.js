@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       models.TransactionTickets.belongsTo(models.Transactions, {
-        foreignKey: 'transaction_ref',
+        foreignKey: 'transactionId',
         onDelete: 'NO ACTION',
       });
       models.TransactionTickets.belongsTo(models.Ticket, {
@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   TransactionTickets.init({
+    transactionId: DataTypes.INTEGER,
     transaction_ref: DataTypes.STRING,
     ticketId: DataTypes.INTEGER,
     cardNumber: DataTypes.STRING

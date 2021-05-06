@@ -38,8 +38,9 @@ export default class ticketController {
         i++;
         const savedTicket = await ticketService.createTicket({ ...attender[method], eventId, userId });
         const {transaction_ref} = savedTransacrion.dataValues;
+        const transactionId = savedTransacrion.dataValues.id;
         const {id,cardNumber} = savedTicket.dataValues;
-        await transactionTicketService.createTransactionTicket({transaction_ref,ticketId:id,cardNumber});
+        await transactionTicketService.createTransactionTicket({transactionId,transaction_ref,ticketId:id,cardNumber});
         updateEvent(eventId);
         updatePaymentMade(attender[method].paymenttype);
         updateSittingPlace(eventId, attender[method].type);

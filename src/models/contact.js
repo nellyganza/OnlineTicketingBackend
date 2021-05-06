@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Contact.init({
-    userId: DataTypes.STRING,
+    userId: DataTypes.INTEGER,
     message: DataTypes.STRING,
   }, {
     sequelize,
