@@ -3,7 +3,7 @@ import { eventEmitter } from '../helpers/notifications/eventEmitter';
 import ticketservice from '../services/ticketService';
 require('../helpers/notifications/eventListeners');
 
-cron.schedule('*/5 * * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   eventEmitter.emit('verifyTransactionEvent');
   // console.log(eventEmitter.eventNames());
 });
