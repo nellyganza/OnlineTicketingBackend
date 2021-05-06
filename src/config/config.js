@@ -23,6 +23,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
+    use_env_variable: 'DATABASE_URL'  
   },
   test: {
     username: DB_USERNAME_TEST,
