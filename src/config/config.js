@@ -13,6 +13,7 @@ const {
   DB_HOST_TEST,
   DB_PORT_TEST,
   DB_DIALECT_TEST,
+  DATABASE_URL
 } = process.env;
 
 module.exports = {
@@ -23,6 +24,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
+    use_env_variable: DATABASE_URL
   },
   test: {
     username: DB_USERNAME_TEST,
@@ -31,6 +33,7 @@ module.exports = {
     host: DB_HOST_TEST,
     port: DB_PORT_TEST,
     dialect: 'postgres',
+    use_env_variable: DATABASE_URL
   },
   production: {
     username: DB_USER,
@@ -39,5 +42,6 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
+    use_env_variable: DATABASE_URL
   },
 };
