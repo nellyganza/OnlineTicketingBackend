@@ -15,13 +15,23 @@ module.exports = (sequelize, DataTypes) => {
       //   foreignKey: 'user',
       //   onDelete: 'CASCADE',
       // });
+      models.Transactions.belongsTo(models.Users, {
+        foreignKey: 'user',
+        onDelete: 'NO ACTION'
+      });
+      models.Transactions.belongsTo(models.Event, {
+        foreignKey: 'event',
+        onDelete: 'NO ACTION'
+      });
+      models.Transactions.hasMany(models.TransactionTickets,{
+        foreignKey: 'transaction_ref'
+      })
     }
   }
   Transactions.init({
     transaction_ref: DataTypes.STRING,
     order_id: DataTypes.STRING,
     event: DataTypes.INTEGER,
-    ticket: DataTypes.INTEGER,
     user: DataTypes.INTEGER,
     status: {
       type: DataTypes.STRING,

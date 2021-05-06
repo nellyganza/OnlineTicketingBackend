@@ -44,7 +44,11 @@ class TransactionService {
       where: { transaction_ref: prop },
     });
   }
-
+  static findPayedTransactions(prop) {
+    return Transactions.findOne({
+      where: prop
+    });
+  }
   static findById(modelId) {
     return Transactions.findOne({
       where: { id: modelId },

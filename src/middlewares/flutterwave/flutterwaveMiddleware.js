@@ -31,18 +31,18 @@ export const rwMobileMoney = async (req, res, next) => {
 export const cardPay = async (req, res, next) => {
   try {
     const payload = {
-      card_number: '5531 8866 5214 2950',
-      cvv: '564',
-      expiry_month: '09',
-      expiry_year: '32',
-      currency: 'RWF',
-      amount: '1000',
-      redirect_url: 'http://localhost:5000/newTicket/payment/webhook',
-      fullname: 'Nishimwe Elysee',
-      email: 'nishimwelys@gmail.com',
-      phone_number: '0780781546',
-      enckey: '611d0eda25a3c931863d92c4',
-      tx_ref: 'MC-32444ee--4eerye4euee3rerds4423e43e', // This is a unique reference, unique to the particular transaction being carried out. It is generated when it is not provided by the merchant for every transaction.
+      card_number: req.body.pay.card_number,
+      cvv: req.body.pay.cvv,
+      expiry_month: req.body.pay.expiry_month,
+      expiry_year: req.body.pay.expiry_year,
+      currency: req.body.pay.currency,
+      amount: req.body.pay.amount,
+      redirect_url:  `${process.env.HOST}/newTicket/payment/webhook`,
+      fullname: req.body.pay.fullname,
+      email: req.body.pay.email,
+      phone_number: req.body.pay.phone_number,
+      enckey: req.body.pay.enckey,
+      tx_ref: req.body.pay.tx_ref, // This is a unique reference, unique to the particular transaction being carried out. It is generated when it is not provided by the merchant for every transaction.
 
     };
     const response = await flw.Charge.card(payload);

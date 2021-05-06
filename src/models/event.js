@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       models.Event.hasMany(models.Comment, {
         foreignKey: 'eventId',
       });
+      models.Event.hasMany(models.Transactions,{
+        foreignKey: 'event'
+      });
     }
   }
   Event.init({

@@ -28,7 +28,7 @@ router.post('/forgot-password', validateEmail, verification.email, usersControll
 router.put('/reset-password/:token', passwordMatch, verification.tokenValid, usersController.changePassword);
 router.put('/changeRole/:id', isAuthenticated, allowedRoles([1]), roleExist, usersController.changeRole);
 router.put('/manager/assign', isAuthenticated, allowedRoles([3]), usersController.assignUsers);
-router.get('/manager/:id', isAuthenticated, allowedRoles([3]), usersController.getUsers);
+router.get('/manager/viewUsers', isAuthenticated, allowedRoles([1]), usersController.getUsers);
 router.put('/updateProfile', isAuthenticated, usersController.updateProfile);
 router.get('/profile/:id', isAuthenticated, usersController.getProfile);
 router.put('/upload', isAuthenticated, fileUploader.any(), fileController.upload);

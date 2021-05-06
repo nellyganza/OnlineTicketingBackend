@@ -12,8 +12,9 @@ const router = express.Router();
 
 router.post('/', isAuthenticated, allowedRoles([2, 3]), newEventEventValidation, checkDates, eventController.saveEvent);
 router.get('/', eventController.getAllEvent);
+router.get('/user', isAuthenticated, allowedRoles([2, 3]), eventController.getAllEventByUser);
 router.get('/findByDates', eventController.findBetween);
-router.put('/:eventId', isAuthenticated, allowedRoles([2, 3]), eventUpdate, eventController.updateEvent);
+router.put('/edit/:eventId', isAuthenticated, allowedRoles([2, 3]), eventUpdate, eventController.updateEvent);
 router.delete('/:eventId', isAuthenticated, allowedRoles([2]), eventController.deleteEvent);
 router.put('/upload/:eventId', isAuthenticated, allowedRoles([2, 3]), fileUploader.any(), fileController.uploadEvents);
 router.get('/numberofTicket/:eventId', isAuthenticated, eventController.getTicketNumber);

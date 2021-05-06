@@ -16,9 +16,6 @@ module.exports = {
       event: {
         type: Sequelize.INTEGER,
       },
-      ticket: {
-        type: Sequelize.INTEGER,
-      },
       status: {
         type: Sequelize.STRING,
 

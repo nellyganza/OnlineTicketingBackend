@@ -18,8 +18,14 @@ module.exports = (sequelize, DataTypes) => {
       models.Users.hasMany(models.Event, {
         foreignKey: 'managerId',
       });
+      models.Users.hasMany(models.Ticket, {
+        foreignKey: 'userId',
+      });
       models.Users.hasMany(models.Comment, {
         foreignKey: 'userId',
+      });
+      models.Users.hasMany(models.Transactions, {
+        foreignKey: 'user',
       });
     }
   }

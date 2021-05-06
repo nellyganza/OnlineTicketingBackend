@@ -3,7 +3,7 @@ import Util from '../../../helpers/utils';
 import { cloudinaryUploader } from '../../../helpers/cloudinaryUploader';
 
 const {
-  newEventSchema, newPaymentMethodSchema, newStittingPlaceSchema, newPaymentGradeCost,
+  newEventSchema, newPaymentMethodSchema, newStittingPlaceSchema, newPaymentGradeCost, oldEventSchema,
 } = EventValidationSchemas;
 
 const util = new Util();
@@ -96,7 +96,7 @@ export const newEventEventValidation = (req, res, next) => {
 };
 export const eventUpdate = (req, res, next) => {
   try {
-    const { error } = newEventEventValidation.validate(req.body);
+    const { error } = oldEventSchema.validate(req.body);
     if (error) {
       const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
       util.setError(400, Error);

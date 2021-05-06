@@ -219,8 +219,7 @@ export default class user {
 
   static async getUsers(req, res) {
     try {
-      const { id } = req.params;
-      const users = await userService.getUsers(id);
+      const users = await userService.getUsers();
       if (users.length >= 1) {
         const message = 'the users assigned to that manager are found';
         util.setSuccess(200, message, users);

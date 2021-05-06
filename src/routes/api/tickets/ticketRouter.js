@@ -4,11 +4,11 @@ import { isAuthenticated, allowedRoles } from '../../../middlewares/authorizatio
 import verfications from '../../../middlewares/verifications/verification';
 import { pay } from '../../../middlewares/stripe/stripeMiddleware';
 import { cardPay, rwMobileMoney } from '../../../middlewares/flutterwave/flutterwaveMiddleware';
-import { verifytx } from '../../../middlewares/flutterwave/verifyTransaction';
 import { ValidationMiddleWare } from '../../../middlewares';
+import {checkPayments} from '../../../middlewares';
 
 const { newTicketValidation, verfiyCardNumbers } = ValidationMiddleWare;
-
+const {checkPyament} = checkPayments;
 const router = express.Router();
 
 // router.post('/newTicket/:eventId', isAuthenticated, allowedRoles([4, 5]), verfications.verfiyCardNumbers, ticketController.saveTicket);
@@ -19,5 +19,5 @@ router.post('/newTicket/payment/cardpay/:eventId', isAuthenticated, allowedRoles
 router.post('/newTicket/payment/momopay/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, verfiyCardNumbers, rwMobileMoney, ticketController.saveTicket);
 router.get('/newTicket/payment/webhook', ticketController.paymentVerificationWebhook);
 router.get('/newTicket/failed/payment/webhook', ticketController.paymentVerificationWebhook);
-router.put('/checkup/payment/:eventId', ticketController.entrance);
+router.put('/checkup/payment/:eventId',checkPyament, ticketController.entrance);
 export default router;

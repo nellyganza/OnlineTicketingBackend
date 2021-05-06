@@ -8,6 +8,7 @@ import Util from '../helpers/utils';
 const util = new Util();
 export default class eventController {
   static async saveEvent(req, res) {
+    const {id} = req.userInfo;
     const {
       event, paymentMethod, sittingPlace, paymentGradeCost,
     } = req.body;
@@ -15,7 +16,7 @@ export default class eventController {
       util.setError(400, 'Bad Information Provided');
       return util.send(res);
     }
-    const saveEvent = { ...event, ticketLeft: event.numberofTicket };
+    const saveEvent = { ...event, ticketLeft: event.numberofTicket,managerId:id };
     try {
       const savedEvent = await eventService.createEvent(saveEvent);
       if (!savedEvent) {
@@ -60,6 +61,41 @@ export default class eventController {
       delete data.page;
       delete data.limit;
       const events = await eventService.findByName({ ...data });
+      result.result = events.slice(startIndex, endIndex);
+      if (!result) {
+        util.setError(404, 'Events Not Found');
+        return util.send(res);
+      }
+      util.setSuccess(200, 'Events Found', result);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async getAllEventByUser(req, res) {
+    try {
+      const { id } = req.userInfo;
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+      const startIndex = (page - 1) * limit;
+      const endIndex = (page * limit);
+      const result = {};
+      result.next = {
+        page: page + 1,
+        limit,
+      };
+      if (startIndex > 0) {
+        result.prev = {
+          page: page - 1,
+          limit,
+        };
+      }
+      const data = { ...req.query };
+      delete data.page;
+      delete data.limit;
+      const events = await eventService.findByName({ ...data, managerId: id });
       result.result = events.slice(startIndex, endIndex);
       if (!result) {
         util.setError(404, 'Events Not Found');

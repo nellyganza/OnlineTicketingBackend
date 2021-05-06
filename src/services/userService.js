@@ -30,7 +30,7 @@ class UserService {
     });
   }
 
-  static getUsers(id) {
+  static getUsers() {
     return Users.findAll(
       {
         where: {

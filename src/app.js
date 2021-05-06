@@ -21,9 +21,6 @@ app.use((request, response, next) => {
   response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
-app.use('/', (req, res) => {
-  res.send('Welcome to Online Ticketing System .......\n  Owner : Intercore LTD');
-});
 app.use('/api-documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(router);
 app.get('/stripe-key', (req, res) => {

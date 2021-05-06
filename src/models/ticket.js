@@ -13,8 +13,16 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       models.Ticket.belongsTo(models.Event, {
         foreignKey: 'eventId',
-        onDelete: 'NO ACTION',
+        onDelete: 'NO ACTION'
       });
+      models.Ticket.belongsTo(models.Users, {
+        foreignKey: 'userId',
+        onDelete: 'NO ACTION'
+      });
+      models.Ticket.hasMany(models.TransactionTickets,{
+        foreignKey: 'ticketId',
+        onDelete: 'NO ACTION'
+      })
     }
   }
   Ticket.init({

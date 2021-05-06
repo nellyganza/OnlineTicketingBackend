@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op,QueryTypes } from 'sequelize';
 import models from '../models';
 
 const { Ticket } = models;

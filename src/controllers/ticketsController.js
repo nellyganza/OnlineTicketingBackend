@@ -2,6 +2,7 @@ import ticketService from '../services/ticketService';
 import userservice from '../services/userService';
 import eventservice from '../services/eventService';
 import transactionService from '../services/transactionService';
+import transactionTicketService from '../services/transactionTicketService';
 import Util from '../helpers/utils';
 import {
   updatePaymentGrade, updatePaymentMade, updateSittingPlace, updateEvent, getAndUpdateSittingPlace,
@@ -11,7 +12,7 @@ const util = new Util();
 
 export default class ticketController {
   static async saveTicket(req, res) {
-    const { id } = req.userInfo;
+    const userId = req.userInfo.id;
     const { pay } = req.body;
     const eventId = req.params.eventId;
 
@@ -19,33 +20,26 @@ export default class ticketController {
       transaction_ref: pay.tx_ref,
       order_id: pay.order_id,
       event: eventId,
-      user: id,
+      user: userId,
     };
     try {
       const savedTransacrion = await transactionService.createTransaction(transaction);
-      util.setSuccess(200, 'Transaction Saved', savedTransacrion);
-    } catch (error) {
-      util.setError(400, error);
-      return util.send(res);
-    }
 
-    const { buyer } = req.body;
-    const { attender } = req.body;
-    const currentUser = await userservice.findById(id);
+      const { attender } = req.body;
 
-    const type = attender.attender1.type;
-    const numberofTicket = attender.length;
-    console.log(req.params.eventId);
-    const event = await eventservice.findById(eventId);
-    if (!event) {
-      util.setError(404, 'selected Event not Exist');
-      return util.send(res);
-    }
-    try {
+      const type = attender.attender1.type;
+      const event = await eventservice.findById(eventId);
+      if (!event) {
+        util.setError(404, 'selected Event not Exist');
+        return util.send(res);
+      }
       let i = 0;
       Object.keys(attender).forEach(async (method) => {
         i++;
-        await ticketService.createTicket({ ...attender[method], eventId, userId: id });
+        const savedTicket = await ticketService.createTicket({ ...attender[method], eventId, userId });
+        const {transaction_ref} = savedTransacrion.dataValues;
+        const {id,cardNumber} = savedTicket.dataValues;
+        await transactionTicketService.createTransactionTicket({transaction_ref,ticketId:id,cardNumber});
         updateEvent(eventId);
         updatePaymentMade(attender[method].paymenttype);
         updateSittingPlace(eventId, attender[method].type);
