@@ -1,7 +1,7 @@
 import app from './app';
 import db from './models/index';
 const {sequelize} =db;
-const port = 5000;
+const port = process.env.PORT || 5000;
 sequelize.sync().then(()=>{
   console.log("Databse asynced");
 })
