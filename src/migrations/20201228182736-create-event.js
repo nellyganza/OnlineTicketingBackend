@@ -13,10 +13,16 @@ module.exports = {
       host: {
         type: Sequelize.STRING,
       },
-      managerId: {
+      userId: {
         type: Sequelize.INTEGER,
       },
       dateAndTimme: {
+        type: Sequelize.DATE,
+      },
+      startDate: {
+        type: Sequelize.DATE,
+      },
+      endDate: {
         type: Sequelize.DATE,
       },
       place: {
@@ -42,6 +48,9 @@ module.exports = {
       },
       status: {
         type: Sequelize.STRING,
+      },
+      share: {
+        type: Sequelize.BOOLEAN,
       },
       eventType: {
         type: Sequelize.STRING,

@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
     eventId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     value: DataTypes.STRING,
-    paymentMade: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
+    accNumber: {
+      type: DataTypes.STRING,
     },
+    accName: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'PaymentMethod',

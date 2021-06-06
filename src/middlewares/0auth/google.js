@@ -7,25 +7,18 @@ import Util from '../../helpers/utils';
 
 const util = new Util();
 const googleAuth = async (req, res) => {
+  const message = 'manually';
   const { emails } = req.user;
   const currentUser = await userService.findByEmail(emails[0].value);
   if (currentUser !== null) {
     if (currentUser.password !== null) {
-      util.setError(400, 'Account Already Exists');
-      return util.send(res);
+      return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/failure/${message}`);
     }
-    if (currentUser.isVerified === false) {
-      util.setError(400, 'Please Verify your Account');
-      return util.send(res);
-      // res.redirect(`${process.env.FRONT_END_URL}/'socialAuth/failed:/auth'`);
-    }
-    const displayData = pick(currentUser.dataValues, ['id', 'firstName', 'lastName', 'email', 'socialId', 'provider']);
+    const displayData = pick(currentUser.dataValues, ['id', 'firstName', 'lastName', 'email', 'RoleId', 'socialId', 'provider']);
     const authToken = AuthTokenHelper.generateToken(displayData);
     userService.updateAtt({ authToken }, { email: displayData.email });
     const encodedToken = Buffer.from(authToken).toString('base64');
-    util.setSuccess(200, 'LoggedIn Success', { displayData, encodedToken });
-    return util.send(res);
-    // res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
+    return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
   }
   if (currentUser === null) {
     return usersController.socialSignup(req.user, res);

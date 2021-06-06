@@ -5,8 +5,9 @@ import transactionService from '../services/transactionService';
 import transactionTicketService from '../services/transactionTicketService';
 import Util from '../helpers/utils';
 import {
-  updatePaymentGrade, updatePaymentMade, updateSittingPlace, updateEvent, getAndUpdateSittingPlace,
+  updatePaymentGrade, updateSittingPlace, updateEvent, getAndUpdateSittingPlace,
 } from '../helpers/ControllerFunctions';
+import { eventEmitter } from '../helpers/notifications/eventEmitter';
 
 const util = new Util();
 
@@ -27,7 +28,6 @@ export default class ticketController {
 
       const { attender } = req.body;
 
-      const type = attender.attender1.type;
       const event = await eventservice.findById(eventId);
       if (!event) {
         util.setError(404, 'selected Event not Exist');
@@ -36,19 +36,22 @@ export default class ticketController {
       let i = 0;
       Object.keys(attender).forEach(async (method) => {
         i++;
-        const savedTicket = await ticketService.createTicket({ ...attender[method], eventId, userId });
+        const savedTicket = await ticketService.createTicket({
+          ...attender[method], eventId, userId, paymenttype: pay.paymenttype,
+        });
         const { transaction_ref } = savedTransacrion.dataValues;
         const transactionId = savedTransacrion.dataValues.id;
-        const { id, cardNumber } = savedTicket.dataValues;
+        const { id, nationalId } = savedTicket.dataValues;
         await transactionTicketService.createTransactionTicket({
-          transactionId, transaction_ref, ticketId: id, cardNumber,
+          transactionId, transaction_ref, ticketId: id, nationalId,
         });
+        eventEmitter.emit('SendSucessfullPaymentNotification', id);
         updateEvent(eventId);
-        updatePaymentMade(attender[method].paymenttype);
         updateSittingPlace(eventId, attender[method].type);
         updatePaymentGrade(attender[method].type);
+        console.log(await getAndUpdateSittingPlace(eventId, attender[method].type, 'getPlaces'));
+        await getAndUpdateSittingPlace(eventId, attender[method].type, 'updatePlaces');
       });
-      await getAndUpdateSittingPlace(eventId, type, i, 'updatePlaces');
       util.setSuccess(200, 'Your Ticket(s) Created success');
       return util.send(res);
     } catch (error) {
@@ -144,12 +147,12 @@ export default class ticketController {
 
   static async entrance(req, res) {
     const { eventId } = req.params;
-    const { cardNumber } = req.body;
-    if (!cardNumber) {
+    const { nationalId } = req.body;
+    if (!nationalId) {
       util.setError(400, 'No card Number found');
       return util.send(res);
     }
-    const ticket = await ticketService.findByCardNumber({ eventId, cardNumber });
+    const ticket = await ticketService.findBynationalId({ eventId, nationalId });
     if (ticket) {
       if (ticket.status === 'not Attended') {
         const updatedticket = await ticketService.updateAtt({ status: 'Attended' }, { id: ticket.id });
@@ -168,7 +171,6 @@ export default class ticketController {
   }
 
   static async paymentVerificationWebhook(request, response) {
-    console.log(`${request}  ${response}`);
     const hash = request.headers['verif-hash'];
 
     if (!hash) {
@@ -179,7 +181,6 @@ export default class ticketController {
       // silently exit, or check that you are passing the right hash on your server.
     }
     const request_json = JSON.parse(request.body);
-    console.log(request_json);
     return response.send(200);
     // return res.status(200).send();
   }

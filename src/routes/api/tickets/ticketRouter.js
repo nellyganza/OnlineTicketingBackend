@@ -5,12 +5,13 @@ import verfications from '../../../middlewares/verifications/verification';
 import { pay } from '../../../middlewares/stripe/stripeMiddleware';
 import { cardPay, rwMobileMoney } from '../../../middlewares/flutterwave/flutterwaveMiddleware';
 import { ValidationMiddleWare, checkPayments } from '../../../middlewares';
+import { verfiyCardNumbers } from '../../../middlewares/validators/validationMiddleware';
 
-const { newTicketValidation, verfiyCardNumbers } = ValidationMiddleWare;
+const { newTicketValidation } = ValidationMiddleWare;
 const { checkPyament } = checkPayments;
 const router = express.Router();
 
-// router.post('/newTicket/:eventId', isAuthenticated, allowedRoles([4, 5]), verfications.verfiyCardNumbers, ticketController.saveTicket);
+router.post('/newTicket/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, ticketController.saveTicket);
 router.get('/byEvent/:eventId', isAuthenticated, allowedRoles([2, 3]), ticketController.getTicketByEvent);
 router.get('/byEventAndUser/:eventId', isAuthenticated, allowedRoles([2, 3, 4, 5]), ticketController.getTicketByEventAndUser);
 router.get('/byUser', isAuthenticated, allowedRoles([4, 5]), ticketController.getTicketByUser);

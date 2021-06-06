@@ -1,6 +1,8 @@
 import models from '../models';
 
-const { Users } = models;
+const {
+  Users, Notification, Event, Comment, EventPayment, EventSittingPlace, PaymentMethod,
+} = models;
 /**
  * @exports
  * @class UserService
@@ -20,6 +22,28 @@ class UserService {
   static findByProp(prop) {
     return Users.findAll({
       where: prop,
+    });
+  }
+
+  static findByAllData(prop) {
+    return Users.findOne({
+      where: prop,
+      include: [
+        {
+          model: Event,
+          include: [{
+            model: Comment,
+            order: [
+              ['createdAt', 'ASC'],
+            ],
+          }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod },
+          ],
+        },
+        {
+          model: Notification,
+        },
+      ],
+      attributes: { exclude: ['password', 'authToken'] },
     });
   }
 

@@ -70,7 +70,7 @@ export default class eventPaymentController {
         util.setError(400, 'Invalid Payment  Id');
         return util.send(res);
       }
-      const PaymentEvents = await eventPaymentService.deleteEventPayment({ id });
+      const PaymentEvents = await eventPaymentService.deleteEventPayment(id);
       if (!PaymentEvents) {
         util.setError(404, 'Events Payment  Not Deleted');
         return util.send(res);

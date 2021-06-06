@@ -16,16 +16,16 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
       });
       models.Users.hasMany(models.Event, {
-        foreignKey: 'managerId',
+        foreignKey: 'userId',
       });
       models.Users.hasMany(models.Ticket, {
         foreignKey: 'userId',
       });
-      models.Users.hasMany(models.Comment, {
-        foreignKey: 'userId',
-      });
       models.Users.hasMany(models.Transactions, {
         foreignKey: 'user',
+      });
+      models.Users.hasMany(models.Notification, {
+        foreignKey: 'userId',
       });
     }
   }
@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     RoleId: DataTypes.INTEGER,
     profilePicture: DataTypes.STRING,
     category: DataTypes.STRING,
+    campanyName: DataTypes.STRING,
     isVerified: DataTypes.BOOLEAN,
     socialId: DataTypes.STRING,
     provider: DataTypes.STRING,

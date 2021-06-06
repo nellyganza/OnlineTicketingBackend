@@ -6,6 +6,7 @@ import eventService from '../../services/eventService';
 import userService from '../../services/userService';
 import { sendSMS } from './smsNotification';
 import notificationsController from '../../controllers/notificationsController';
+import { sendMessageSMS } from '../../config/nexmo';
 
 const { notifyTheUser } = notificationsController;
 const unirest = require('unirest');
@@ -13,7 +14,7 @@ const unirest = require('unirest');
 const server_url = 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify';
 eventEmitter.on('verifyTransactionEvent', async () => {
   const transactions = await transactionService.getTransactions();
-  transactions.forEach(async (tx) => {
+  transactions.forEach((tx) => {
     if (tx.status === 'PENDING') {
       try {
         const payload = {
@@ -25,7 +26,6 @@ eventEmitter.on('verifyTransactionEvent', async () => {
           .send(payload)
           .end(async (response) => {
             if (response.body.data.status === 'successful' && response.body.data.chargecode === '00') {
-              console.log(response.body.data);
               tx.status = 'PAYED';
               await tx.save();
               eventEmitter.emit('SendSucessfullPaymentNotification', tx);
@@ -42,29 +42,35 @@ eventEmitter.on('verifyTransactionEvent', async () => {
   });
 });
 
-eventEmitter.on('SendSucessfullPaymentNotification', async (tx) => {
-  const tickets = await ticketService.findByUserANDEvent({ userId: tx.user, eventId: tx.event });
-  tickets.forEach(async (tc) => {
-    const {
-      fullName, cardNumber, phoneNumber, email, sittingPlace, eventId,
-    } = tc.dataValues;
-    const event = await eventService.findById(eventId);
-    const { title, place, dateAndTimme } = event.dataValues;
-    console.log(event);
-    const msg = `Hello ${fullName}, <br>Here are the details for your ticket. 
+eventEmitter.on('SendSucessfullPaymentNotification', async (ticketId) => {
+  const tickets = await ticketService.findById(ticketId);
+  const {
+    fullName, nationalId, phoneNumber, email, sittingPlace, eventId, userId,
+  } = tickets;
+  const event = await eventService.findById(eventId);
+  const { title, place, dateAndTimme } = event.dataValues;
+  const msg = `Hello ${fullName}, <br>Here are the details for your ticket. 
         Event Name: ${title} <br>
         Place : ${place} <br>
         Date : ${dateAndTimme} <br>
         Sitting Position : ${sittingPlace} <br>
-        Holders card : ${cardNumber} 
+        Holders card : ${nationalId} 
         
         Thank you for using Intercore Online Ticketing<br><br>`;
-    // sendSMS(phoneNumber,msg);
-    notifyTheUser({
-      receiver: email,
-      userId: tx.user,
-      eventId: tx.event,
-      message: msg,
-    }, email);
-  });
+  const msms = `Hello ${fullName}, Here are the details for your ticket.
+  Event Name: ${title}
+  Place : ${place}
+  Date : ${dateAndTimme}
+  Sitting Position : ${sittingPlace} 
+  Holders card : ${nationalId} 
+                
+  Thank you for using Intercore Online Ticketing`;
+
+  notifyTheUser({
+    receiver: email,
+    userId,
+    eventId,
+    message: msg,
+  }, email);
+  sendMessageSMS(phoneNumber, msms);
 });

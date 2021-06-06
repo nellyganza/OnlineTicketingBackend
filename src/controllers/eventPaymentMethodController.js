@@ -70,12 +70,12 @@ export default class eventPaymentController {
         util.setError(400, 'Invalid Payment Method Id');
         return util.send(res);
       }
-      const PaymentMethodEvents = await eventPaymentService.deletePaymentMethod({ id });
+      const PaymentMethodEvents = await eventPaymentService.deletePaymentMethod(id);
       if (!PaymentMethodEvents) {
-        util.setError(404, 'Events Payment Method Not Deleted');
+        util.setError(404, 'Events Payment share Method Not Deleted');
         return util.send(res);
       }
-      util.setSuccess(200, 'Events Payment Method Deleted', PaymentMethodEvents);
+      util.setSuccess(200, 'Events Payment share Method Deleted', PaymentMethodEvents);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);

@@ -16,8 +16,11 @@ module.exports = {
       value: {
         type: Sequelize.STRING,
       },
-      paymentMade: {
-        type: Sequelize.INTEGER,
+      accNumber: {
+        type: Sequelize.STRING,
+      },
+      accName: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

@@ -18,7 +18,7 @@ class EventPaymentService {
   }
 
   static updateAtt(set, prop) {
-    return EventPayment.update(set, {
+    return EventPayment.upsert(set, {
       returning: true,
       where: prop,
     });
@@ -45,13 +45,19 @@ class EventPaymentService {
     });
   }
 
+  static findOneById(modelId) {
+    return EventPayment.findOne({
+      where: { id: modelId },
+    });
+  }
+
   static incrementPaymentGrade(id) {
     return EventPayment.increment({ boughtTickets: 1 }, { where: { id } });
   }
 
   static deleteEventPayment(modelId) {
     return EventPayment.destroy({
-      where: { eventId: modelId },
+      where: { id: modelId },
     });
   }
 }

@@ -6,17 +6,17 @@ import Util from '../../helpers/utils';
 const util = new Util();
 
 export const checkPyament = async (req, res, next) => {
-  const { cardNumber } = req.body;
+  const { nationalId } = req.body;
   const { eventId } = req.params;
 
-  const ticket = await ticketService.findByCardNumber({ cardNumber, eventId, status: 'not Attended' });
+  const ticket = await ticketService.findBynationalId({ nationalId, eventId, status: 'not Attended' });
   if (!ticket) {
     util.message = 'This card was used Before in this Event !!';
     util.statusCode = 400;
     return util.send(res);
   }
   const { userId, id } = ticket.dataValues;
-  const txTService = await transactionTicketService.findByProp({ cardNumber, ticketId: id });
+  const txTService = await transactionTicketService.findByProp({ nationalId, ticketId: id });
   console.log(txTService);
   if (txTService.length > 0) {
     txTService.forEach(async (txt) => {

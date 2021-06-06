@@ -8,92 +8,131 @@ const {
 
 const util = new Util();
 
-export const newEventEventValidation = (req, res, next) => {
-  const {
-    event, paymentMethod, sittingPlace, paymentGradeCost,
-  } = req.body;
-  const newEvent = () => {
-    try {
-      const { error } = newEventSchema.validate(event);
+const newEvent = (req) => {
+  const { event } = req.body;
+  const obj = {
+    error: false,
+    body: {},
+  };
+  try {
+    const { error } = newEventSchema.validate(event);
+    if (error) {
+      const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
+      obj.error = true;
+      console.log(Error);
+      obj.body = { Error };
+      return obj;
+    }
+
+    return obj;
+  } catch (error) {
+    obj.error = true;
+    return obj;
+  }
+};
+const paymentM = (req) => {
+  const { paymentMethod } = req.body;
+  const obj = {
+    error: false,
+    body: {},
+  };
+  try {
+    const paymentErrors = [];
+    Object.keys(paymentMethod).forEach((method) => {
+      const { error } = newPaymentMethodSchema.validate(paymentMethod[method]);
       if (error) {
         const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
-        util.setError(400, Error);
-        return util.send(res);
+        paymentErrors.push(Error);
       }
-    } catch (error) {
-      util.setError(500, error);
-      return util.send(res);
+    });
+    if (paymentErrors.length > 0) {
+      obj.error = true;
+      obj.body = { ...paymentErrors };
+      return obj;
     }
-  };
-  const paymentM = () => {
-    try {
-      const paymentErrors = [];
-      Object.keys(paymentMethod).forEach((method) => {
-        const { error } = newPaymentMethodSchema.validate(paymentMethod[method]);
-        if (error) {
-          const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
-          paymentErrors.push(Error);
-        }
-      });
-      if (paymentErrors.length > 0) {
-        util.setError(400, paymentErrors);
-        return util.send(res);
-      }
-    } catch (error) {
-      util.setError(500, error);
-      return util.send(res);
-    }
-  };
-  const sittiPlace = () => {
-    try {
-      const paymentErrors = [];
-      Object.keys(sittingPlace).forEach((sitti) => {
-        const { error } = newStittingPlaceSchema.validate(sittingPlace[sitti]);
-        if (error) {
-          const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
-          paymentErrors.push(Error);
-        }
-      });
-      if (paymentErrors.length > 0) {
-        util.setError(400, paymentErrors);
-        return util.send(res);
-      }
-    } catch (error) {
-      util.setError(500, error);
-      return util.send(res);
-    }
-  };
-  const paymentGrade = () => {
-    try {
-      const paymentErrors = [];
-      Object.keys(paymentGradeCost).forEach((grade) => {
-        const { error } = newPaymentGradeCost.validate(paymentGradeCost[grade]);
-        if (error) {
-          const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
-          paymentErrors.push(Error);
-        }
-      });
-      if (paymentErrors.length > 0) {
-        util.setError(400, paymentErrors);
-        return util.send(res);
-      }
-    } catch (error) {
-      util.setError(500, error);
-      return util.send(res);
-    }
-  };
 
+    return obj;
+  } catch (error) {
+    obj.error = true;
+    return obj;
+  }
+};
+const sittiPlace = (req) => {
+  const { sittingPlace } = req.body;
+  const obj = {
+    error: false,
+    body: {},
+  };
   try {
-    newEvent(req, res);
-    paymentM(req, res);
-    sittiPlace();
-    paymentGrade();
+    const paymentErrors = [];
+    Object.keys(sittingPlace).forEach((sitti) => {
+      const { error } = newStittingPlaceSchema.validate(sittingPlace[sitti]);
+      if (error) {
+        const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
+        paymentErrors.push(Error);
+      }
+    });
+    if (paymentErrors.length > 0) {
+      obj.error = true;
+      obj.body = { ...paymentErrors };
+      return obj;
+    }
+
+    return obj;
+  } catch (error) {
+    obj.error = true;
+    return obj;
+  }
+};
+const paymentGrade = (req) => {
+  const { paymentGradeCost } = req.body;
+  const obj = {
+    error: false,
+    body: {},
+  };
+  try {
+    const paymentErrors = [];
+    Object.keys(paymentGradeCost).forEach((grade) => {
+      const { error } = newPaymentGradeCost.validate(paymentGradeCost[grade]);
+      if (error) {
+        const Error = error.details[0].message.replace('/', '').replace(/"/g, '');
+        paymentErrors.push(Error);
+      }
+    });
+
+    if (paymentErrors.length > 0) {
+      obj.error = true;
+      obj.body = { ...paymentErrors };
+      return obj;
+    }
+
+    return obj;
+  } catch (error) {
+    obj.error = true;
+    return obj;
+  }
+};
+
+export const newEventEventValidation = (req, res, next) => {
+  try {
+    const n = newEvent(req);
+    const pm = paymentM(req);
+    const s = sittiPlace(req);
+    const pg = paymentGrade(req);
+    if (n.error || pm.error || s.error || pg.error) {
+      const errors = {
+        ...n.body, ...pm.error, ...s.body, ...pg.body,
+      };
+      util.setError(400, errors);
+      return util.send(res);
+    }
     next();
   } catch (error) {
     util.setError(500, error);
     return util.send(res);
   }
 };
+
 export const eventUpdate = (req, res, next) => {
   try {
     const { error } = oldEventSchema.validate(req.body);

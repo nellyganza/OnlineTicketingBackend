@@ -51,7 +51,7 @@ class PaymentMethodService {
 
   static deletePaymentMethod(modelId) {
     return PaymentMethod.destroy({
-      where: { eventID: modelId },
+      where: { id: modelId },
     });
   }
 }

@@ -25,7 +25,9 @@ class ContactService {
   }
 
   static getContacts() {
-    return Contact.findAll();
+    return Contact.findAll(
+      {order: [['createdAt', 'ASC']]}
+    );
   }
 
   /**

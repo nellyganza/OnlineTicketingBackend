@@ -4,7 +4,6 @@ import ticketservice from '../services/ticketService';
 
 require('../helpers/notifications/eventListeners');
 
-cron.schedule('*/5 * * * *', async () => {
-  eventEmitter.emit('verifyTransactionEvent');
-  // console.log(eventEmitter.eventNames());
-});
+// cron.schedule('*/5 * * * *', async () => {
+//   eventEmitter.emit('verifyTransactionEvent');
+// });

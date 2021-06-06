@@ -2,7 +2,9 @@ import models from '../models';
 
 const { Op } = require('sequelize');
 
-const { Event } = models;
+const {
+  Event, Comment, EventPayment, EventSittingPlace, PaymentMethod,
+} = models;
 /**
  * @exports
  * @class EventService
@@ -27,7 +29,15 @@ class EventService {
   }
 
   static getEvents() {
-    return Event.findAll();
+    return Event.findAll({
+      include: [{
+        model: Comment,
+        order: [
+          ['createdAt', 'ASC'],
+        ],
+      }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod },
+      ],
+    });
   }
 
   /**
@@ -38,6 +48,100 @@ class EventService {
   static findByName(prop) {
     return Event.findAll({
       where: prop,
+      include: [{
+        model: Comment,
+        order: [
+          ['createdAt', 'ASC'],
+        ],
+      }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod }],
+    });
+  }
+
+  static findByFilters(search, place, date) {
+    return Event.findAll({
+      where: {
+        [Op.or]: [
+          {
+            title: {
+              [Op.iLike]: `%${search}%`,
+            },
+          },
+          {
+            place: {
+              [Op.iLike]: `%${place}%`,
+            },
+          },
+          {
+            dateAndTimme: {
+              [Op.between]: [date[0], date[1]],
+            },
+          },
+        ],
+        [Op.and]: [
+          {
+            status: 'Pending',
+          },
+        ],
+      },
+      include: [{
+        model: Comment,
+        order: [
+          ['createdAt', 'ASC'],
+        ],
+      }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod }],
+    });
+  }
+
+  static findByFilters2(search, place, dateRange, date, category, country, host) {
+    return Event.findAll({
+      where: {
+        [Op.and]: [
+          {
+            title: {
+              [Op.iLike]: `%${search}%`,
+            },
+          },
+          {
+            place: {
+              [Op.iLike]: `%${place}%`,
+            },
+          },
+          {
+            dateAndTimme: {
+              [Op.between]: [dateRange[0], dateRange[1]],
+            },
+          },
+          {
+            dateAndTimme: {
+              [Op.eq]: date,
+            },
+          },
+          {
+            category: {
+              [Op.in]: category,
+            },
+          },
+          {
+            country: {
+              [Op.in]: country,
+            },
+          },
+          {
+            host: {
+              [Op.in]: host,
+            },
+          },
+          {
+            status: 'Pending',
+          },
+        ],
+      },
+      include: [{
+        model: Comment,
+        order: [
+          ['createdAt', 'ASC'],
+        ],
+      }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod }],
     });
   }
 
@@ -46,12 +150,24 @@ class EventService {
       where: {
         dateAndTimme: { [Op.between]: [prop.startDate, prop.endDate] },
       },
+      include: [{
+        model: Comment,
+        order: [
+          ['createdAt', 'ASC'],
+        ],
+      }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod }],
     });
   }
 
   static findById(modelId) {
     return Event.findOne({
       where: { id: modelId },
+      include: [{
+        model: Comment,
+        order: [
+          ['createdAt', 'ASC'],
+        ],
+      }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod }],
     });
   }
 

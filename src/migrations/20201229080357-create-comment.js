@@ -10,8 +10,8 @@ module.exports = {
       eventId: {
         type: Sequelize.INTEGER,
       },
-      userId: {
-        type: Sequelize.INTEGER,
+      userName: {
+        type: Sequelize.STRING,
       },
       comment: {
         type: Sequelize.STRING,

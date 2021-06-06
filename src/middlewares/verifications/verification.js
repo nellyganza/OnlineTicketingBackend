@@ -15,7 +15,7 @@ export default class verifications {
           email: user[0].email,
           resetpassword: true,
         };
-        const token = await newJwtToken(payload, '1h');
+        const token = await newJwtToken(payload);
         res.token = token;
         res.userInfo = user[0];
         next();

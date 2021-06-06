@@ -28,6 +28,9 @@ module.exports = (sequelize, DataTypes) => {
       models.Event.hasMany(models.Transactions, {
         foreignKey: 'event',
       });
+      models.Event.belongsTo(models.Users, {
+        foreignKey: 'userId',
+      });
     }
   }
   Event.init({
@@ -36,8 +39,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     host: DataTypes.STRING,
-    managerId: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER,
     dateAndTimme: DataTypes.DATE,
+    startDate: DataTypes.DATE,
+    endDate: DataTypes.DATE,
     place: DataTypes.STRING,
     country: DataTypes.STRING,
     description: DataTypes.STRING,
@@ -56,6 +61,10 @@ module.exports = (sequelize, DataTypes) => {
     status: {
       type: DataTypes.STRING,
       defaultValue: 'Pending',
+    },
+    share: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     eventType: {
       type: DataTypes.STRING,

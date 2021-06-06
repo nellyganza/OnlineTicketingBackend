@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     transactionId: DataTypes.INTEGER,
     transaction_ref: DataTypes.STRING,
     ticketId: DataTypes.INTEGER,
-    cardNumber: DataTypes.STRING,
+    nationalId: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'TransactionTickets',

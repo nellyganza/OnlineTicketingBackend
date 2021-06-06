@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const resetPasswordTemplate = (emailData) => {
-  const link = `${process.env.HOST}/api/v1/users/reset-password/${emailData.token}`;
+  const link = `${process.env.FRONT_END_URL}/changePassword?token=${emailData.token}`;
+  console.log(emailData.token);
   const template = `<!DOCTYPE html>
     <html lang="en">
     <head>

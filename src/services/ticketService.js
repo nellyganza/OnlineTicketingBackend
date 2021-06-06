@@ -51,7 +51,7 @@ class TicketService {
     });
   }
 
-  static findByCardNumber(prop) {
+  static findBynationalId(prop) {
     return Ticket.findOne({
       where: prop,
     });

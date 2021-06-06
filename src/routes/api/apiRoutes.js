@@ -11,6 +11,7 @@ import eventSittingPlace from './events/eventSittingPlaceRouter';
 import ticket from './tickets/ticketRouter';
 import card from './cards/cardRouter';
 import transactions from './transactions/transactionRouter';
+import comments from './comments/commentrouter';
 
 const router = express.Router();
 router.use('/users', user);
@@ -25,4 +26,5 @@ router.use('/events/eventSittingPlaces', eventSittingPlace);
 router.use('/events/tickets', ticket);
 router.use('/cards', card);
 router.use('/transactions', transactions);
+router.use('/comments', comments);
 export default router;

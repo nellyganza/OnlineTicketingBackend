@@ -11,7 +11,6 @@ import {
   sendPasswordResetLink,
 } from '../utils/sendPasswordLInk';
 import 'dotenv/config';
-import { decodeToken } from '../middlewares/verifications/verifyToken';
 
 const util = new Util();
 export default class user {
@@ -53,17 +52,14 @@ export default class user {
           id: newUser.id,
           roleId: newUser.roleId,
         };
-        const token = await newJwtToken(payload, '1h');
+        const token = await newJwtToken(payload);
         await userService.updateAtt({ authToken: token }, { id: newUser.id });
 
         const encodedToken = Buffer.from(token).toString('base64');
-        util.setSuccess(200, 'Account Created Success', encodedToken);
-        return util.send(res);
-        // res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
+        return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
       }
     } catch (error) {
-      util.setError(500, 'Failed to create your account');
-      return util.send(res);
+      return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/failure/error`);
     }
   }
 
@@ -77,7 +73,7 @@ export default class user {
       const {
         id, isVerified, RoleId, email,
       } = await userService.findById(res.id);
-      const token = await newJwtToken({ userId: id, RoleId }, '1h');
+      const token = await newJwtToken({ userId: id, RoleId });
       const data = { userId: id, email, token };
       const message = 'your account was verified!';
       util.setSuccess(200, message, data);
@@ -123,25 +119,21 @@ export default class user {
     try {
       const { email, password } = req.body;
       if (email === null) {
-        util.message = 'Email is Required';
-        util.statusCode = 400;
+        util.setError(400, 'Email is Required');
         return util.send(res);
       }
       if (password === null) {
-        util.message = 'Password is Required';
-        util.statusCode = 400;
+        util.setError(400, 'Password is Required');
         return util.send(res);
       }
 
       const currentUser = await userService.findByEmail(email);
       if (!currentUser) {
-        util.message = 'User not exist';
-        util.statusCode = 404;
+        util.setError(404, 'User not exist');
         return util.send(res);
       }
       if (currentUser.isVerified === false) {
-        util.message = 'Please Verify your account';
-        util.statusCode = 400;
+        util.setError(400, 'Please Verify your account');
         return util.send(res);
       }
       if (currentUser.socialId !== null) {
@@ -153,10 +145,7 @@ export default class user {
         const displayData = pick(currentUser.dataValues, ['firstName', 'lastName', 'email', 'id', 'RoleId']);
         const authToken = AuthTokenHelper.generateToken(displayData);
         userService.updateAtt({ authToken }, { email: displayData.email });
-        util.statusCode = 200;
-        util.type = 'success';
-        util.message = 'User Logged in Successfully';
-        util.data = { displayData, authToken };
+        util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken });
         return util.send(res);
       }
       util.setError(401, 'Incorrect username or password');
@@ -290,6 +279,25 @@ export default class user {
         } else {
           util.setError(401, 'AUhtentication failed');
         }
+        return util.send(res);
+      }
+      util.setError(400, 'Invalid Token');
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async myAllData(req, res) {
+    try {
+      const { token } = req.params;
+      console.log(token);
+      if (token) {
+        const userInfo = await userService.findByAllData({ authToken: token });
+        util.setSuccess(200, 'User Data', {
+          userInfo,
+        });
         return util.send(res);
       }
       util.setError(400, 'Invalid Token');

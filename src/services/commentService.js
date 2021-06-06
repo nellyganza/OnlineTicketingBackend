@@ -34,7 +34,7 @@ class CommentService {
    * @returns {*} JSON data
    */
   static findByName(prop) {
-    return Comment.findOne({
+    return Comment.findAll({
       where: prop,
     });
   }

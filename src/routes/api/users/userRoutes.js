@@ -15,6 +15,7 @@ const {
   createUserValidation, signupValidate, passwordMatch, roleExist, validateEmail, verifyAdmin, verifyEmail,
 } = ValidationMiddleWare;
 router.get('/me/:token', usersController.myCredintials);
+router.get('/getAll/:token', usersController.myAllData);
 router.post('/signup', signupValidate, usersController.signupWithEmail);
 router.get('/verify/:token', verifyEmail, usersController.verifyEmail);
 router.post('/request/phoneNumber', usersController.sendVerificationCode);

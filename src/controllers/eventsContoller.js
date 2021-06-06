@@ -16,7 +16,7 @@ export default class eventController {
       util.setError(400, 'Bad Information Provided');
       return util.send(res);
     }
-    const saveEvent = { ...event, ticketLeft: event.numberofTicket, managerId: id };
+    const saveEvent = { ...event, ticketLeft: event.numberofTicket, userId: id };
     try {
       const savedEvent = await eventService.createEvent(saveEvent);
       if (!savedEvent) {
@@ -34,6 +34,33 @@ export default class eventController {
       });
       util.setSuccess(201, 'Events Prepared Success', { savedEvent });
       return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async getEventById(req, res) {
+    try {
+      const eventId = req.params.eventId;
+      const event = await eventService.findById(eventId);
+      if (event) {
+        return res.send({ event });
+      }
+      return res.status(400).send({ message: 'Event Not Found' });
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  }
+
+  static async getFillteredEvents1(req, res) {
+    try {
+      const { search, place, date } = req.query;
+      const result = await eventService.findByFilters(search, place, date);
+      if (result) {
+        util.setSuccess(200, 'Events Found', result);
+        return util.send(res);
+      }
     } catch (error) {
       util.setError(500, error.message);
       return util.send(res);
@@ -95,7 +122,7 @@ export default class eventController {
       const data = { ...req.query };
       delete data.page;
       delete data.limit;
-      const events = await eventService.findByName({ ...data, managerId: id });
+      const events = await eventService.findByName({ ...data, userId: id });
       result.result = events.slice(startIndex, endIndex);
       if (!result) {
         util.setError(404, 'Events Not Found');
@@ -152,7 +179,7 @@ export default class eventController {
         util.setError(400, 'Invalid Event Id');
         return util.send(res);
       }
-      const event = await eventService.deleteEvent({ id: eventId });
+      const event = await eventService.deleteEvent(eventId);
       if (!event) {
         util.setError(404, 'Event not Deleted');
         return util.send(res);
@@ -179,8 +206,7 @@ export default class eventController {
         util.setError(400, `Only ${events.dataValues.ticketLeft} tickets left`);
         util.send(res);
       }
-      const places = await getAndUpdateSittingPlace(eventId, type, numberofTickets, 'getPlaces');
-      console.log(places);
+      const places = await getAndUpdateSittingPlace(eventId, type, 'getPlaces');
       util.setSuccess(200, 'Tickets Available', places);
       util.send(res);
     } catch (error) {

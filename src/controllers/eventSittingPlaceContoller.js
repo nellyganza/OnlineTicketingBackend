@@ -66,11 +66,13 @@ export default class eventSittingController {
   static async deleteSittingPlace(req, res) {
     try {
       const { id } = req.params;
+      console.log(id);
       if (!id) {
         util.setError(400, 'Invalid Sitting Id');
         return util.send(res);
       }
-      const sittiEvents = await eventStittingPlaceService.deleteEventSittingPlace({ id });
+      const sittiEvents = await eventStittingPlaceService.deleteEventSittingPlace(id);
+      console.log(sittiEvents)
       if (!sittiEvents) {
         util.setError(404, 'Events Sitting Not Deleted');
         return util.send(res);

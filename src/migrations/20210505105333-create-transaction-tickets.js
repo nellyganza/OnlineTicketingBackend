@@ -10,7 +10,7 @@ module.exports = {
       transaction_ref: {
         type: Sequelize.STRING,
       },
-      cardNumber: {
+      nationalId: {
         type: Sequelize.STRING,
       },
       ticketId: {

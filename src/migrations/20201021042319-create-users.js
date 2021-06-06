@@ -33,6 +33,9 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: 'Individual',
       },
+      campanyName: {
+        type: Sequelize.STRING,
+      },
       isVerified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

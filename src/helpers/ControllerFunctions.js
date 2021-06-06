@@ -8,23 +8,17 @@ export const updateEvent = async (eventid) => {
   await EventService.decrementTicketLeft(eventid);
 };
 
-export const updatePaymentMade = async (id) => {
-  await PaymentMethodService.incrementPaymentMade(id);
-};
-
 export const updateSittingPlace = async (eventId, type) => {
-  const gradeType = await EventPaymentService.findById(type);
-  const data = { ...gradeType['0'] };
-  const Sitting = await EventSittingPlaceService.findByName({ eventId, name: data.dataValues.name });
-  const sitting = { ...Sitting['0'] };
-  await EventSittingPlaceService.incrementNumberOfPeople(sitting.dataValues.id);
-  await EventSittingPlaceService.decrementPlaceLeft(sitting.dataValues.id);
+  const gradeType = await EventPaymentService.findOneById(type);
+  const sitting = await EventSittingPlaceService.findOneByName({ eventId, name: gradeType.name });
+  await EventSittingPlaceService.incrementNumberOfPeople(sitting.id);
+  await EventSittingPlaceService.decrementPlaceLeft(sitting.id);
 };
 
-export const getAndUpdateSittingPlace = async (eventId, type, numberofTickets, action) => {
+export const getAndUpdateSittingPlace = async (eventId, type, action) => {
   if (action === 'getPlaces') {
     const places = [];
-    let placetobegiven = numberofTickets;
+    let placetobegiven = 1;
     const gradeType = await EventPaymentService.findById(type);
     const data = { ...gradeType['0'] };
     const Sitting = await EventSittingPlaceService.findByName({ eventId, name: data.dataValues.name });
@@ -34,7 +28,6 @@ export const getAndUpdateSittingPlace = async (eventId, type, numberofTickets, a
         continue;
       }
       const start = sitting.dataValues.placeAvailable[i][0].value;
-      console.log(start);
       const end = sitting.dataValues.placeAvailable[i][1].value;
       const remains = end - start;
       if (remains <= 0) {
@@ -55,7 +48,7 @@ export const getAndUpdateSittingPlace = async (eventId, type, numberofTickets, a
     }
   }
   if (action === 'updatePlaces') {
-    let placetobegiven = numberofTickets;
+    let placetobegiven = 1;
     const gradeType = await EventPaymentService.findById(type);
     const data = { ...gradeType['0'] };
     const Sitting = await EventSittingPlaceService.findByName({ eventId, name: data.dataValues.name });

@@ -9,16 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      models.Contact.belongsTo(models.Users, {
-        foreignKey: 'userId',
-        onDelete: 'CASCADE',
-      });
-    }
   }
   Contact.init({
-    userId: DataTypes.INTEGER,
+    email: DataTypes.STRING,
+    fullName: DataTypes.STRING,
+    subject: DataTypes.STRING,
     message: DataTypes.STRING,
+    read: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   }, {
     sequelize,
     modelName: 'Contact',

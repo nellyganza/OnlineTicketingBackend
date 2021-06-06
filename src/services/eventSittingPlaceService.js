@@ -18,7 +18,7 @@ class EventSittingPlaceService {
   }
 
   static updateAtt(set, prop) {
-    return EventSittingPlace.update(set, {
+    return EventSittingPlace.upsert(set, {
       returning: true,
       where: prop,
     });
@@ -39,6 +39,12 @@ class EventSittingPlaceService {
     });
   }
 
+  static findOneByName(prop) {
+    return EventSittingPlace.findOne({
+      where: prop,
+    });
+  }
+
   static findById(modelId) {
     return EventSittingPlace.findAll({
       where: { id: modelId },
@@ -55,7 +61,7 @@ class EventSittingPlaceService {
 
   static deleteEventSittingPlace(modelId) {
     return EventSittingPlace.destroy({
-      where: { eventId: modelId },
+      where: { id: modelId },
     });
   }
 }

@@ -20,12 +20,12 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       paymenttype: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       fullName: {
         type: Sequelize.STRING,
       },
-      cardNumber: {
+      nationalId: {
         type: Sequelize.STRING,
       },
       phoneNumber: {
