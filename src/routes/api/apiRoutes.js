@@ -12,6 +12,7 @@ import ticket from './tickets/ticketRouter';
 import card from './cards/cardRouter';
 import transactions from './transactions/transactionRouter';
 import comments from './comments/commentrouter';
+import notification from './notifications';
 
 const router = express.Router();
 router.use('/users', user);
@@ -27,4 +28,5 @@ router.use('/events/tickets', ticket);
 router.use('/cards', card);
 router.use('/transactions', transactions);
 router.use('/comments', comments);
+router.use('/notifications', notification);
 export default router;

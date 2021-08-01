@@ -30,7 +30,9 @@ router.put('/reset-password/:token', passwordMatch, verification.tokenValid, use
 router.put('/changeRole/:id', isAuthenticated, allowedRoles([1]), roleExist, usersController.changeRole);
 router.put('/manager/assign', isAuthenticated, allowedRoles([3]), usersController.assignUsers);
 router.get('/manager/viewUsers', isAuthenticated, allowedRoles([1]), usersController.getUsers);
+router.get('/admin/viewUsers', isAuthenticated, allowedRoles([1]), usersController.getManagerUsers);
 router.put('/updateProfile', isAuthenticated, usersController.updateProfile);
-router.get('/profile/:id', isAuthenticated, usersController.getProfile);
-router.put('/upload', isAuthenticated, fileUploader.any(), fileController.upload);
+router.post('/upload', fileUploader.any(), fileController.upload);
+router.put('/brokeUser/:id', isAuthenticated, allowedRoles([1]), usersController.brokeUser);
+router.get('/calculate', isAuthenticated, allowedRoles([1, 2, 3]), usersController.getNumberOfAllUsers);
 export default router;

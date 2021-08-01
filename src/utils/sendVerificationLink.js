@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import Util from '../helpers/utils';
-import { newJwtToken } from '../helpers/tokenGenerator';
+import { newJwtToken, getJwtToken } from '../helpers/tokenGenerator';
 import { transporter } from '../helpers/mailHelper';
 import { confirmEmail } from '../services/templates/confirmEmail';
 
@@ -11,7 +11,7 @@ export const sendLink = async (res, userInfo) => {
   try {
     const { email, id, firstName } = userInfo;
     const payload = { userEmail: email, userId: id };
-    const tokenLink = await newJwtToken(payload, '72h');
+    const tokenLink = await getJwtToken(payload, '72h');
     const emailTemplate = confirmEmail({ name: firstName, token: tokenLink });
     const mailOptions = {
       from: process.env.EMAIL,

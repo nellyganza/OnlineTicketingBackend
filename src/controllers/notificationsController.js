@@ -12,12 +12,13 @@ export default class notifier {
       email,
     });
   }
+  
 
-  static async showAll(req, res) {
+  static async markRead(req, res) {
     try {
-      const { id } = req.userInfo;
-      const notifications = await notificationService.getNotifications(id);
-      util.setSuccess(200, 'Notifications', notifications);
+      const id = req.params.id;
+      const data = await notificationService.update({ id });
+      util.setSuccess(200, 'Updated', data);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);
@@ -25,13 +26,42 @@ export default class notifier {
     }
   }
 
-  static async getOne(req, res) {
+  static async showAll(req, res) {
+    try {
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+      const { id } = req.userInfo;
+
+      const notifications = await notificationService.getNotifications(id);
+      const result = {};
+      result.number = notifications.length;
+      result.result = notifications.slice(page, page + limit);
+      util.setSuccess(200, 'all Notifications', result);
+      return util.send(res);
+    } catch (error) {
+      console.log(error);
+      util.setError(500, 'Unable to retrieve all notifications');
+      return util.send(res);
+    }
+  }
+
+  static async deleteOne(req, res) {
+    try {
+      const notId = req.params.notId;
+      const notifications = await notificationService.deleteOneNotification(notId);
+      util.setSuccess(200, 'Notification Deleted', notifications);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async deletAll(req, res) {
     try {
       const { id } = req.userInfo;
-      const { notification } = req.params;
-      const notifications = await notificationService.getOne({ receiver: id, id: notification });
-      await notificationService.update({ receiver: id, id: notification });
-      util.setSuccess(200, 'Notifications', notifications);
+      const notifications = await notificationService.deleteAllNotification(id);
+      util.setSuccess(200, 'Notifications Deleted', notifications);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);

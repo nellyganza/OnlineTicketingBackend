@@ -14,6 +14,10 @@ const googleAuth = async (req, res) => {
     if (currentUser.password !== null) {
       return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/failure/${message}`);
     }
+    if (currentUser.status === 'broked') {
+      util.setError(403, 'Your account was Blocked, Please Contact Adiministrator.');
+      return util.send(res);
+    }
     const displayData = pick(currentUser.dataValues, ['id', 'firstName', 'lastName', 'email', 'RoleId', 'socialId', 'provider']);
     const authToken = AuthTokenHelper.generateToken(displayData);
     userService.updateAtt({ authToken }, { email: displayData.email });

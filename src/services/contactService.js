@@ -17,6 +17,10 @@ class ContactService {
     return Contact.create(newContact);
   }
 
+  static numberOfMessages() {
+    return Contact.count();
+  }
+
   static updateAtt(set, prop) {
     return Contact.update(set, {
       returning: true,
@@ -26,7 +30,7 @@ class ContactService {
 
   static getContacts() {
     return Contact.findAll(
-      {order: [['createdAt', 'ASC']]}
+      { order: [['createdAt', 'ASC']] },
     );
   }
 

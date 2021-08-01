@@ -14,7 +14,8 @@ export const isAuthenticated = async (req, res, next) => {
       util.setError(401, Error);
       return util.send(res);
     }
-    req.userInfo = decoded;
+    const { status } = loggedIn[0].dataValues;
+    req.userInfo = { ...decoded, status };
     next();
   } catch (error) {
     util.setError(500, error.message);
@@ -37,4 +38,18 @@ export const allowedRoles = (roles) => {
     }
   };
   return allow;
+};
+
+export const checkBlocked = (req, res, next) => {
+  const { status } = req.userInfo;
+  try {
+    if (status === 'broked') {
+      util.setError(403, 'Your account was Blocked, Please Contact Adiministrator.');
+      return util.send(res);
+    }
+    next();
+  } catch (error) {
+    util.setError(500, error.message);
+    return util.send(res);
+  }
 };

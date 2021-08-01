@@ -72,7 +72,7 @@ export default class eventSittingController {
         return util.send(res);
       }
       const sittiEvents = await eventStittingPlaceService.deleteEventSittingPlace(id);
-      console.log(sittiEvents)
+      console.log(sittiEvents);
       if (!sittiEvents) {
         util.setError(404, 'Events Sitting Not Deleted');
         return util.send(res);

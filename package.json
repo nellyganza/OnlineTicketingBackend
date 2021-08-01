@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src -s -d dist",
-    "start": "npm run db:migrate && npm run db:seed:undo:all && npm run db:seed && node dist/index.js",
+    "start": "npm run build && npm run db:migrate && npm run db:seed:undo:all && npm run db:seed && node dist/index.js",
     "app:start": "npm run db:migrate && npm run db:seed:undo:all && npm run db:seed &&  nodemon --exec ./node_modules/.bin/babel-node ./src/index.js",
     "lint": "eslint src/ --fix",
     "db:migrate": "sequelize db:migrate",
@@ -26,6 +26,9 @@
     "@babel/register": "^7.12.0",
     "@babel/runtime": "^7.12.0",
     "@hapi/joi": "^17.1.1",
+    "@babel/core": "^7.11.6",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
     "bcrypt": "^3.0.6",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
@@ -62,16 +65,13 @@
     "swagger-jsdoc": "^4.2.3",
     "swagger-ui-express": "^4.1.4",
     "twilio": "^3.66.0",
-    "unirest": "^0.6.0"
+    "unirest": "^0.6.0",
+    "nyc": "^15.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/node": "^7.10.5",
-    "@babel/preset-env": "^7.11.5",
     "eslint": "^7.11.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.1",
-    "nodemon": "^2.0.7",
-    "nyc": "^15.1.0"
+    "nodemon": "^2.0.7"
   }
 }

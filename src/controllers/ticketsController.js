@@ -49,7 +49,6 @@ export default class ticketController {
         updateEvent(eventId);
         updateSittingPlace(eventId, attender[method].type);
         updatePaymentGrade(attender[method].type);
-        console.log(await getAndUpdateSittingPlace(eventId, attender[method].type, 'getPlaces'));
         await getAndUpdateSittingPlace(eventId, attender[method].type, 'updatePlaces');
       });
       util.setSuccess(200, 'Your Ticket(s) Created success');
@@ -63,24 +62,8 @@ export default class ticketController {
   static async getTicketByEvent(req, res) {
     const eventId = req.params.eventId;
     try {
-      const page = Number(req.query.page);
-      const limit = Number(req.query.limit);
-      const startIndex = (page - 1) * limit;
-      const endIndex = (page * limit);
-      const result = {};
-      result.next = {
-        page: page + 1,
-        limit,
-      };
-      if (startIndex > 0) {
-        result.prev = {
-          page: page - 1,
-          limit,
-        };
-      }
-      const FoundTickets = await ticketService.findByName({ eventId });
-      result.result = FoundTickets.slice(startIndex, endIndex);
-      util.setSuccess(200, 'Tickets Found', result);
+      const foundTickets = await ticketService.findByName({ eventId });
+      util.setSuccess(200, 'Tickets Found', { ...foundTickets });
       return util.send(res);
     } catch (error) {
       util.setError(404, error.message);

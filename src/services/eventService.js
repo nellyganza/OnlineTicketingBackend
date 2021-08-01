@@ -57,6 +57,18 @@ class EventService {
     });
   }
 
+  static getCalenderEvents() {
+    return Event.findAll(
+      {
+        where: {
+          status: 'Pending',
+          share: true,
+        },
+        attributes: ['id', 'title', ['dateAndTimme', 'start']],
+      },
+    );
+  }
+
   static findByFilters(search, place, date) {
     return Event.findAll({
       where: {
@@ -143,6 +155,10 @@ class EventService {
         ],
       }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod }],
     });
+  }
+
+  static numberOfEvents() {
+    return Event.count();
   }
 
   static findBetween(prop) {

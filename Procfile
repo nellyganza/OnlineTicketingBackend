@@ -1,1 +1,1 @@
-web: node dist/index.js && ./node_modules/.bin/sequelize db:seed:undo:all && ./node_modules/.bin/sequelize db:seed:all
+web: ./node_modules/.bin/sequelize db:migrate &&  ./node_modules/.bin/sequelize db:seed:undo:all && ./node_modules/.bin/sequelize db:seed:all && node dist/index.js

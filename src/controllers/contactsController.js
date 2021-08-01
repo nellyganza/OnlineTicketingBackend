@@ -7,15 +7,15 @@ export default class contact {
     try {
       const page = Number(req.query.page);
       const limit = Number(req.query.limit);
-      
+
       const contacts = await contactService.getContacts();
-      const result = {}
+      const result = {};
       result.number = contacts.length;
-      result.result = contacts.slice(page, page+limit);
+      result.result = contacts.slice(page, page + limit);
       util.setSuccess(200, 'all contacts', result);
       return util.send(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       util.setError(500, 'Unable to retrieve all contacts');
       return util.send(res);
     }
@@ -79,13 +79,14 @@ export default class contact {
       return util.send(res);
     }
   }
+
   static async readcontact(req, res) {
     try {
       const read = req.body.read;
-      console.log(read)
+      console.log(read);
       const { id } = req.params;
 
-      const updatedcontact = await contactService.updateAtt({ read:read }, {id});
+      const updatedcontact = await contactService.updateAtt({ read }, { id });
       util.setSuccess(200, 'contact readed', updatedcontact);
       return util.send(res);
     } catch (error) {

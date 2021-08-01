@@ -136,6 +136,17 @@ export default class eventController {
     }
   }
 
+  static async getEventCalenderDate(req, res) {
+    try {
+      const events = await eventService.getCalenderEvents();
+      util.setSuccess(200, 'Events', events);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
   static async findBetween(req, res) {
     try {
       const { startDate, endDate } = req.query;

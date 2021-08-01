@@ -1,7 +1,8 @@
+import { Op } from 'sequelize';
 import models from '../models';
 
 const {
-  Users, Notification, Event, Comment, EventPayment, EventSittingPlace, PaymentMethod,
+  Users, Notification, Event, Comment, EventPayment, EventSittingPlace, PaymentMethod, Ticket,
 } = models;
 /**
  * @exports
@@ -25,6 +26,10 @@ class UserService {
     });
   }
 
+  static numberOfUsers() {
+    return Users.count();
+  }
+
   static findByAllData(prop) {
     return Users.findOne({
       where: prop,
@@ -41,6 +46,16 @@ class UserService {
         },
         {
           model: Notification,
+        },
+        {
+          model: Ticket,
+          include: [
+            {
+              model: Event,
+              include: [{ model: EventPayment }, { model: EventSittingPlace },
+              ],
+            },
+          ],
         },
       ],
       attributes: { exclude: ['password', 'authToken'] },
@@ -60,7 +75,18 @@ class UserService {
         where: {
           isVerified: true,
         },
-        attributes: ['id', 'email', 'RoleId', 'isVerified'],
+        attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture'],
+      },
+    );
+  }
+
+  static getAdminUsers() {
+    return Users.findAll(
+      {
+        where: {
+          RoleId: { [Op.in]: [2, 3] },
+        },
+        attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture'],
       },
     );
   }

@@ -123,7 +123,7 @@ export const newEventEventValidation = (req, res, next) => {
       const errors = {
         ...n.body, ...pm.error, ...s.body, ...pg.body,
       };
-      util.setError(400, errors);
+      util.setError(400, errors.Error);
       return util.send(res);
     }
     next();

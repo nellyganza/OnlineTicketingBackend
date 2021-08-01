@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
     category: DataTypes.STRING,
     campanyName: DataTypes.STRING,
     isVerified: DataTypes.BOOLEAN,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'active',
+    },
     socialId: DataTypes.STRING,
     provider: DataTypes.STRING,
     authToken: DataTypes.TEXT,

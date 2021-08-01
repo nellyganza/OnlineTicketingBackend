@@ -17,11 +17,24 @@ class Notificationervice {
     return Notification.create(newNotification);
   }
 
-  static getNotification(email) {
-    return Notification.findAll({
-      where: {
-        receiver: email,
+  static getNotifications(id) {
+    return Notification.findAll(
+      {
+        where: { userId: id },
+        order: [['createdAt', 'ASC']],
       },
+    );
+  }
+
+  static deleteAllNotification(userId) {
+    return Notification.destroy({
+      where: { userId },
+    });
+  }
+
+  static deleteOneNotification(notId) {
+    return Notification.destroy({
+      where: { id: notId },
     });
   }
 

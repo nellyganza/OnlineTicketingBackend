@@ -7,6 +7,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      transactionId: {
+        type: Sequelize.INTEGER,
+      },
       transaction_ref: {
         type: Sequelize.STRING,
       },

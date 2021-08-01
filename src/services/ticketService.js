@@ -1,7 +1,7 @@
 import { Op, QueryTypes } from 'sequelize';
 import models from '../models';
 
-const { Ticket } = models;
+const { Ticket, Event, Users } = models;
 /**
  * @exports
  * @class TicketService
@@ -29,6 +29,10 @@ class TicketService {
     return Ticket.findAll();
   }
 
+  static totalIcome() {
+    return Ticket.sum('price');
+  }
+
   /**
    * Find a User in storage using login credentials.
    * @param {*} prop HTTP request
@@ -37,6 +41,9 @@ class TicketService {
   static findByName(prop) {
     return Ticket.findAll({
       where: prop,
+      include: [
+        { model: Users }, { model: Event },
+      ],
     });
   }
 

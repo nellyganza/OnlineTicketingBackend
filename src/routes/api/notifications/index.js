@@ -4,6 +4,8 @@ import notificationsController from '../../../controllers/notificationsControlle
 
 const router = express.Router();
 router.get('/', isAuthenticated, notificationsController.showAll);
-router.get('/:notification', isAuthenticated, notificationsController.getOne);
+router.get('/read/:id', isAuthenticated, notificationsController.markRead);
+router.delete('/deleteAll', isAuthenticated, notificationsController.deletAll);
+router.delete('/deleteOne/:notId', isAuthenticated, notificationsController.deleteOne);
 
 export default router;
