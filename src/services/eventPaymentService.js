@@ -40,7 +40,7 @@ class EventPaymentService {
   }
 
   static findById(modelId) {
-    return EventPayment.findAll({
+    return EventPayment.findOne({
       where: { id: modelId },
     });
   }

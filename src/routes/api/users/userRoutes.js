@@ -15,7 +15,7 @@ const {
   createUserValidation, signupValidate, passwordMatch, roleExist, validateEmail, verifyAdmin, verifyEmail,
 } = ValidationMiddleWare;
 router.get('/me/:token', usersController.myCredintials);
-router.get('/getAll/:token', usersController.myAllData);
+router.get('/getAll', isAuthenticated, usersController.myAllData);
 router.post('/signup', signupValidate, usersController.signupWithEmail);
 router.get('/verify/:token', verifyEmail, usersController.verifyEmail);
 router.post('/request/phoneNumber', usersController.sendVerificationCode);
@@ -28,7 +28,6 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', { sessio
 router.post('/forgot-password', validateEmail, verification.email, usersController.resetPassword);
 router.put('/reset-password/:token', passwordMatch, verification.tokenValid, usersController.changePassword);
 router.put('/changeRole/:id', isAuthenticated, allowedRoles([1]), roleExist, usersController.changeRole);
-router.put('/manager/assign', isAuthenticated, allowedRoles([3]), usersController.assignUsers);
 router.get('/manager/viewUsers', isAuthenticated, allowedRoles([1]), usersController.getUsers);
 router.get('/admin/viewUsers', isAuthenticated, allowedRoles([1]), usersController.getManagerUsers);
 router.put('/updateProfile', isAuthenticated, usersController.updateProfile);

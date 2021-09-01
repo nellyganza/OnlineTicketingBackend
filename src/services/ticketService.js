@@ -1,7 +1,9 @@
 import { Op, QueryTypes } from 'sequelize';
 import models from '../models';
 
-const { Ticket, Event, Users } = models;
+const {
+  Ticket, Event, Users, EventPayment,
+} = models;
 /**
  * @exports
  * @class TicketService

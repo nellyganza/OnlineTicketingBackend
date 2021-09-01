@@ -19,9 +19,9 @@ export const rwMobileMoney = async (req, res, next) => {
     const response = await flw.MobileMoney.rwanda(payload);
     console.log(response);
     const opn = await open(response.meta.authorization.redirect);
-    next();
-    // util.setSuccess(200, 'Success', opn);
-    // return util.send(res);
+    // next();
+    util.setSuccess(200, 'Success', opn);
+    return util.send(res);
   } catch (error) {
     util.setError(400, error.message);
     return util.send(res);
@@ -35,6 +35,7 @@ export const cardPay = async (req, res, next) => {
       cvv: req.body.pay.cvv,
       expiry_month: req.body.pay.expiry_month,
       expiry_year: req.body.pay.expiry_year,
+
       currency: req.body.pay.currency,
       amount: req.body.pay.amount,
       redirect_url: `${process.env.HOST}/newTicket/payment/webhook`,
@@ -67,10 +68,15 @@ export const cardPay = async (req, res, next) => {
     if (response.meta.authorization.mode === 'redirect') {
       const url = response.meta.authorization.redirect;
       open(url);
+      util.setSuccess(200, 'Success', url);
+      return util.send(res);
     }
 
     console.log(response);
+    util.setSuccess(200, 'Success', response);
+    return util.send(res);
   } catch (error) {
-    console.log(error);
+    util.setError(500, error);
+    return util.send(res);
   }
 };

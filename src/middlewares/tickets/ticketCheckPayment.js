@@ -11,7 +11,6 @@ export const checkPyament = async (req, res, next) => {
 
   const ticket = await ticketService.findBynationalId({ nationalId, eventId, status: 'not Attended' });
   if (!ticket) {
-    util.message = 'This card was used Before in this Event !!';
     util.statusCode = 400;
     return util.send(res);
   }

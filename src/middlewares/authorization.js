@@ -1,20 +1,21 @@
 import { decodeToken } from './verifications/verifyToken';
 import Util from '../helpers/utils';
 import userService from '../services/userService';
+import tokenService from '../services/tokenService';
 
 const util = new Util();
 
 export const isAuthenticated = async (req, res, next) => {
   try {
-    const authToken = req.headers.authorization;
-    const decoded = await decodeToken(authToken);
-    const loggedIn = await userService.findByProp({ authToken });
-    if (!loggedIn[0]) {
+    const token = req.headers.authorization;
+    const decoded = await decodeToken(token);
+    const loggedIn = await tokenService.findByToken({ token });
+    if (!loggedIn) {
       const Error = 'Login first To continue';
       util.setError(401, Error);
       return util.send(res);
     }
-    const { status } = loggedIn[0].dataValues;
+    const { status } = loggedIn.User;
     req.userInfo = { ...decoded, status };
     next();
   } catch (error) {

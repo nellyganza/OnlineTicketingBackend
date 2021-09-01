@@ -1,12 +1,16 @@
 /* eslint-disable camelcase */
+import fs from 'fs';
 import { eventEmitter } from './eventEmitter';
 import transactionService from '../../services/transactionService';
 import ticketService from '../../services/ticketService';
 import eventService from '../../services/eventService';
+import eventPaymentService from '../../services/eventPaymentService';
 import userService from '../../services/userService';
 import { sendSMS } from './smsNotification';
 import notificationsController from '../../controllers/notificationsController';
 import { sendMessageSMS } from '../../config/nexmo';
+
+const QRCode = require('qrcode');
 
 const { notifyTheUser } = notificationsController;
 const unirest = require('unirest');
@@ -42,21 +46,38 @@ eventEmitter.on('verifyTransactionEvent', async () => {
   });
 });
 
-eventEmitter.on('SendSucessfullPaymentNotification', async (ticketId) => {
+eventEmitter.on('SendSucessfullPaymentNotification', async (ticketId, datas) => {
   const tickets = await ticketService.findById(ticketId);
   const {
-    fullName, nationalId, phoneNumber, email, sittingPlace, eventId, userId,
+    fullName, nationalId, phoneNumber, email, sittingPlace, eventId, userId, type,
   } = tickets;
+  const eventPay = await eventPaymentService.findOneById(type);
   const event = await eventService.findById(eventId);
   const { title, place, dateAndTimme } = event.dataValues;
-  const msg = `Hello ${fullName}, <br>Here are the details for your ticket. 
-        Event Name: ${title} <br>
-        Place : ${place} <br>
-        Date : ${dateAndTimme} <br>
-        Sitting Position : ${sittingPlace} <br>
-        Holders card : ${nationalId} 
-        
-        Thank you for using Intercore Online Ticketing<br><br>`;
+  const segs = [
+    { data: datas.nationalId, mode: 'alphanumeric' },
+  ];
+
+  const res = await QRCode.toDataURL(segs);
+  const data = res.replace(/^data:image\/\w+;base64,/, '');
+  const fileName = `${__dirname}/${fullName}barcode.png`;
+
+  fs.writeFile(fileName, data, { encoding: 'base64' }, (err) => {
+    // Finished
+  });
+  const msg = `<div style="text-align:left;">
+  Hello ${fullName}, <br>Here are the details for your ticket. 
+  Event Name: ${title} <br>
+  Place : ${place} <br>
+  Date : ${dateAndTimme} <br>
+  Sitting Position : ${sittingPlace} in  ${eventPay.name} <br>
+  National ID : ${nationalId} <br>
+
+  Please use attached QR code for entrance when you don't have a National ID card<br>
+ 
+  Thank you for using Intercore Online Ticketing<br><br>
+  </div>`;
+  const attach = { fileName, file: `${fullName}barcode.png`, cid: 'qrcode' };
   const msms = `Hello ${fullName}, Here are the details for your ticket.
   Event Name: ${title}
   Place : ${place}
@@ -70,7 +91,7 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (ticketId) => {
     receiver: email,
     userId,
     eventId,
-    message: msg,
+    message: { msg, attach },
   }, email);
-  sendMessageSMS(phoneNumber, msms);
+  // sendMessageSMS(phoneNumber, msms);
 });

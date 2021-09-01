@@ -18,7 +18,7 @@ class EventSittingPlaceService {
   }
 
   static updateAtt(set, prop) {
-    return EventSittingPlace.upsert(set, {
+    return EventSittingPlace.update(set, {
       returning: true,
       where: prop,
     });
@@ -34,7 +34,7 @@ class EventSittingPlaceService {
    * @returns {*} JSON data
    */
   static findByName(prop) {
-    return EventSittingPlace.findAll({
+    return EventSittingPlace.findOne({
       where: prop,
     });
   }

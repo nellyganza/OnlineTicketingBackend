@@ -8,6 +8,7 @@ import eventService from '../services/eventService';
 import conactsService from '../services/contactService';
 import ticketService from '../services/ticketService';
 import AuthTokenHelper from '../helpers/AuthTokenHelper';
+import tokenService from '../services/tokenService';
 import { nexmo } from '../config/nexmo';
 import { sendSMS } from '../helpers/notifications/smsNotification';
 import {
@@ -56,8 +57,8 @@ export default class user {
           roleId: newUser.roleId,
         };
         const token = await newJwtToken(payload);
-        await userService.updateAtt({ authToken: token }, { id: newUser.id });
-
+        // await userService.updateAtt({ authToken: token }, { id: newUser.id });
+        await tokenService.createToken({ token, user: newUser.id });
         const encodedToken = Buffer.from(token).toString('base64');
         return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
       }
@@ -153,7 +154,8 @@ export default class user {
       if (isMatch) {
         const displayData = pick(currentUser.dataValues, ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture']);
         const authToken = AuthTokenHelper.generateToken(displayData);
-        userService.updateAtt({ authToken }, { email: displayData.email });
+        // userService.updateAtt({ authToken }, { email: displayData.email });
+        await tokenService.createToken({ token: authToken, user: displayData.id });
         util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken });
         return util.send(res);
       }
@@ -208,32 +210,19 @@ export default class user {
   }
 
   static async userLogout(req, res) {
-    try {
-      const queryResult = await userService.updateAtt(
-        { authToken: null },
-        { id: res.id },
-      );
-      util.setSuccess('200', 'Logout successful');
-      return util.send(res);
-    } catch (error) {
-      util.setError(500, error.message);
-      return util.send(res);
-    }
-  }
+    console.log(res.token);
 
-  static async assignUsers(req, res) {
     try {
-      const { lineManagerId } = req.body;
-      const { userId } = req.body;
-      const lineManager = await userService.findByLineManagerId(lineManagerId);
-      if (lineManager) {
-        const update = await userService.updateAtt({ lineManager: lineManagerId }, { id: userId });
-        util.setSuccess('200', 'user is assigned to the manager');
-        return util.send(res);
-      }
-      util.setError(400, 'The manager doesn\'t exist');
+      // const queryResult = await userService.updateAtt(
+      //   { authToken: null },
+      //   { id: res.id },
+      // );
+      const removedToken = await tokenService.deleteToken(res.token);
+      // tokenService
+      util.setSuccess('200', 'Logout successful', removedToken);
       return util.send(res);
     } catch (error) {
+      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }
@@ -243,11 +232,11 @@ export default class user {
     try {
       const users = await userService.getUsers();
       if (users.length >= 1) {
-        const message = 'the users assigned to that manager are found';
+        const message = 'the users are found';
         util.setSuccess(200, message, users);
         return util.send(res);
       }
-      util.setError(400, 'The manager doesn\'t have users');
+      util.setError(400, 'users not found');
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);
@@ -321,16 +310,11 @@ export default class user {
 
   static async myAllData(req, res) {
     try {
-      const { token } = req.params;
-      console.log(token);
-      if (token) {
-        const userInfo = await userService.findByAllData({ authToken: token });
-        util.setSuccess(200, 'User Data', {
-          userInfo,
-        });
-        return util.send(res);
-      }
-      util.setError(400, 'Invalid Token');
+      const { id } = req.userInfo;
+      const userInfo = await userService.findByAllData({ id });
+      util.setSuccess(200, 'User Data', {
+        userInfo,
+      });
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);

@@ -6,13 +6,15 @@ const util = new Util();
 
 export default class notifier {
   static async notifyTheUser(notification, email) {
+    const sendNot = { ...notification };
+    notification.message = notification.message.msg;
     await notificationService.createNotification(notification);
     await sendNotification({
-      message: renderEmail(notification.message),
+      message: renderEmail(sendNot.message.msg),
       email,
+      attachement: sendNot.message.attach,
     });
   }
-  
 
   static async markRead(req, res) {
     try {

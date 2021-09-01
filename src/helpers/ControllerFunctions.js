@@ -14,21 +14,18 @@ export const updateSittingPlace = async (eventId, type) => {
   await EventSittingPlaceService.incrementNumberOfPeople(sitting.id);
   await EventSittingPlaceService.decrementPlaceLeft(sitting.id);
 };
-
 export const getAndUpdateSittingPlace = async (eventId, type, action) => {
   if (action === 'getPlaces') {
     const places = [];
     let placetobegiven = 1;
     const gradeType = await EventPaymentService.findById(type);
-    const data = { ...gradeType['0'] };
-    const Sitting = await EventSittingPlaceService.findByName({ eventId, name: data.dataValues.name });
-    const sitting = { ...Sitting['0'] };
-    for (let i = 0; i < sitting.dataValues.placeAvailable.length; i++) {
-      if (sitting.dataValues.placeAvailable[i][0] === undefined) {
+    const sitting = await EventSittingPlaceService.findByName({ eventId, name: gradeType.name });
+    for (let i = 0; i < sitting.placeAvailable.length; i++) {
+      if (sitting.placeAvailable[i][0] === undefined) {
         continue;
       }
-      const start = sitting.dataValues.placeAvailable[i][0].value;
-      const end = sitting.dataValues.placeAvailable[i][1].value;
+      const start = sitting.placeAvailable[i][0].value;
+      const end = sitting.placeAvailable[i][1].value;
       const remains = end - start;
       if (remains <= 0) {
         continue;
@@ -50,30 +47,32 @@ export const getAndUpdateSittingPlace = async (eventId, type, action) => {
   if (action === 'updatePlaces') {
     let placetobegiven = 1;
     const gradeType = await EventPaymentService.findById(type);
-    const data = { ...gradeType['0'] };
-    const Sitting = await EventSittingPlaceService.findByName({ eventId, name: data.dataValues.name });
-    const sitting = { ...Sitting['0'] };
-    const place = sitting.dataValues.placeAvailable;
-    for (let i = 0; i < sitting.dataValues.placeAvailable.length; i++) {
-      if (sitting.dataValues.placeAvailable[i][0] === undefined) {
+    const sitting = await EventSittingPlaceService.findByName({ eventId, name: gradeType.name });
+    const place = sitting.placeAvailable;
+    let sittingPlace = 0;
+    for (let i = 0; i < sitting.placeAvailable.length; i++) {
+      if (sitting.placeAvailable[i][0] === undefined) {
         continue;
       }
-      const start = sitting.dataValues.placeAvailable[i][0].value;
-      const end = sitting.dataValues.placeAvailable[i][1].value;
+      const start = sitting.placeAvailable[i][0].value;
+      const end = sitting.placeAvailable[i][1].value;
       const remains = end - start;
       if (remains <= 0) {
         continue;
       }
       if (placetobegiven <= remains) {
         place[i][0].value += placetobegiven;
+        sittingPlace = place[i][0].value;
         break;
       }
       if (placetobegiven > remains) {
         placetobegiven -= remains;
         place[i][0].value += remains;
+        sittingPlace = place[i][0].value;
       }
     }
-    await EventSittingPlaceService.updateAtt({ placeAvailable: place }, { id: sitting.dataValues.id });
+    await EventSittingPlaceService.updateAtt({ placeAvailable: place }, { id: sitting.id });
+    return sittingPlace;
   }
 };
 

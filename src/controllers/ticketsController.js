@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import ticketService from '../services/ticketService';
 import userservice from '../services/userService';
 import eventservice from '../services/eventService';
@@ -16,6 +17,7 @@ export default class ticketController {
     const userId = req.userInfo.id;
     const { pay } = req.body;
     const eventId = req.params.eventId;
+    const messages = [];
 
     const transaction = {
       transaction_ref: pay.tx_ref,
@@ -24,7 +26,7 @@ export default class ticketController {
       user: userId,
     };
     try {
-      const savedTransacrion = await transactionService.createTransaction(transaction);
+      // const savedTransacrion = await transactionService.createTransaction(transaction);
 
       const { attender } = req.body;
 
@@ -33,26 +35,50 @@ export default class ticketController {
         util.setError(404, 'selected Event not Exist');
         return util.send(res);
       }
-      let i = 0;
-      Object.keys(attender).forEach(async (method) => {
-        i++;
-        const savedTicket = await ticketService.createTicket({
-          ...attender[method], eventId, userId, paymenttype: pay.paymenttype,
-        });
-        const { transaction_ref } = savedTransacrion.dataValues;
-        const transactionId = savedTransacrion.dataValues.id;
-        const { id, nationalId } = savedTicket.dataValues;
-        await transactionTicketService.createTransactionTicket({
-          transactionId, transaction_ref, ticketId: id, nationalId,
-        });
-        eventEmitter.emit('SendSucessfullPaymentNotification', id);
-        updateEvent(eventId);
-        updateSittingPlace(eventId, attender[method].type);
-        updatePaymentGrade(attender[method].type);
-        await getAndUpdateSittingPlace(eventId, attender[method].type, 'updatePlaces');
+      const i = 0;
+      _.map(attender, async (att) => {
+        const ticket = await ticketService.findBynationalId({ eventId, nationalId: att.nationalId });
+        if (!ticket) {
+          const sittingPlace = await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces') - 1;
+          const savedTicket = await ticketService.createTicket({
+            ...att, eventId, userId, paymenttype: pay.paymenttype, sittingPlace,
+          });
+          const { id, nationalId } = savedTicket.dataValues;
+          eventEmitter.emit('SendSucessfullPaymentNotification', id, { nationalId, names: att.fullName });
+          await updateEvent(eventId);
+          await updatePaymentGrade(att.type);
+          await updateSittingPlace(eventId, att.type);
+
+          messages.push(`Ticket of ${att.fullName} from event ${event.title} saved`);
+        } else {
+          messages.push(`${att.fullName} already have bought ticket from event ${event.title}`);
+        }
       });
-      util.setSuccess(200, 'Your Ticket(s) Created success');
-      return util.send(res);
+      // Object.keys(attender).forEach(async (method) => {
+      //   const ticket = await ticketService.findBynationalId({ eventId, nationalId: attender[method].nationalId });
+      //   if (!ticket) {
+      //     i++;
+      //     const savedTicket = await ticketService.createTicket({
+      //       ...attender[method], eventId, userId, paymenttype: pay.paymenttype,
+      //     });
+      //     const { transaction_ref } = savedTransacrion.dataValues;
+      //     const transactionId = savedTransacrion.dataValues.id;
+      //     const { id, nationalId } = savedTicket.dataValues;
+      //     await transactionTicketService.createTransactionTicket({
+      //       transactionId, transaction_ref, ticketId: id, nationalId,
+      //     });
+      //     eventEmitter.emit('SendSucessfullPaymentNotification', id);
+      //     updateEvent(eventId);
+      //     updateSittingPlace(eventId, attender[method].type);
+      //     updatePaymentGrade(attender[method].type);
+      //     await getAndUpdateSittingPlace(eventId, attender[method].type, 'updatePlaces');
+      //     messages.push(`Ticket of ${attender[method].fullName} from event ${event.title} saved`);
+      //   } else {
+      //     messages.push(`${attender[method].fullName} already have bought ticket from event ${event.title}`);
+      //   }
+      // });
+      util.setSuccess(200, messages);
+      util.send(res);
     } catch (error) {
       util.setError(404, error.message);
       return util.send(res);
@@ -131,14 +157,17 @@ export default class ticketController {
   static async entrance(req, res) {
     const { eventId } = req.params;
     const { nationalId } = req.body;
+    const sittingType = req.body.sittingType ? req.body.sittingType : null;
     if (!nationalId) {
-      util.setError(400, 'No card Number found');
+      util.setError(400, 'No National ID found in request');
       return util.send(res);
     }
-    const ticket = await ticketService.findBynationalId({ eventId, nationalId });
+    let ticket;
+    if (!sittingType) ticket = await ticketService.findBynationalId({ eventId, nationalId });
+    else ticket = await ticketService.findBynationalId({ eventId, nationalId, type: sittingType });
     if (ticket) {
       if (ticket.status === 'not Attended') {
-        const updatedticket = await ticketService.updateAtt({ status: 'Attended' }, { id: ticket.id });
+        const updatedticket = await ticketService.updateAtt({ status: 'Attended', currentStatus: 'IN' }, { id: ticket.id });
         if (!updatedticket) {
           util.setError(400, 'Please Try again');
           return util.send(res);
@@ -146,10 +175,25 @@ export default class ticketController {
         util.setSuccess(200, 'You are verified, Please Enter', updatedticket);
         return util.send(res);
       }
-      util.setError(200, 'You have Already Entered');
+      if (ticket.currentStatus === 'IN') {
+        const outTicket = await ticketService.updateAtt({ currentStatus: 'OUT' }, { id: ticket.id });
+        if (!outTicket) {
+          util.setError(400, 'Please Try again');
+          return util.send(res);
+        }
+        util.setSuccess(200, 'Your are in now', outTicket);
+        return util.send(res);
+      }
+
+      const inTicket = await ticketService.updateAtt({ currentStatus: 'IN' }, { id: ticket.id });
+      if (!inTicket) {
+        util.setError(400, 'Please Try again');
+        return util.send(res);
+      }
+      util.setSuccess(200, 'Your are out now', inTicket);
       return util.send(res);
     }
-    util.setError(400, 'Please, If you know that you have bought the ticket , Contact the Administrators');
+    util.setError(400, 'Please, If you know that you have bought the ticket,Check the Tapping Device if match with your Ticket or Contact the Administrators');
     return util.send(res);
   }
 
@@ -164,7 +208,12 @@ export default class ticketController {
       // silently exit, or check that you are passing the right hash on your server.
     }
     const request_json = JSON.parse(request.body);
+    console.log(request_json);
     return response.send(200);
-    // return res.status(200).send();
+  }
+
+  static async returnValidated(req, res) {
+    util.setSuccess(200, 'Ticket Validated');
+    return util.send(res);
   }
 }

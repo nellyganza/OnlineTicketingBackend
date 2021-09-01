@@ -53,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     numberboughtticket: {
+      defaultValue: 0,
       type: DataTypes.INTEGER,
     },
     ticketLeft: {

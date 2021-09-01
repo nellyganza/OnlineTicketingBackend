@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: DataTypes.STRING,
     email: DataTypes.STRING,
     sittingPlace: DataTypes.INTEGER,
+    currentSatus: {
+      type: DataTypes.STRING,
+      defaultValue: 'OUT',
+    },
     status: {
       type: DataTypes.STRING,
       defaultValue: 'not Attended',

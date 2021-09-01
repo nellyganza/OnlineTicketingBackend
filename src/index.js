@@ -1,11 +1,11 @@
 import app from './app';
-import db from './models/index';
+// import db from './models/index';
 
-const { sequelize } = db;
+// const { sequelize } = db;
 const port = process.env.PORT || 5000;
-sequelize.sync().then(() => {
-  console.log('Databse asynced');
-});
+// sequelize.sync().then(() => {
+//   console.log('Databse asynced');
+// });
 app.listen(port, (err) => {
   if (err) {
     console.log(err);

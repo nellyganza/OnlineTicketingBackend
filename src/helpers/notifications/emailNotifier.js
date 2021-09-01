@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import fs from 'fs';
 import { transporter } from '../mailHelper';
 
 dotenv.config();
@@ -47,7 +48,7 @@ export const renderEmail = ($message) => {
     <body>
         <div class="wrapper">
            <div class="logo">
-            <div>InterCore</div>
+            <div>RwandaTicket</div>
            </div>
           <center> <div class="content">
             <p>${$message}</p>
@@ -62,8 +63,16 @@ export const sendNotification = async (email) => {
   const mailOpt = {
     from: process.env.EMAIL,
     to: email.email,
-    subject: 'Intercore Notification',
+    subject: 'RwandaTicket Notification',
     html: email.message,
+    attachments: [{
+      filename: email.attachement.file,
+      path: email.attachement.fileName,
+      cid: email.attachement.cid,
+    }],
   };
   await transporter.sendMail(mailOpt);
+  fs.rm(email.attachement.fileName, () => {
+    console.log('file removed');
+  });
 };

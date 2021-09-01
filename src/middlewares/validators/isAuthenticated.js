@@ -1,6 +1,7 @@
 import Util from '../../helpers/utils';
 import { decodeToken } from '../verifications/verifyToken';
 import userServices from '../../services/userService';
+import tokenService from '../../services/tokenService';
 
 const util = new Util();
 
@@ -36,21 +37,18 @@ export default class Auth {
 
   static async isUserExists(req, res, next) {
     try {
-      const user = await userServices.findByEmail(res.email);
+      // const user = await userServices.findByEmail(res.email);
       const authToken = req.headers.authorization;
-      if (!user) {
-        util.setError(404, 'User not found');
-        return util.send(res);
-      }
-      if (user.authToken == null) {
+      const authUser = await tokenService.findByToken({ token: authToken });
+      if (!authUser) {
         util.setError(401, 'user not logged in');
         return util.send(res);
       }
-      if (authToken !== user.authToken) {
-        util.setError(403, 'Invalid Token');
+      if (authUser.User == null) {
+        util.setError(400, 'user not found');
         return util.send(res);
       }
-      res.id = user.id;
+      res.token = authUser;
       return next();
     } catch (error) {
       util.setError(500, error.message);

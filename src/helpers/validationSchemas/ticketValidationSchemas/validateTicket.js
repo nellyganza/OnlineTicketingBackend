@@ -13,5 +13,5 @@ export const newTicketAttender = joi.object({
   email: joi.string().email(),
   fullName: joi.string().required().min(2),
   nationalId: joi.string().required().length(16),
-  sittingPlace: joi.number().required(),
+  sittingPlace: joi.any(),
 });
