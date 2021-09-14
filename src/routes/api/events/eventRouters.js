@@ -18,7 +18,7 @@ router.get('/user', isAuthenticated, allowedRoles([2, 3]), checkBlocked, eventCo
 router.get('/findByDates', eventController.findBetween);
 router.put('/edit/:eventId', isAuthenticated, allowedRoles([2, 3]), checkBlocked, eventUpdate, eventController.updateEvent);
 router.delete('/:eventId', isAuthenticated, allowedRoles([2, 3]), checkBlocked, eventController.deleteEvent);
-router.put('/upload/:eventId', isAuthenticated, allowedRoles([2, 3]), checkBlocked, fileController.uploadEvents);
+router.put('/upload/:eventId', isAuthenticated, allowedRoles([2, 3]), fileUploader.any(), fileController.uploadEvents);
 router.get('/numberofTicket/:eventId', eventController.getTicketNumber);
 router.get('/byNamePlaceDate', eventController.getFillteredEvents1);
 router.post('/images', fileUploader.any(), fileController.setEventImages);

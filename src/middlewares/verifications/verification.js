@@ -1,6 +1,6 @@
 import userService from '../../services/userService';
 import Util from '../../helpers/utils';
-import { newJwtToken } from '../../helpers/tokenGenerator';
+import { getJwtToken, newJwtToken } from '../../helpers/tokenGenerator';
 import { decodeToken } from './verifyToken';
 import { tokenValid } from '../../helpers/validationSchemas/userValidationSchemas/validateUser';
 
@@ -15,7 +15,7 @@ export default class verifications {
           email: user[0].email,
           resetpassword: true,
         };
-        const token = await newJwtToken(payload);
+        const token = await getJwtToken(payload, '72h');
         res.token = token;
         res.userInfo = user[0];
         next();

@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'ticketId',
         onDelete: 'NO ACTION',
       });
+      models.Ticket.hasOne(models.EventPayment, {
+        foreignKey: 'id',
+      });
     }
   }
   Ticket.init({

@@ -25,6 +25,9 @@ module.exports = {
       endDate: {
         type: Sequelize.DATE,
       },
+      duration: {
+        type: Sequelize.DOUBLE,
+      },
       place: {
         type: Sequelize.STRING,
       },
@@ -32,10 +35,13 @@ module.exports = {
         type: Sequelize.STRING,
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       image: {
         type: Sequelize.ARRAY(Sequelize.TEXT),
+      },
+      placeImage: {
+        type: Sequelize.BLOB('long'),
       },
       numberofTicket: {
         type: Sequelize.INTEGER,

@@ -8,5 +8,6 @@ router.post('/:eventId', isAuthenticated, allowedRoles([2, 3]), eventController.
 router.get('/:eventId', isAuthenticated, allowedRoles([2, 3]), eventController.getAllPaymentByEId);
 router.put('/:id', isAuthenticated, allowedRoles([2, 3]), eventController.updatePaymentPlaceByPId);
 router.delete('/:id', isAuthenticated, allowedRoles([2, 3]), eventController.deletePaymentPlaceByPId);
+router.get('/find/:id', isAuthenticated, allowedRoles([2, 3]), eventController.findByID);
 
 export default router;

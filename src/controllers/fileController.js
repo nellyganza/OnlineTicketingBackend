@@ -1,4 +1,4 @@
-import userService from '../services/userService';
+import fs from 'fs';
 import eventService from '../services/eventService';
 import Util from '../helpers/utils';
 import { cloudinaryUploader } from '../helpers/cloudinaryUploader';
@@ -35,13 +35,13 @@ const uploadEvents = async (req, res) => {
       util.setError(400, 'Event Not Found');
       util.send(res);
     }
-    const urls = data.image || [];
+    let imageData = '';
     for (let index = 0; index < req.files.length; index++) {
       const { path } = req.files[index];
-      const url = await cloudinaryUploader(path);
-      urls.push(url);
+      console.log(path);
+      imageData = fs.readFileSync(path);
     }
-    const updatedEvent = await eventService.updateAtt({ image: urls }, { id: eventId });
+    const updatedEvent = await eventService.updateAtt({ placeImage: imageData }, { id: eventId });
     const message = 'Event Images Uploaded';
     await fsPromises.rmdir(directory, {
       recursive: true,
@@ -49,6 +49,7 @@ const uploadEvents = async (req, res) => {
     util.setSuccess(200, message, updatedEvent);
     return util.send(res);
   } catch (error) {
+    console.log(error);
     util.setError(500, error);
     return util.send(res);
   }

@@ -104,31 +104,12 @@ export default class eventController {
   static async getAllEventByUser(req, res) {
     try {
       const { id } = req.userInfo;
-      const page = Number(req.query.page);
-      const limit = Number(req.query.limit);
-      const startIndex = (page - 1) * limit;
-      const endIndex = (page * limit);
-      const result = {};
-      result.next = {
-        page: page + 1,
-        limit,
-      };
-      if (startIndex > 0) {
-        result.prev = {
-          page: page - 1,
-          limit,
-        };
-      }
-      const data = { ...req.query };
-      delete data.page;
-      delete data.limit;
-      const events = await eventService.findByName({ ...data, userId: id });
-      result.result = events.slice(startIndex, endIndex);
-      if (!result) {
+      const events = await eventService.findByName({ userId: id });
+      if (!events) {
         util.setError(404, 'Events Not Found');
         return util.send(res);
       }
-      util.setSuccess(200, 'Events Found', result);
+      util.setSuccess(200, 'Events Found', events);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);

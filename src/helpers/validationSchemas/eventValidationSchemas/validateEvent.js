@@ -6,6 +6,7 @@ export const newEventSchema = joi.object({
   dateAndTimme: joi.date().iso().required(),
   startDate: joi.date().iso().required(),
   endDate: joi.date().iso().required(),
+  duration: joi.any().required(),
   place: joi.string().required(),
   image: joi.array(),
   description: joi.string().required().min(15),
@@ -13,6 +14,7 @@ export const newEventSchema = joi.object({
   eventType: joi.string().required(),
   country: joi.string().required(),
   share: joi.boolean().required(),
+  placeImage: joi.any(),
 });
 
 export const newPaymentMethodSchema = joi.object({
@@ -38,6 +40,7 @@ export const oldEventSchema = joi.object({
   dateAndTimme: joi.date().iso().required(),
   startDate: joi.date().iso().required(),
   endDate: joi.date().iso().required(),
+  duration: joi.any().required(),
   place: joi.string().required(),
   image: joi.array(),
   description: joi.string().required().min(15),
@@ -46,4 +49,5 @@ export const oldEventSchema = joi.object({
   country: joi.string().required(),
   share: joi.boolean().required(),
   status: joi.string().required(),
+  placeImage: joi.any(),
 });

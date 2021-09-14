@@ -28,6 +28,10 @@ class EventService {
     });
   }
 
+  static getAll() {
+    return Event.findAll();
+  }
+
   static getEvents() {
     return Event.findAll({
       include: [{

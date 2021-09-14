@@ -57,7 +57,6 @@ export default class user {
           roleId: newUser.roleId,
         };
         const token = await newJwtToken(payload);
-        // await userService.updateAtt({ authToken: token }, { id: newUser.id });
         await tokenService.createToken({ token, user: newUser.id });
         const encodedToken = Buffer.from(token).toString('base64');
         return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
@@ -79,13 +78,9 @@ export default class user {
         id, isVerified, RoleId, email,
       } = await userService.findById(res.id);
       const token = await newJwtToken({ userId: id, RoleId });
-      const data = { userId: id, email, token };
-      const message = 'your account was verified!';
-      util.setSuccess(200, message, data);
-      return util.send(res);
+      return res.redirect(`${process.env.FRONT_END_URL}/login?statusCode=200`);
     } catch (error) {
-      util.setError(500, error.message);
-      return util.send(res);
+      return res.redirect(`${process.env.FRONT_END_URL}/login?statusCode=500`);
     }
   }
 
@@ -154,7 +149,6 @@ export default class user {
       if (isMatch) {
         const displayData = pick(currentUser.dataValues, ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture']);
         const authToken = AuthTokenHelper.generateToken(displayData);
-        // userService.updateAtt({ authToken }, { email: displayData.email });
         await tokenService.createToken({ token: authToken, user: displayData.id });
         util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken });
         return util.send(res);
@@ -210,15 +204,8 @@ export default class user {
   }
 
   static async userLogout(req, res) {
-    console.log(res.token);
-
     try {
-      // const queryResult = await userService.updateAtt(
-      //   { authToken: null },
-      //   { id: res.id },
-      // );
       const removedToken = await tokenService.deleteToken(res.token);
-      // tokenService
       util.setSuccess('200', 'Logout successful', removedToken);
       return util.send(res);
     } catch (error) {
@@ -286,15 +273,16 @@ export default class user {
     try {
       const { token } = req.params;
       if (token) {
-        const userInfo = await userService.findByProp({ authToken: token });
-        if (userInfo[0]) {
+        const foundToken = await tokenService.findByToken({ token });
+        const userInfo = await userService.findById(foundToken.user);
+        if (userInfo) {
           const {
             id, email, firstName, lastName, RoleId, isVerified, status, phoneNumber, category, campanyName, profilePicture, authToken,
-          } = userInfo[0];
+          } = userInfo;
           const displayData = {
             id, email, firstName, lastName, RoleId, isVerified, status, phoneNumber, category, campanyName, profilePicture,
           };
-          util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken });
+          util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken: foundToken.token });
         } else {
           util.setError(401, 'AUhtentication failed');
         }

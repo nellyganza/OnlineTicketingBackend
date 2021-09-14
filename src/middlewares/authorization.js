@@ -8,18 +8,19 @@ const util = new Util();
 export const isAuthenticated = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
-    const decoded = await decodeToken(token);
+    await decodeToken(token);
     const loggedIn = await tokenService.findByToken({ token });
     if (!loggedIn) {
       const Error = 'Login first To continue';
       util.setError(401, Error);
       return util.send(res);
     }
-    const { status } = loggedIn.User;
-    req.userInfo = { ...decoded, status };
+    const { id,firstName,lastName,email,phoneNumber,RoleId,profilePicture,campanyName,isVerified,status,category } = loggedIn.User;
+    req.userInfo = { id,firstName,lastName,email,phoneNumber,RoleId,profilePicture,campanyName,isVerified,status,category };
     next();
   } catch (error) {
-    util.setError(500, error.message);
+    console.log(error);
+    util.setError(500, error);
     return util.send(res);
   }
 };
@@ -28,13 +29,15 @@ export const allowedRoles = (roles) => {
   const allow = (req, res, next) => {
     try {
       const { RoleId } = req.userInfo;
+      console.log(RoleId)
       if (roles.indexOf(RoleId) < 0) {
         util.setError(403, 'You are not allowed to permform this task');
         return util.send(res);
       }
       next();
     } catch (error) {
-      util.setError(500, error.message);
+      console.log(error);
+      util.setError(500, error);
       return util.send(res);
     }
   };

@@ -1,8 +1,8 @@
-import { Op, QueryTypes } from 'sequelize';
+import { Op } from 'sequelize';
 import models from '../models';
 
 const {
-  Ticket, Event, Users, EventPayment,
+  Ticket, Event, Users, EventPayment,PaymentMethod
 } = models;
 /**
  * @exports
@@ -44,7 +44,7 @@ class TicketService {
     return Ticket.findAll({
       where: prop,
       include: [
-        { model: Users }, { model: Event },
+        { model: Users }, { model: Event,include:[{ model: PaymentMethod }] },{ model: EventPayment },
       ],
     });
   }
@@ -63,6 +63,17 @@ class TicketService {
   static findBynationalId(prop) {
     return Ticket.findOne({
       where: prop,
+    });
+  }
+
+  static findByTicketsExists(eventId, nationIds) {
+    return Ticket.findAll({
+      where: {
+        [Op.and]: [
+          { eventId },
+          { nationalId: { [Op.in]: nationIds } },
+        ],
+      },
     });
   }
 

@@ -1,19 +1,15 @@
 import notificationService from '../services/notifications';
-import { renderEmail, sendNotification } from '../helpers/notifications/emailNotifier';
 import Util from '../helpers/utils';
 
 const util = new Util();
 
 export default class notifier {
-  static async notifyTheUser(notification, email) {
-    const sendNot = { ...notification };
-    notification.message = notification.message.msg;
-    await notificationService.createNotification(notification);
-    await sendNotification({
-      message: renderEmail(sendNot.message.msg),
-      email,
-      attachement: sendNot.message.attach,
-    });
+  static async notifyTheUser(notification) {
+    try {
+      await notificationService.createNotification(notification);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   static async markRead(req, res) {

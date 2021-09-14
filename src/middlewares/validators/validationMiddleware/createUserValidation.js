@@ -60,18 +60,16 @@ export const verifyEmail = async (req, res, next) => {
         id: data.userId,
       });
       if (isVerified[0]) {
-        util.setError(422, 'Your account is already verified');
-        return util.send(res);
+        return res.redirect(422, `${process.env.FRONT_END_URL}/login`);
       }
       res.id = data.userId;
       next();
     } else {
       util.setError(404, 'Sorry we can\'t find your account');
-      return util.send(res);
+      return res.redirect(404, `${process.env.FRONT_END_URL}/`);
     }
   } catch (error) {
-    util.setError(500, error.message);
-    return util.send(res);
+    return res.redirect(500, `${process.env.FRONT_END_URL}/`);
   }
 };
 

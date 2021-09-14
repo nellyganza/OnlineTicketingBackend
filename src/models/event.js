@@ -43,9 +43,10 @@ module.exports = (sequelize, DataTypes) => {
     dateAndTimme: DataTypes.DATE,
     startDate: DataTypes.DATE,
     endDate: DataTypes.DATE,
+    duration: DataTypes.DOUBLE,
     place: DataTypes.STRING,
     country: DataTypes.STRING,
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     image: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
     },
@@ -66,6 +67,9 @@ module.exports = (sequelize, DataTypes) => {
     share: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    placeImage: {
+      type: DataTypes.BLOB('long'),
     },
     eventType: {
       type: DataTypes.STRING,

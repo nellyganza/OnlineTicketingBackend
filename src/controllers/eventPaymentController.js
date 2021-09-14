@@ -23,6 +23,26 @@ export default class eventPaymentController {
     }
   }
 
+  static async findByID(req, res) {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        util.setError(400, 'Invalid  Id');
+        return util.send(res);
+      }
+      const PaymentEvents = await eventPaymentService.findById(id);
+      if (!PaymentEvents) {
+        util.setError(404, 'Events Payment  Not Found');
+        return util.send(res);
+      }
+      util.setSuccess(200, 'Events Payment  Found', PaymentEvents);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
   static async getAllPaymentByEId(req, res) {
     try {
       const { eventId } = req.params;
