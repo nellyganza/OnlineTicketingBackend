@@ -47,7 +47,6 @@ export const newTicketValidation = async (req, res, next) => {
   };
   const noerrorattender = await validateAttender();
   const noerrorbuyer = await validateBuyer();
-  console.log(noerrorattender, noerrorbuyer);
   if (noerrorattender && noerrorbuyer) {
     next();
   }

@@ -25,6 +25,9 @@ module.exports = {
       endDate: {
         type: Sequelize.DATE,
       },
+      duration: {
+        type: Sequelize.DOUBLE,
+      },
       place: {
         type: Sequelize.STRING,
       },

@@ -66,6 +66,17 @@ class TicketService {
     });
   }
 
+  static findByTicketsExists(eventId, nationIds) {
+    return Ticket.findAll({
+      where: {
+        [Op.and]: [
+          { eventId },
+          { nationalId: { [Op.in]: nationIds } },
+        ],
+      },
+    });
+  }
+
   static findById(modelId) {
     return Ticket.findOne({
       where: { id: modelId },

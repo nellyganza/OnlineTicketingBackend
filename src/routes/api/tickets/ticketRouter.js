@@ -7,11 +7,11 @@ import { cardPay, rwMobileMoney } from '../../../middlewares/flutterwave/flutter
 import { ValidationMiddleWare, checkPayments } from '../../../middlewares';
 
 const { newTicketValidation } = ValidationMiddleWare;
-const { checkPyament } = checkPayments;
+const { checkPyament, findTickets } = checkPayments;
 const router = express.Router();
 
 router.post('/newTicket/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, ticketController.saveTicket);
-router.post('/newTicket/validate/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, ticketController.returnValidated);
+router.post('/newTicket/validate/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, findTickets, ticketController.returnValidated);
 router.get('/byEvent/:eventId', isAuthenticated, allowedRoles([2, 3]), ticketController.getTicketByEvent);
 router.get('/byEventAndUser/:eventId', isAuthenticated, allowedRoles([2, 3, 4, 5]), ticketController.getTicketByEventAndUser);
 router.get('/byUser', isAuthenticated, allowedRoles([4, 5]), ticketController.getTicketByUser);

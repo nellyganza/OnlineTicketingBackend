@@ -43,6 +43,7 @@ module.exports = (sequelize, DataTypes) => {
     dateAndTimme: DataTypes.DATE,
     startDate: DataTypes.DATE,
     endDate: DataTypes.DATE,
+    duration: DataTypes.DOUBLE,
     place: DataTypes.STRING,
     country: DataTypes.STRING,
     description: DataTypes.STRING,

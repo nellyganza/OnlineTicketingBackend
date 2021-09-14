@@ -35,48 +35,17 @@ export default class ticketController {
         util.setError(404, 'selected Event not Exist');
         return util.send(res);
       }
-      const i = 0;
       _.map(attender, async (att) => {
-        const ticket = await ticketService.findBynationalId({ eventId, nationalId: att.nationalId });
-        if (!ticket) {
-          const sittingPlace = await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces') - 1;
-          const savedTicket = await ticketService.createTicket({
-            ...att, eventId, userId, paymenttype: pay.paymenttype, sittingPlace,
-          });
-          const { id, nationalId } = savedTicket.dataValues;
-          eventEmitter.emit('SendSucessfullPaymentNotification', id, { nationalId, names: att.fullName });
-          await updateEvent(eventId);
-          await updatePaymentGrade(att.type);
-          await updateSittingPlace(eventId, att.type);
-
-          messages.push(`Ticket of ${att.fullName} from event ${event.title} saved`);
-        } else {
-          messages.push(`${att.fullName} already have bought ticket from event ${event.title}`);
-        }
+        const sittingPlace = await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces') - 1;
+        const savedTicket = await ticketService.createTicket({
+          ...att, eventId, userId, paymenttype: pay.paymenttype, sittingPlace,
+        });
+        const { id, nationalId } = savedTicket.dataValues;
+        eventEmitter.emit('SendSucessfullPaymentNotification', id, { nationalId, names: att.fullName });
+        await updateEvent(eventId);
+        await updatePaymentGrade(att.type);
+        await updateSittingPlace(eventId, att.type);
       });
-      // Object.keys(attender).forEach(async (method) => {
-      //   const ticket = await ticketService.findBynationalId({ eventId, nationalId: attender[method].nationalId });
-      //   if (!ticket) {
-      //     i++;
-      //     const savedTicket = await ticketService.createTicket({
-      //       ...attender[method], eventId, userId, paymenttype: pay.paymenttype,
-      //     });
-      //     const { transaction_ref } = savedTransacrion.dataValues;
-      //     const transactionId = savedTransacrion.dataValues.id;
-      //     const { id, nationalId } = savedTicket.dataValues;
-      //     await transactionTicketService.createTransactionTicket({
-      //       transactionId, transaction_ref, ticketId: id, nationalId,
-      //     });
-      //     eventEmitter.emit('SendSucessfullPaymentNotification', id);
-      //     updateEvent(eventId);
-      //     updateSittingPlace(eventId, attender[method].type);
-      //     updatePaymentGrade(attender[method].type);
-      //     await getAndUpdateSittingPlace(eventId, attender[method].type, 'updatePlaces');
-      //     messages.push(`Ticket of ${attender[method].fullName} from event ${event.title} saved`);
-      //   } else {
-      //     messages.push(`${attender[method].fullName} already have bought ticket from event ${event.title}`);
-      //   }
-      // });
       util.setSuccess(200, messages);
       util.send(res);
     } catch (error) {
