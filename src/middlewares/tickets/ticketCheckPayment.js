@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { at } from 'lodash';
 import transactionService from '../../services/transactionService';
 import ticketService from '../../services/ticketService';
 import transactionTicketService from '../../services/transactionTicketService';
@@ -9,17 +9,28 @@ const util = new Util();
 
 export const findTickets = async (req, res, next) => {
   const userId = req.userInfo.id;
-  const { pay } = req.body;
+  const { pay, attender } = req.body;
   const eventId = req.params.eventId;
-  const messages = [];
+  let messages = '';
 
   try {
+    const attansers = _.map(_.groupBy(attender, (a) => a.type), (a, i) => ({ id: Number(i), number: a.length }));
+
     const event = await EventService.findById(eventId);
     if (!event) {
       util.setError(404, 'selected Event not Exist');
       return util.send(res);
     }
-    const { attender } = req.body;
+    _.map(attansers, (a) => {
+      const { placesLeft, name } = event.EventSittingPlaces.find((p) => p.id === a.id) || 0;
+      if (placesLeft < a.number) {
+        messages = `${messages}\n In ${name} remains ${placesLeft} Tickets and your requesting ${a.number} Tickets`;
+      }
+    });
+    if (messages.length > 0) {
+      util.setError(400, messages);
+      return util.send(res);
+    }
 
     const natIDs = [];
     _.map(attender, async (att) => {
@@ -28,7 +39,7 @@ export const findTickets = async (req, res, next) => {
     const tickets = await ticketService.findByTicketsExists(eventId, natIDs);
     if (tickets.length > 0) {
       _.map(tickets, async (att) => {
-        messages.push(`${att.fullName} with ID/Passport ${att.nationalId} already have bought ticket from event ${event.title}`);
+        messages = `${messages}\n ${att.fullName} with ID/Passport ${att.nationalId} already have bought ticket from event ${event.title}`;
       });
 
       util.setError(400, messages);
@@ -52,7 +63,6 @@ export const checkPyament = async (req, res, next) => {
   }
   const { userId, id } = ticket.dataValues;
   const txTService = await transactionTicketService.findByProp({ nationalId, ticketId: id });
-  console.log(txTService);
   if (txTService.length > 0) {
     txTService.forEach(async (txt) => {
       const { transaction_ref } = txt.dataValues;

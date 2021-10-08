@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import models from '../models';
 
 const {
-  Ticket, Event, Users, EventPayment,PaymentMethod
+  Ticket, Event, Users, EventPayment, PaymentMethod,
 } = models;
 /**
  * @exports
@@ -44,7 +44,7 @@ class TicketService {
     return Ticket.findAll({
       where: prop,
       include: [
-        { model: Users }, { model: Event,include:[{ model: PaymentMethod }] },{ model: EventPayment },
+        { model: Users }, { model: Event, include: [{ model: PaymentMethod }] }, { model: EventPayment },
       ],
     });
   }

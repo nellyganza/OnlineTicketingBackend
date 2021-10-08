@@ -44,7 +44,7 @@ export default class ticketController {
         await updatePaymentGrade(att.type);
         await updateSittingPlace(eventId, att.type);
       });
-      util.setSuccess(200, messages);
+      util.setSuccess(200, 'Tickets Saved Success');
       util.send(res);
     } catch (error) {
       util.setError(404, error.message);

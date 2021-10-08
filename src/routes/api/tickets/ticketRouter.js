@@ -14,8 +14,8 @@ router.post('/newTicket/validate/:eventId', isAuthenticated, allowedRoles([1, 2,
 router.get('/byEvent/:eventId', isAuthenticated, allowedRoles([2, 3]), ticketController.getTicketByEvent);
 router.get('/byEventAndUser/:eventId', isAuthenticated, allowedRoles([2, 3, 4, 5]), ticketController.getTicketByEventAndUser);
 router.get('/byUser', isAuthenticated, allowedRoles([4, 5]), ticketController.getTicketByUser);
-router.post('/newTicket/payment/cardpay/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, cardPay);
-router.post('/newTicket/payment/momopay/:eventId', isAuthenticated, allowedRoles([4, 5]), newTicketValidation, rwMobileMoney);
+router.post('/newTicket/payment/cardpay/:eventId', isAuthenticated, allowedRoles([1, 2, 3, 4, 5]), newTicketValidation, cardPay);
+router.post('/newTicket/payment/momopay/:eventId', isAuthenticated, allowedRoles([1, 2, 3, 4, 5]), newTicketValidation, findTickets, rwMobileMoney);
 router.get('/newTicket/payment/webhook', ticketController.paymentVerificationWebhook);
 router.get('/newTicket/failed/payment/webhook', ticketController.paymentVerificationWebhook);
 // router.put('/checkup/payment/:eventId', checkPyament, ticketController.entrance);

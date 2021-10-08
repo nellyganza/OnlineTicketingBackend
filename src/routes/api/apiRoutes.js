@@ -13,6 +13,8 @@ import card from './cards/cardRouter';
 import transactions from './transactions/transactionRouter';
 import comments from './comments/commentrouter';
 import notification from './notifications';
+import clients from './clients/clientsRouter';
+import image from './images/imagesRouter';
 
 const router = express.Router();
 router.use('/users', user);
@@ -29,4 +31,6 @@ router.use('/cards', card);
 router.use('/transactions', transactions);
 router.use('/comments', comments);
 router.use('/notifications', notification);
+router.use('/client', clients);
+router.use('/image', image);
 export default router;
