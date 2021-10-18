@@ -11,6 +11,7 @@ import userService from '../../services/userService';
 
 import notificationService from '../../services/notifications';
 import { renderEmail, sendNotification } from './emailNotifier';
+import { sendSms, sendTwilloSms } from '../../config/sendSms';
 
 const QRCode = require('qrcode');
 
@@ -121,7 +122,8 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (ticketId, datas) => 
       attachement: attach,
     });
 
-    // sendMessageSMS(phoneNumber, msms);
+    sendTwilloSms(phoneNumber, msms);
+    sendSms(phoneNumber, msms);
 
     logger.info(buyerMessage);
     logger.info(sellerMessage);
@@ -181,7 +183,7 @@ eventEmitter.on('SendSucessfullPaymentNotificationUssd', async (ticketId, datas)
       attachement: attach,
     });
 
-    // sendMessageSMS(phoneNumber, msms);
+    // sendTwilloSms(phoneNumber, msms);
   } catch (error) {
     console.log(error);
     logger.error(error.message);

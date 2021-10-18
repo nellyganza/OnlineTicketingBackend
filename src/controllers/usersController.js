@@ -129,7 +129,7 @@ export default class user {
 
       const currentUser = await userService.findByEmail(email);
       if (!currentUser) {
-        util.setError(404, 'User not exist');
+        util.setError(404, 'Incorrect Email Address');
         return util.send(res);
       }
       if (currentUser.isVerified === false) {
@@ -153,7 +153,7 @@ export default class user {
         util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken });
         return util.send(res);
       }
-      util.setError(401, 'Incorrect username or password');
+      util.setError(401, 'Incorrect password');
       return util.send(res);
     } catch (err) {
       util.setError(400, err.message);

@@ -10,8 +10,8 @@ export const signupValidateSchema = joi.object({
   password: joi.string().required().min(6)
     .max(32),
   confirmPassword: joi.string().valid(joi.ref('password')).required(),
-  firstName: joi.string().required().min(4).max(16),
-  lastName: joi.string().required().min(4).max(16),
+  firstName: joi.string().required().min(1).max(32),
+  lastName: joi.string().required().min(1).max(32),
   phoneNumber: joi.string().required().pattern(/^\+(?:[0-9] ?){6,14}[0-9]$/),
 });
 

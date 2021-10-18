@@ -15,6 +15,7 @@ import comments from './comments/commentrouter';
 import notification from './notifications';
 import clients from './clients/clientsRouter';
 import image from './images/imagesRouter';
+import flutterwave from './flutterwave/flutterwave';
 
 const router = express.Router();
 router.use('/users', user);
@@ -33,4 +34,5 @@ router.use('/comments', comments);
 router.use('/notifications', notification);
 router.use('/client', clients);
 router.use('/image', image);
+router.use('/flutterwave', flutterwave);
 export default router;

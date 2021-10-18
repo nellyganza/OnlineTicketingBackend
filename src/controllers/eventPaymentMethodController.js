@@ -47,7 +47,7 @@ export default class eventPaymentController {
     try {
       const { id } = req.params;
       if (!id) {
-        util.setError(400, 'Invalid Place Id');
+        util.setError(400, 'Invalid Receiver');
         return util.send(res);
       }
       const PaymentMethodEvents = await eventPaymentService.updateAtt({ ...req.body }, { id });

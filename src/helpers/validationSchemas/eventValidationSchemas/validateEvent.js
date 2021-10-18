@@ -19,9 +19,13 @@ export const newEventSchema = joi.object({
 
 export const newPaymentMethodSchema = joi.object({
   name: joi.string().required(),
-  value: joi.string().required().max(2),
+  value: joi.any().required(),
   accNumber: joi.string().required(),
   accName: joi.string().required(),
+  phoneNumber: joi.string().required(),
+  email: joi.string().required(),
+  flutterId: joi.string().required(),
+
 });
 
 export const newStittingPlaceSchema = joi.object({
@@ -50,4 +54,5 @@ export const oldEventSchema = joi.object({
   share: joi.boolean().required(),
   status: joi.string().required(),
   placeImage: joi.any(),
+  ticketLeft: joi.any(),
 });

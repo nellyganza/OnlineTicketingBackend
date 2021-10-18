@@ -1,5 +1,6 @@
 import Util from '../helpers/utils';
 import clientsService from '../services/clientService';
+import { cloudinaryUploader } from '../helpers/cloudinaryUploader';
 
 const fs = require('fs');
 
@@ -7,7 +8,8 @@ const util = new Util();
 export default class contact {
   static async registerClient(req, res) {
     try {
-      const savedclient = await clientsService.createClients({ title: req.body.title, image: fs.readFileSync(req.files[0].path) });
+      const url = await cloudinaryUploader(req.files[0].path);
+      const savedclient = await clientsService.createClients({ title: req.body.title, image: url });
       util.setSuccess(200, 'Client Saved', savedclient);
       return util.send(res);
     } catch (error) {

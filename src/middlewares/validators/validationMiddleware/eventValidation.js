@@ -45,6 +45,7 @@ const paymentM = (req) => {
         paymentErrors.push(Error);
       }
     });
+    console.log(paymentErrors);
     if (paymentErrors.length > 0) {
       obj.error = true;
       obj.body = { ...paymentErrors };
@@ -123,6 +124,7 @@ export const newEventEventValidation = (req, res, next) => {
       const errors = {
         ...n.body, ...pm.error, ...s.body, ...pg.body,
       };
+      console.log(errors);
       util.setError(400, errors.Error);
       return util.send(res);
     }

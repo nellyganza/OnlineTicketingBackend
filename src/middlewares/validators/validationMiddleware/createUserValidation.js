@@ -16,7 +16,7 @@ const util = new Util();
 export const createUserValidation = async (req, res, next) => {
   const { error } = validateUser.validate(req.body);
   if (error) {
-    util.setError(400, 'Validation error occurred');
+    util.setError(400, error.message);
     return util.send(res);
   }
   next();

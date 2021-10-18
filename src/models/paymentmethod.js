@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     accName: DataTypes.STRING,
+    phoneNumber: DataTypes.STRING,
+    email: DataTypes.STRING,
+    flutterId: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'PaymentMethod',

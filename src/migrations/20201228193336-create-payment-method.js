@@ -19,7 +19,16 @@ module.exports = {
       accNumber: {
         type: Sequelize.STRING,
       },
+      flutterId: {
+        type: Sequelize.STRING,
+      },
       accName: {
+        type: Sequelize.STRING,
+      },
+      phoneNumber: {
+        type: Sequelize.STRING,
+      },
+      email: {
         type: Sequelize.STRING,
       },
       createdAt: {

@@ -1,5 +1,6 @@
 import Util from '../helpers/utils';
 import imagesService from '../services/slidingImageService';
+import { cloudinaryUploader } from '../helpers/cloudinaryUploader';
 
 const fs = require('fs');
 
@@ -7,7 +8,8 @@ const util = new Util();
 export default class imagesController {
   static async registerImage(req, res) {
     try {
-      const savedimage = await imagesService.createslidingImages({ title: req.body.title, image: fs.readFileSync(req.files[0].path) });
+      const url = await cloudinaryUploader(req.files[0].path);
+      const savedimage = await imagesService.createslidingImages({ title: req.body.title, image: url });
       util.setSuccess(200, 'Image Saved', savedimage);
       return util.send(res);
     } catch (error) {

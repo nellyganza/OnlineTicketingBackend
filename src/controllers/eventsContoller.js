@@ -8,6 +8,7 @@ import Util from '../helpers/utils';
 const util = new Util();
 export default class eventController {
   static async saveEvent(req, res) {
+    console.log('Saving Event');
     const { id } = req.userInfo;
     const {
       event, paymentMethod, sittingPlace, paymentGradeCost,
@@ -35,7 +36,8 @@ export default class eventController {
       util.setSuccess(201, 'Events Prepared Success', { savedEvent });
       return util.send(res);
     } catch (error) {
-      util.setError(500, error.message);
+      util.setError(500, error);
+      console.log(error);
       return util.send(res);
     }
   }
