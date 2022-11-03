@@ -13,8 +13,8 @@ class EventPaymentService {
    * @memberof EventPaymentService
    * @returns {object} data
    */
-  static createEventPayment(newEventPayment) {
-    return EventPayment.create(newEventPayment);
+  static createEventPayment(newEventPayment, transaction) {
+    return EventPayment.create(newEventPayment, { transaction });
   }
 
   static updateAtt(set, prop) {
@@ -51,8 +51,8 @@ class EventPaymentService {
     });
   }
 
-  static incrementPaymentGrade(id) {
-    return EventPayment.increment({ boughtTickets: 1 }, { where: { id } });
+  static incrementPaymentGrade(id, transaction) {
+    return EventPayment.increment({ boughtTickets: 1 }, { where: { id }, transaction });
   }
 
   static deleteEventPayment(modelId) {

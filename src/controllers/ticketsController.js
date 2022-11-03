@@ -7,6 +7,7 @@ import {
 } from '../helpers/ControllerFunctions';
 import { eventEmitter } from '../helpers/notifications/eventEmitter';
 import guestService from '../services/guestService';
+import { sequelize } from '../models';
 
 const util = new Util();
 
@@ -15,6 +16,7 @@ export default class ticketController {
     const userId = req.userInfo.id;
     const { pay } = req.body;
     const eventId = req.params.eventId;
+    const transaction = await sequelize.transaction();
     try {
       const { attender } = req.body;
 
@@ -23,20 +25,27 @@ export default class ticketController {
         util.setError(404, 'selected Event not Exist');
         return util.send(res);
       }
-      _.map(attender, async (att) => {
-        const sittingPlace = await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces') - 1;
+      const keys = Object.keys(attender).map((e) => e);
+
+      transaction.afterCommit(async () => {
+        util.setSuccess(200, 'Tickets Saved Success');
+        util.send(res);
+      });
+      for (let index = 0; index < keys.length; index++) {
+        const att = attender[keys[index]];
+        const sittingPlace = await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces', transaction) - 1;
         const savedTicket = await ticketService.createTicket({
           ...att, eventId, userId, paymenttype: pay.paymenttype, sittingPlace,
-        });
+        }, transaction);
+        await updateEvent(eventId, transaction);
+        await updatePaymentGrade(att.type, transaction);
+        await updateSittingPlace(eventId, att.type, transaction);
         const { id, nationalId } = savedTicket.dataValues;
         eventEmitter.emit('SendSucessfullPaymentNotification', id, { nationalId, names: att.fullName });
-        await updateEvent(eventId);
-        await updatePaymentGrade(att.type);
-        await updateSittingPlace(eventId, att.type);
-      });
-      util.setSuccess(200, 'Tickets Saved Success');
-      util.send(res);
+      }
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       util.setError(404, error.message);
       return util.send(res);
     }

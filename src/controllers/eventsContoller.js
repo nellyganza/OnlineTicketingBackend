@@ -5,6 +5,7 @@ import eventPaymentMethodService from '../services/paymentMethodService';
 import { getAndUpdateSittingPlace } from '../helpers/ControllerFunctions';
 import Util from '../helpers/utils';
 import { eventEmitter } from '../helpers/notifications/eventEmitter';
+import { sequelize } from '../models';
 
 const util = new Util();
 export default class EventController {
@@ -17,30 +18,45 @@ export default class EventController {
       util.setError(400, 'Bad Information Provided');
       return util.send(res);
     }
+    const transaction = await sequelize.transaction();
     const saveEvent = { ...event, ticketLeft: event.numberofTicket, userId: id };
+    console.log(event, paymentMethod, sittingPlace, paymentGradeCost, saveEvent);
     try {
-      const savedEvent = await eventService.createEvent(saveEvent);
+      const savedEvent = await eventService.createEvent(saveEvent,transaction);
       if (!savedEvent) {
         util.setError(400, 'Event not Created');
         return util.send(res);
       }
 
-      const paym = [];
-      Object.keys(paymentMethod).forEach(async (method) => {
-        const savedPayment = await eventPaymentMethodService.createPaymentMethod({ ...paymentMethod[method], eventId: savedEvent.id });
-        paym.push(savedPayment);
-      });
-      Object.keys(sittingPlace).forEach(async (sitti) => {
-        await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces });
-      });
-      Object.keys(paymentGradeCost).forEach(async (grade) => {
-        await eventPaymentService.createEventPayment({ ...paymentGradeCost[grade], eventId: savedEvent.id });
-      });
 
-      util.setSuccess(201, 'Events Prepared Success', { savedEvent });
-      eventEmitter.emit('createdEvent', { user: req.userInfo, event: { ...savedEvent.dataValues }, paymentMethod });
-      return util.send(res);
+      let methodkeys = Object.keys(paymentMethod);
+      const savedMethods = [];
+      for (let index = 0; index < methodkeys.length; index++) {
+        const method = methodkeys[index];
+        const savedPayment = await eventPaymentMethodService.createPaymentMethod({ ...paymentMethod[method], eventId: savedEvent.id },transaction);
+        savedMethods.push({...savedPayment.dataValues});
+      }
+
+      let sittingkeys = Object.keys(sittingPlace);
+      for (let index = 0; index < sittingkeys.length; index++) {
+        const sitti = sittingkeys[index];
+        await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces },transaction);
+      }
+
+      let gradeKeys = Object.keys(paymentGradeCost);
+      for (let index = 0; index < gradeKeys.length; index++) {
+        const grade = gradeKeys[index];
+        await eventPaymentService.createEventPayment({ ...paymentGradeCost[grade], eventId: savedEvent.id },transaction);
+      }
+
+      transaction.afterCommit(async () => {
+        util.setSuccess(201, 'Events Prepared Success', { savedEvent });
+        eventEmitter.emit('createdEvent', { user: req.userInfo, event: { ...savedEvent.dataValues }, savedMethods });
+        return util.send(res);
+      });
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       util.setError(500, error.message);
       return util.send(res);
     }
@@ -76,12 +92,12 @@ export default class EventController {
   static async getFillteredEvents(req, res) {
     try {
       const {
-        name, place
+        name, place,
       } = req.query;
       const { page, size } = req.query;
       const category = req.query.category ? req.query.category.split(',') : [];
-      console.log(page,size);
-      const result = await eventService.findByFilters2(name, place, category,undefined, page, size);
+      console.log(page, size);
+      const result = await eventService.findByFilters2(name, place, category, undefined, page, size);
       console.log(result);
       if (result) {
         util.setSuccess(200, 'Events Found', result);

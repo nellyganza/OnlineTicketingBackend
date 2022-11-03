@@ -8,11 +8,8 @@ export default class Contact {
       const page = Number(req.query.page);
       const limit = Number(req.query.limit);
 
-      const contacts = await contactService.getContacts();
-      const result = {};
-      result.number = contacts.length;
-      result.result = contacts.slice(page, page + limit);
-      util.setSuccess(200, 'all contacts', result);
+      const contacts = await contactService.getContacts(page, limit);
+      util.setSuccess(200, 'all contacts', contacts);
       return util.send(res);
     } catch (error) {
       util.setError(500, 'Unable to retrieve all contacts');

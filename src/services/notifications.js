@@ -1,11 +1,12 @@
 import models from '../models';
+import MainService from './MainService';
 
 const { Notification } = models;
 /**
  * @exports
  * @class Notificationservice
  */
-class Notificationervice {
+class Notificationervice extends MainService {
   /**
    * create new user
    * @static createNotification
@@ -17,13 +18,19 @@ class Notificationervice {
     return Notification.create(newNotification);
   }
 
-  static getNotifications(id) {
-    return Notification.findAll(
+  static getNotifications(id, page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Notification.findAndCountAll(
       {
         where: { userId: id },
         order: [['createdAt', 'ASC']],
+        limit,
+        offset,
       },
-    );
+    ).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
   }
 
   static deleteAllNotification(userId) {

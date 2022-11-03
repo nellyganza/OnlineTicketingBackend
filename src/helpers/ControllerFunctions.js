@@ -2,18 +2,18 @@ import EventPaymentService from '../services/eventPaymentService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import EventService from '../services/eventService';
 
-export const updateEvent = async (eventid) => {
-  await EventService.incrementNumberOfBought(eventid);
-  await EventService.decrementTicketLeft(eventid);
+export const updateEvent = async (eventid, transaction) => {
+  await EventService.incrementNumberOfBought(eventid, transaction);
+  await EventService.decrementTicketLeft(eventid, transaction);
 };
 
-export const updateSittingPlace = async (eventId, type) => {
+export const updateSittingPlace = async (eventId, type, transaction) => {
   const gradeType = await EventPaymentService.findOneById(type);
   const sitting = await EventSittingPlaceService.findOneByName({ eventId, name: gradeType.name });
-  await EventSittingPlaceService.incrementNumberOfPeople(sitting.id);
-  await EventSittingPlaceService.decrementPlaceLeft(sitting.id);
+  await EventSittingPlaceService.incrementNumberOfPeople(sitting.id, transaction);
+  await EventSittingPlaceService.decrementPlaceLeft(sitting.id, transaction);
 };
-export const getAndUpdateSittingPlace = async (eventId, type, action) => {
+export const getAndUpdateSittingPlace = async (eventId, type, action, transaction) => {
   if (action === 'getPlaces') {
     const places = [];
     let placetobegiven = 1;
@@ -70,11 +70,11 @@ export const getAndUpdateSittingPlace = async (eventId, type, action) => {
         sittingPlace = place[i][0].value;
       }
     }
-    await EventSittingPlaceService.updateAtt({ placeAvailable: place }, { id: sitting.id });
+    await EventSittingPlaceService.updateAtt({ placeAvailable: place }, { id: sitting.id }, transaction);
     return sittingPlace;
   }
 };
 
-export const updatePaymentGrade = async (id) => {
-  await EventPaymentService.incrementPaymentGrade(id);
+export const updatePaymentGrade = async (id, transaction) => {
+  await EventPaymentService.incrementPaymentGrade(id, transaction);
 };

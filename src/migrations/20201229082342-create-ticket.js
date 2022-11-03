@@ -43,6 +43,10 @@ module.exports = {
       currentSatus: {
         type: Sequelize.STRING,
       },
+      isChild: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -50,6 +54,12 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+      },
+    }, {
+      uniqueKeys: {
+        Tickets_unique: {
+          fields: ['eventId', 'nationalId'],
+        },
       },
     });
   },

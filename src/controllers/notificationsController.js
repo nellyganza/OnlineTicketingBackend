@@ -30,11 +30,8 @@ export default class Notifier {
       const limit = Number(req.query.limit);
       const { id } = req.userInfo;
 
-      const notifications = await notificationService.getNotifications(id);
-      const result = {};
-      result.number = notifications.length;
-      result.result = notifications.slice(page, page + limit);
-      util.setSuccess(200, 'all Notifications', result);
+      const notifications = await notificationService.getNotifications(id, page, limit);
+      util.setSuccess(200, 'all Notifications', notifications);
       return util.send(res);
     } catch (error) {
       util.setError(500, 'Unable to retrieve all notifications');

@@ -18,8 +18,8 @@ class EventService extends MainService {
    * @memberof EventService
    * @returns {object} data
    */
-  static createEvent(newEvent) {
-    return Event.create(newEvent);
+  static createEvent(newEvent,transaction) {
+    return Event.create(newEvent,{transaction});
   }
 
   static updateAtt(set, prop) {
@@ -131,7 +131,7 @@ class EventService extends MainService {
 
   static findByFilters2(name, place, category, dateRange, page, size) {
     const { limit, offset } = this.getPagination(page, size);
-    console.log(limit,offset)
+    console.log(limit, offset);
     return Event.findAndCountAll({
       where: {
         [Op.and]: [
@@ -213,12 +213,12 @@ class EventService extends MainService {
     });
   }
 
-  static incrementNumberOfBought(id) {
-    return Event.increment({ numberboughtticket: 1 }, { where: { id } });
+  static incrementNumberOfBought(id, t) {
+    return Event.increment({ numberboughtticket: 1 }, { where: { id }, transaction: t });
   }
 
-  static decrementTicketLeft(id) {
-    return Event.decrement({ ticketLeft: 1 }, { where: { id } });
+  static decrementTicketLeft(id, t) {
+    return Event.decrement({ ticketLeft: 1 }, { where: { id }, transaction: t });
   }
 
   static deleteEvent(modelId) {

@@ -16,12 +16,12 @@ import { transporter } from '../mailHelper';
 import { successCreationTemplate } from '../../services/templates/succeCreatedEventEmail';
 import { successCreationPatTemplate } from '../../services/templates/eventCreatedPattern';
 import Util from '../utils';
+import {logger} from '../Logger' 
 
 const QRCode = require('qrcode');
 
 const unirest = require('unirest');
 
-const logger = new Logger('intercore.log');
 const util = new Util();
 
 const server_url = 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify';
@@ -71,7 +71,8 @@ eventEmitter.on('completeEvent', async () => {
 });
 
 eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
-  const patt = `You have distributed shares for different Patterns 
+  try {
+    const patt = `You have distributed shares for different Patterns 
     <div>
      ${Object.values(paymentMethod).map((p, index) => `<br/><span>${index + 1}. ${p.name} who have ${p.value} %</span><br/>`)}
     </div>`;
@@ -98,6 +99,9 @@ eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
     };
     await transporter.sendMail(mailOptions2);
   });
+  } catch (error) {
+    logger.error(error.message);
+  }
 });
 
 eventEmitter.on('SendSucessfullPaymentNotification', async (ticketId, datas) => {

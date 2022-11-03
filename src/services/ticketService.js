@@ -17,8 +17,8 @@ class TicketService extends MainService {
    * @memberof TicketService
    * @returns {object} data
    */
-  static createTicket(newTicket) {
-    return Ticket.create(newTicket);
+  static createTicket(newTicket, t) {
+    return Ticket.create(newTicket, { transaction: t });
   }
 
   static updateAtt(set, prop) {

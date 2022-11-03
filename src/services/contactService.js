@@ -1,11 +1,12 @@
 import models from '../models';
+import MainService from './MainService';
 
 const { Contact } = models;
 /**
  * @exports
  * @class ContactService
  */
-class ContactService {
+class ContactService extends MainService {
   /**
    * create new user
    * @static createContact
@@ -28,10 +29,18 @@ class ContactService {
     });
   }
 
-  static getContacts() {
-    return Contact.findAll(
-      { order: [['createdAt', 'ASC']] },
-    );
+  static getContacts(page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Contact.findAndCountAll(
+      {
+        order: [['createdAt', 'ASC']],
+        limit,
+        offset,
+      },
+    ).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
   }
 
   /**

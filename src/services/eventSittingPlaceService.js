@@ -13,14 +13,15 @@ class EventSittingPlaceService {
    * @memberof EventSittingPlaceService
    * @returns {object} data
    */
-  static createEventSittingPlace(newEventSittingPlace) {
-    return EventSittingPlace.create(newEventSittingPlace);
+  static createEventSittingPlace(newEventSittingPlace,transaction) {
+    return EventSittingPlace.create(newEventSittingPlace,{transaction});
   }
 
-  static updateAtt(set, prop) {
+  static updateAtt(set, prop, t) {
     return EventSittingPlace.update(set, {
       returning: true,
       where: prop,
+      transaction: t,
     });
   }
 
@@ -51,12 +52,12 @@ class EventSittingPlaceService {
     });
   }
 
-  static incrementNumberOfPeople(id) {
-    return EventSittingPlace.increment({ numberOfpeople: 1 }, { where: { id } });
+  static incrementNumberOfPeople(id, transaction) {
+    return EventSittingPlace.increment({ numberOfpeople: 1 }, { where: { id }, transaction });
   }
 
-  static decrementPlaceLeft(id) {
-    return EventSittingPlace.decrement({ placesLeft: 1 }, { where: { id } });
+  static decrementPlaceLeft(id, transaction) {
+    return EventSittingPlace.decrement({ placesLeft: 1 }, { where: { id }, transaction });
   }
 
   static deleteEventSittingPlace(modelId) {
