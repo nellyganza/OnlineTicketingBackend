@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       models.Event.belongsTo(models.Users, {
         foreignKey: 'userId',
       });
+      models.Event.belongsTo(models.Category, {
+        foreignKey: 'categoryId',
+      });
     }
   }
   Event.init({
@@ -42,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     host: DataTypes.STRING,
-    userId: DataTypes.INTEGER,
+    userId: DataTypes.UUID,
     dateAndTimme: DataTypes.STRING,
     startDate: DataTypes.STRING,
     endDate: DataTypes.STRING,
@@ -74,8 +77,8 @@ module.exports = (sequelize, DataTypes) => {
     placeImage: {
       type: DataTypes.TEXT,
     },
-    eventType: {
-      type: DataTypes.STRING,
+    categoryId: {
+      type: DataTypes.UUID,
     },
   }, {
     sequelize,

@@ -3,15 +3,21 @@ module.exports = {
     await queryInterface.createTable('Ads', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       image: {
         type: Sequelize.STRING,
       },
-      location: {
-        type: Sequelize.STRING,
+      AdsPositionId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'AdsPositions',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       priority: {
         type: Sequelize.INTEGER,

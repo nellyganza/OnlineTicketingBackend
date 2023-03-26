@@ -1,7 +1,7 @@
 import { decodeToken } from './verifications/verifyToken';
 import Util from '../helpers/utils';
-import userService from '../services/userService';
 import tokenService from '../services/tokenService';
+import roleService from '../services/roleService';
 
 const util = new Util();
 
@@ -28,10 +28,11 @@ export const isAuthenticated = async (req, res, next) => {
 };
 
 export const allowedRoles = (roles) => {
-  const allow = (req, res, next) => {
+  const allow = async (req, res, next) => {
     try {
       const { RoleId } = req.userInfo;
-      if (roles.indexOf(RoleId) < 0) {
+      const role = await roleService.findById(RoleId);
+      if (roles.indexOf(role.slug) < 0) {
         util.setError(403, 'You are not allowed to permform this task');
         return util.send(res);
       }

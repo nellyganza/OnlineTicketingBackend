@@ -4,6 +4,7 @@ import ticketService from '../../services/ticketService';
 import transactionTicketService from '../../services/transactionTicketService';
 import Util from '../../helpers/utils';
 import EventService from '../../services/eventService';
+import EventSittingPlaceService from '../../services/eventSittingPlaceService';
 
 const util = new Util();
 
@@ -17,12 +18,13 @@ export const findTickets = async (req, res, next) => {
     const attansers = _.map(_.groupBy(attender, (a) => a.type), (a, i) => ({ id: Number(i), number: a.length }));
 
     const event = await EventService.findById(eventId);
+    const EventSittingPlaces = await EventSittingPlaceService.findByName({ eventId });
     if (!event) {
       util.setError(404, 'selected Event not Exist');
       return util.send(res);
     }
     _.map(attansers, (a) => {
-      const { placesLeft, name } = event.EventSittingPlaces.find((p) => p.id === a.id) || 0;
+      const { placesLeft, name } = EventSittingPlaces.find((p) => p.id === a.id) || 0;
       if (placesLeft < a.number) {
         messages = `${messages}\n In ${name} remains ${placesLeft} Tickets and your requesting ${a.number} Tickets`;
       }
@@ -47,7 +49,8 @@ export const findTickets = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    util.setError(404, error.message);
+    console.log(error);
+    util.setError(400, error.message);
     return util.send(res);
   }
 };

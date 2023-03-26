@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { pick } from 'lodash';
+import { propertiesToJson } from 'properties-file';
 import { sendLink } from '../utils/sendVerificationLink';
 import { newJwtToken } from '../helpers/tokenGenerator';
 import Util from '../helpers/utils';
@@ -15,22 +16,34 @@ import {
   sendPasswordResetLink,
 } from '../utils/sendPasswordLInk';
 import 'dotenv/config';
+import { deleteFileById } from '../middlewares/mongo/upload';
+import RoleService from '../services/roleService';
+
+const PropertiesReader = require('properties-reader');
 
 const util = new Util();
-export default class user {
+export default class User {
   static async signupWithEmail(req, res) {
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      const defaulRole = await RoleService.findByName({ slug: 'attender_user' });
       const newUser = {
+        campanyName: req.body.companyName,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
         phoneNumber: req.body.phoneNumber,
         password: hashedPassword,
+        category: req.body.category,
+        document: req.files && req.files[0] ? req.files[0].filename : '',
+        type: req.body.type,
+        RoleId: defaulRole.dataValues.id,
+        share: req.body.type === 'Organizer' ? 15 : 0,
       };
       const createdUser = await userService.createuser(newUser);
       return sendLink(res, createdUser);
     } catch (error) {
+      deleteFileById(req.files[0].id);
       util.setError(500, error.message);
       return util.send(res);
     }
@@ -80,6 +93,22 @@ export default class user {
       return res.redirect(`${process.env.FRONT_END_URL}/login?statusCode=200`);
     } catch (error) {
       return res.redirect(`${process.env.FRONT_END_URL}/login?statusCode=500`);
+    }
+  }
+
+  static async verifyByAdmin(req, res) {
+    try {
+      const { id } = req.params;
+      await userService.updateAtt({
+        isVerified: true,
+      }, {
+        id,
+      });
+      util.setSuccess(200, 'Account Verified Successfull', {});
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message, null);
+      return util.send(res);
     }
   }
 
@@ -146,9 +175,9 @@ export default class user {
       }
       const isMatch = await bcrypt.compare(password, currentUser.password);
       if (isMatch) {
-        const displayData = pick(currentUser.dataValues, ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture']);
+        const displayData = pick(currentUser.dataValues, ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture', 'Role', 'share']);
         const authToken = AuthTokenHelper.generateToken(displayData);
-        await tokenService.createToken({ token: authToken, user: displayData.id });
+        await tokenService.createToken({ token: authToken, userId: displayData.id });
         util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken });
         return util.send(res);
       }
@@ -216,12 +245,8 @@ export default class user {
   static async getUsers(req, res) {
     try {
       const users = await userService.getUsers();
-      if (users.length >= 1) {
-        const message = 'the users are found';
-        util.setSuccess(200, message, users);
-        return util.send(res);
-      }
-      util.setError(400, 'users not found');
+      const message = 'the users are found';
+      util.setSuccess(200, message, users);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);
@@ -232,12 +257,27 @@ export default class user {
   static async getManagerUsers(req, res) {
     try {
       const users = await userService.getAdminUsers();
-      if (users.length >= 1) {
-        const message = 'the users are found';
-        util.setSuccess(200, message, users);
-        return util.send(res);
+      const message = 'the users are found';
+      util.setSuccess(200, message, users);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async findByCategory(req, res) {
+    try {
+      const { name, value } = req.params;
+      let users = [];
+      if (name === 'category') {
+        users = await userService.findByProp({ category: value });
       }
-      util.setError(400, 'ther user not found');
+      if (name === 'type') {
+        users = await userService.findByProp({ type: value });
+      }
+      const message = 'the users are found';
+      util.setSuccess(200, message, users);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);
@@ -248,12 +288,32 @@ export default class user {
   static async updateProfile(req, res) {
     try {
       const { id } = req.userInfo;
-
       const userExist = await userService.findById(id);
       if (userExist) {
         const update = await userService.updateAtt({ ...req.body }, { id });
         if (update) {
           util.setSuccess(200, 'user profile updated');
+          return util.send(res);
+        }
+        util.setError(400, 'user profile not updated');
+        return util.send(res);
+      }
+      util.setError(400, 'The user doesn\'t exist');
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async updateUserInfo(req, res) {
+    try {
+      const { id } = req.body;
+      const userExist = await userService.findById(id);
+      if (userExist) {
+        const update = await userService.updateAtt({ ...req.body }, { id });
+        if (update) {
+          util.setSuccess(200, 'User updated successfully');
           return util.send(res);
         }
         util.setError(400, 'user profile not updated');
@@ -282,7 +342,7 @@ export default class user {
           };
           util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken: foundToken.token });
         } else {
-          util.setError(401, 'AUhtentication failed');
+          util.setError(401, 'Authentication failed');
         }
         return util.send(res);
       }
@@ -377,6 +437,29 @@ export default class user {
       return util.send(res);
     } catch (error) {
       util.setError(500, error);
+      return util.send(res);
+    }
+  }
+
+  static async getManagerAccount(req, res) {
+    try {
+      const data = propertiesToJson(`${process.env.PROPERTY_LOCATION}eticket.properties`);
+      const accName = {
+        id: data['bank.id'],
+        name: data['bank.name'],
+        code: data['bank.code'],
+      };
+      const resp = {
+        accName,
+        name: data.name,
+        accNumber: data.accNumber,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+      };
+      util.setSuccess(200, 'Data Result', { ...resp });
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
       return util.send(res);
     }
   }

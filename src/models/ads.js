@@ -11,11 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      models.Ads.belongsTo(models.AdsPosition, {
+        foreignKey: 'AdsPositionId',
+      });
     }
   }
   Ads.init({
     image: DataTypes.STRING,
-    location: DataTypes.STRING,
+    AdsPositionId: DataTypes.UUID,
     priority: DataTypes.INTEGER,
     link: DataTypes.TEXT,
   }, {

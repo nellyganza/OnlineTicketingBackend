@@ -16,11 +16,11 @@ module.exports = (sequelize, DataTypes) => {
       //   onDelete: 'CASCADE',
       // });
       models.Transactions.belongsTo(models.Users, {
-        foreignKey: 'user',
+        foreignKey: 'userId',
         onDelete: 'NO ACTION',
       });
       models.Transactions.belongsTo(models.Event, {
-        foreignKey: 'event',
+        foreignKey: 'eventId',
         onDelete: 'NO ACTION',
       });
       models.Transactions.hasMany(models.TransactionTickets, {
@@ -31,8 +31,18 @@ module.exports = (sequelize, DataTypes) => {
   Transactions.init({
     transaction_ref: DataTypes.STRING,
     order_id: DataTypes.STRING,
-    event: DataTypes.INTEGER,
-    user: DataTypes.INTEGER,
+    eventId: DataTypes.UUID,
+    userId: DataTypes.UUID,
+    ticketContent: {
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue('ticketContent');
+        return rawValue ? JSON.parse(rawValue) : null;
+      },
+      set(value) {
+        this.setDataValue('ticketContent', JSON.stringify(value) || '');
+      },
+    },
     status: {
       type: DataTypes.STRING,
       defaultValue: 'PENDING',

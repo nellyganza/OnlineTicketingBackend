@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   EventSittingPlace.init({
-    eventId: DataTypes.INTEGER,
+    eventId: DataTypes.UUID,
     name: DataTypes.STRING,
     totalPlaces: DataTypes.INTEGER,
     numberOfpeople: {

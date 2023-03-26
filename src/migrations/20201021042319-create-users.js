@@ -3,9 +3,9 @@ module.exports = {
     await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       firstName: {
         type: Sequelize.STRING,
@@ -15,16 +15,23 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
+        unique: true,
       },
       phoneNumber: {
         type: Sequelize.STRING,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
       },
       RoleId: {
-        type: Sequelize.INTEGER,
-        defaultValue: 5,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Roles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       profilePicture: {
         type: Sequelize.STRING,
@@ -33,7 +40,14 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: 'Individual',
       },
+      type: {
+        type: Sequelize.STRING,
+        defaultValue: 'Attendee',
+      },
       campanyName: {
+        type: Sequelize.STRING,
+      },
+      document: {
         type: Sequelize.STRING,
       },
       isVerified: {
@@ -59,6 +73,9 @@ module.exports = {
       },
       authToken: {
         type: Sequelize.TEXT,
+      },
+      share: {
+        type: Sequelize.INTEGER,
       },
     });
   },

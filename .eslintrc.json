@@ -28,6 +28,16 @@
         "max-len":"off",
         "no-param-reassign":"off",
         "import/prefer-default-export": "off",
-        "prefer-destructuring":"off"
+        "prefer-destructuring":"off",
+        "import/no-mutable-exports":"off",
+        "no-underscore-dangle":"off"
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"],
+                "moduleDirectory": ["node_modules", "src/"]
+            }
+        }
     }
 }

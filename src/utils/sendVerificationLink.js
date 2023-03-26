@@ -20,13 +20,19 @@ export const sendLink = async (res, userInfo) => {
       html: emailTemplate,
     };
     const emailsent = await transporter.sendMail(mailOptions);
+    let message = '';
     if (emailsent) {
-      const message = 'A verification email has been sent to you email please go and confirm that email';
+      message = 'A verification email has been sent to you email please go and confirm that email';
       const data = { token: tokenLink };
       util.setSuccess(201, message, data);
-	  return util.send(res);
+      return util.send(res);
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    if (error.code === 'EAUTH') {
+      util.setSuccess(200, 'Account Created but A verification email not Sent but you can contact the Administrator to activate your account', { token: null });
+    } else {
+      util.setError(500, error.message);
+    }
+    return util.send(res);
   }
 };

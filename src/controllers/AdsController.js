@@ -6,7 +6,10 @@ const util = new Util();
 export default class AdsController {
   static async saveAds(req, res) {
     try {
-      const savedAds = await adsService.createAds(req.body);
+      const { AdsPositionId, priority, link } = req.body;
+      const savedAds = await adsService.createAds({
+        AdsPositionId, priority, link, image: req.files && req.files[0] ? req.files[0].filename : '',
+      });
       if (!savedAds) {
         util.setError(400, 'Failed to create an Ads');
         util.send(res);
@@ -35,11 +38,19 @@ export default class AdsController {
   static async updateAds(req, res) {
     try {
       const { id } = req.params;
-      const updatedAds = await adsService.updateAtt({ ...req.body }, { id });
+      const { AdsPositionId, priority, link } = req.body;
+      const adToUpdate = await adsService.findById(id);
+      if (!adToUpdate) {
+        util.setError(400, 'Ad to update not found');
+        return util.send(res);
+      }
+      const updatedAds = await adsService.updateAtt({
+        AdsPositionId, priority, link, image: req.files && req.files[0] ? req.files[0].filename : adToUpdate.image,
+      }, { id });
       util.setSuccess(200, 'Ads updated successfully', updatedAds);
       return util.send(res);
     } catch (error) {
-      util.setError(500, 'Sorry Ads not deleted');
+      util.setError(500, 'Sorry Ads not Updated');
       return util.send(res);
     }
   }

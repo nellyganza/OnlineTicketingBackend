@@ -16,8 +16,8 @@ export default class Role {
 
   static async saveRole(req, res) {
     try {
-      const { name } = req.body;
-      const createdRole = await roleService.createRole({ name });
+      const { name, description } = req.body;
+      const createdRole = await roleService.createRole({ name, description, slug: name.toLowerCase().replace(/ /g, '_') });
       util.setSuccess(200, 'Role created', createdRole);
       return util.send(res);
     } catch (error) {

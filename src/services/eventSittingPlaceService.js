@@ -13,15 +13,15 @@ class EventSittingPlaceService {
    * @memberof EventSittingPlaceService
    * @returns {object} data
    */
-  static createEventSittingPlace(newEventSittingPlace,transaction) {
-    return EventSittingPlace.create(newEventSittingPlace,{transaction});
+  static createEventSittingPlace(newEventSittingPlace, transaction) {
+    return EventSittingPlace.create(newEventSittingPlace, { transaction });
   }
 
-  static updateAtt(set, prop, t) {
+  static updateAtt(set, prop, transaction) {
     return EventSittingPlace.update(set, {
       returning: true,
       where: prop,
-      transaction: t,
+      transaction,
     });
   }
 

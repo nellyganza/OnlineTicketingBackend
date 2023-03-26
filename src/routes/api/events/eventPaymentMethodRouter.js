@@ -4,9 +4,9 @@ import { isAuthenticated, allowedRoles } from '../../../middlewares/authorizatio
 
 const router = express.Router();
 
-router.post('/:eventId', isAuthenticated, allowedRoles([2, 3]), eventController.createPaymentMethodByEId);
+router.post('/:eventId', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.createPaymentMethodByEId);
 router.get('/:eventId', eventController.getAllPaymentMethodByEId);
-router.put('/:id', isAuthenticated, allowedRoles([2, 3]), eventController.updatePaymentPlaceByPId);
-router.delete('/:id', isAuthenticated, allowedRoles([2, 3]), eventController.deletePaymentPlaceByPId);
+router.put('/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.updatePaymentPlaceByPId);
+router.delete('/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.deletePaymentPlaceByPId);
 
 export default router;

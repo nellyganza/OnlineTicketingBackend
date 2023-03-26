@@ -1,6 +1,6 @@
 import models from '../models';
 
-const { Guest } = models;
+const { Guest, EventPayment } = models;
 /**
  * @exports
  * @class GuestService
@@ -27,6 +27,7 @@ class GuestService {
   static getGuests(eventId) {
     return Guest.findAll({
       where: { eventId },
+      include: [{ model: EventPayment }],
     });
   }
 
@@ -38,12 +39,14 @@ class GuestService {
   static findByName(prop) {
     return Guest.findOne({
       where: prop,
+      include: [{ model: EventPayment }],
     });
   }
 
   static findById(modelId) {
     return Guest.findOne({
       where: { id: modelId },
+      include: [{ model: EventPayment }],
     });
   }
 

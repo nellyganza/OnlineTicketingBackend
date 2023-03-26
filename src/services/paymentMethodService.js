@@ -13,8 +13,8 @@ class PaymentMethodService {
    * @memberof PaymentMethodService
    * @returns {object} data
    */
-  static createPaymentMethod(newPaymentMethod,transaction) {
-    return PaymentMethod.create(newPaymentMethod,{transaction});
+  static createPaymentMethod(newPaymentMethod, transaction) {
+    return PaymentMethod.create(newPaymentMethod, { transaction });
   }
 
   static updateAtt(set, prop) {

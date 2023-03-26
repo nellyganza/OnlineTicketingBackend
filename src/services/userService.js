@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import models from '../models';
 
 const {
-  Users, Notification, Event, Comment, EventPayment, EventSittingPlace, PaymentMethod, Ticket,
+  Users, Notification, Event, Comment, EventPayment, EventSittingPlace, PaymentMethod, Roles,
 } = models;
 /**
  * @exports
@@ -22,7 +22,7 @@ class UserService {
 
   static findByProp(prop) {
     return Users.findAll({
-      where: prop,
+      where: prop, include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
     });
   }
 
@@ -65,6 +65,7 @@ class UserService {
         where: {
           isVerified: true,
         },
+        include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
         attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture'],
       },
     );
@@ -73,10 +74,14 @@ class UserService {
   static getAdminUsers() {
     return Users.findAll(
       {
-        where: {
-          RoleId: { [Op.in]: [2, 3] },
-        },
-        attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture'],
+        include: [{
+          model: Roles,
+          where: {
+            slug: { [Op.in]: ['manager', 'event_admin'] },
+          },
+          attributes: ['id', 'name', 'slug'],
+        }],
+        attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture', 'share'],
       },
     );
   }
@@ -89,12 +94,13 @@ class UserService {
   static findByEmail(prop) {
     return Users.findOne({
       where: { email: prop },
+      include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
     });
   }
 
   static findById(modelId) {
     return Users.findOne({
-      where: { id: modelId },
+      where: { id: modelId }, include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
     });
   }
 

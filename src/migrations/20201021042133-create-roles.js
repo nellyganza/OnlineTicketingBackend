@@ -3,11 +3,18 @@ module.exports = {
     await queryInterface.createTable('Roles', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       name: {
+        type: Sequelize.STRING,
+        unique: true,
+      },
+      description: {
+        type: Sequelize.STRING,
+      },
+      slug: {
         type: Sequelize.STRING,
       },
       createdAt: {

@@ -10,28 +10,33 @@ module.exports = {
      * }], {});
     */
     await queryInterface.bulkInsert('Roles', [{
-      id: 1,
       name: 'Super admin',
+      description: 'Super admin',
+      slug: 'super_admin',
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
-      id: 2,
       name: 'Event Admin',
+      description: 'Event Admin',
+      slug: 'event_admin',
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
-      id: 3,
       name: 'Manager',
+      description: 'Manager',
+      slug: 'manager',
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
-      id: 4,
       name: 'Buyer user',
+      description: 'Buyer user',
+      slug: 'buyer_user',
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
-      id: 5,
       name: 'Attender user',
+      description: 'Attender user',
+      slug: 'attender_user',
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});

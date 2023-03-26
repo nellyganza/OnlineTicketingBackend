@@ -3,11 +3,17 @@ module.exports = {
     await queryInterface.createTable('Permissions', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       name: {
+        type: Sequelize.STRING,
+        unqiue: {
+          msg: 'This permission already exists',
+        },
+      },
+      description: {
         type: Sequelize.STRING,
       },
       createdAt: {

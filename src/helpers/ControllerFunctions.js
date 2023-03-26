@@ -13,7 +13,7 @@ export const updateSittingPlace = async (eventId, type, transaction) => {
   await EventSittingPlaceService.incrementNumberOfPeople(sitting.id, transaction);
   await EventSittingPlaceService.decrementPlaceLeft(sitting.id, transaction);
 };
-export const getAndUpdateSittingPlace = async (eventId, type, action, transaction) => {
+export const getAndUpdateSittingPlace = async (eventId, type, action) => {
   if (action === 'getPlaces') {
     const places = [];
     let placetobegiven = 1;
@@ -42,6 +42,7 @@ export const getAndUpdateSittingPlace = async (eventId, type, action, transactio
         }
       }
     }
+    return places;
   }
   if (action === 'updatePlaces') {
     let placetobegiven = 1;
@@ -70,8 +71,7 @@ export const getAndUpdateSittingPlace = async (eventId, type, action, transactio
         sittingPlace = place[i][0].value;
       }
     }
-    await EventSittingPlaceService.updateAtt({ placeAvailable: place }, { id: sitting.id }, transaction);
-    return sittingPlace;
+    return { sittingPlace: sittingPlace - 1, place, sitting };
   }
 };
 

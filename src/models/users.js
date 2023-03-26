@@ -22,13 +22,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId',
       });
       models.Users.hasMany(models.Transactions, {
-        foreignKey: 'user',
+        foreignKey: 'userId',
       });
       models.Users.hasMany(models.Notification, {
         foreignKey: 'userId',
       });
       models.Users.hasMany(models.Token, {
-        foreignKey: 'user',
+        foreignKey: 'userId',
       });
     }
   }
@@ -41,8 +41,10 @@ module.exports = (sequelize, DataTypes) => {
     RoleId: DataTypes.INTEGER,
     profilePicture: DataTypes.STRING,
     category: DataTypes.STRING,
+    type: DataTypes.STRING,
     campanyName: DataTypes.STRING,
     isVerified: DataTypes.BOOLEAN,
+    document: DataTypes.STRING,
     status: {
       type: DataTypes.STRING,
       defaultValue: 'active',
@@ -50,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
     socialId: DataTypes.STRING,
     provider: DataTypes.STRING,
     authToken: DataTypes.TEXT,
+    share: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Users',

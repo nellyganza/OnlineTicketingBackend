@@ -96,7 +96,8 @@ export const verifyAdmin = async (req, res, next) => {
   try {
     const data = await decodeToken(req.headers.authorization);
     const { RoleId } = data;
-    if (RoleId === 1) {
+    const role = await roleService.findById(RoleId);
+    if (role.slug === 'super_admin') {
       next();
     } else {
       util.setError(400, 'Un authorized access');

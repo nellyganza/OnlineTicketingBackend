@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   EventPayment.init({
-    eventId: DataTypes.INTEGER,
+    eventId: DataTypes.UUID,
     name: DataTypes.STRING,
     price: DataTypes.FLOAT,
     boughtTickets: {

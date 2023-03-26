@@ -2,7 +2,7 @@ import Util from '../helpers/utils';
 import txService from '../services/transactionService';
 
 const util = new Util();
-export default class contact {
+export default class TransactionController {
   static async getAllTransactions(req, res) {
     try {
       const transactions = await txService.getTransactions();

@@ -5,8 +5,15 @@ module.exports = {
         allowNull: false,
         type: Sequelize.TEXT,
       },
-      user: {
-        type: Sequelize.INTEGER,
+      userId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       createdAt: {
         allowNull: false,

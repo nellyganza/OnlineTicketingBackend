@@ -3,18 +3,31 @@ module.exports = {
     await queryInterface.createTable('Notifications', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       receiver: {
         type: Sequelize.STRING,
       },
       userId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       eventId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Events',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       message: {
         type: Sequelize.TEXT,

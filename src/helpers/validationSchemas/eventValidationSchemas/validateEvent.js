@@ -11,7 +11,7 @@ export const newEventSchema = joi.object({
   image: joi.array(),
   description: joi.string().required().min(15),
   numberofTicket: joi.number().required().min(1),
-  eventType: joi.string().required(),
+  categoryId: joi.any().required(),
   country: joi.string().required(),
   share: joi.boolean().required(),
   placeImage: joi.any(),
@@ -39,7 +39,7 @@ export const newPaymentGradeCost = joi.object({
 });
 
 export const oldEventSchema = joi.object({
-  id: joi.number(),
+  id: joi.any(),
   title: joi.string().required().min(2),
   host: joi.string().required(),
   dateAndTimme: joi.date().iso().required(),
@@ -50,7 +50,7 @@ export const oldEventSchema = joi.object({
   image: joi.array(),
   description: joi.string().required().min(15),
   numberofTicket: joi.number().required().min(1),
-  eventType: joi.string().required(),
+  categoryId: joi.any().required(),
   country: joi.string().required(),
   share: joi.boolean().required(),
   status: joi.string().required(),

@@ -3,30 +3,54 @@ module.exports = {
     await queryInterface.createTable('Tickets', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       eventId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Events',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       userId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       price: {
         type: Sequelize.FLOAT,
+        allowNull: false,
       },
       type: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'EventPayments',
+          key: 'id',
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        },
       },
       paymenttype: {
         type: Sequelize.STRING,
       },
       fullName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       nationalId: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       phoneNumber: {
         type: Sequelize.STRING,

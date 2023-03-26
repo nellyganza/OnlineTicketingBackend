@@ -18,6 +18,8 @@ import image from './images/imagesRouter';
 import flutterwave from './flutterwave/flutterwave';
 import ads from './ads/adsRouter';
 import guestRouter from './guests/guestRouter';
+import fileRouter from './files/fileRouter';
+import categoryRouter from './category/categoryRouter';
 
 const router = express.Router();
 router.use('/users', user);
@@ -39,4 +41,6 @@ router.use('/image', image);
 router.use('/advert', ads);
 router.use('/guest', guestRouter);
 router.use('/flutterwave', flutterwave);
+router.use('/files', fileRouter);
+router.use('/category', categoryRouter);
 export default router;

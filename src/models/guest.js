@@ -15,16 +15,20 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'eventId',
         onDelete: 'CASCADE',
       });
+      models.Guest.belongsTo(models.EventPayment, {
+        foreignKey: 'type',
+      });
     }
   }
   Guest.init({
-    eventId: DataTypes.INTEGER,
-    fullName: DataTypes.STRING,
-    email: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING,
-    nationalId: DataTypes.STRING,
-    organization: DataTypes.STRING,
-    status: DataTypes.STRING,
+    eventId: { type: DataTypes.UUID, allowNull: false },
+    type: { type: DataTypes.UUID, allowNull: false },
+    fullName: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false },
+    phoneNumber: { type: DataTypes.STRING, allowNull: false },
+    nationalId: { type: DataTypes.STRING, allowNull: false },
+    organization: { type: DataTypes.STRING, allowNull: false },
+    status: { type: DataTypes.STRING },
   }, {
     sequelize,
     modelName: 'Guest',

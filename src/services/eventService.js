@@ -4,7 +4,7 @@ import MainService from './MainService';
 const { Op } = require('sequelize');
 
 const {
-  Event, Comment, EventPayment, EventSittingPlace, PaymentMethod,
+  Event, Comment, EventPayment, EventSittingPlace, PaymentMethod, Category,
 } = models;
 /**
  * @exports
@@ -18,8 +18,8 @@ class EventService extends MainService {
    * @memberof EventService
    * @returns {object} data
    */
-  static createEvent(newEvent,transaction) {
-    return Event.create(newEvent,{transaction});
+  static createEvent(newEvent, transaction) {
+    return Event.create(newEvent, { transaction });
   }
 
   static updateAtt(set, prop) {
@@ -32,7 +32,15 @@ class EventService extends MainService {
   static getAll(page, size, prop) {
     const { limit, offset } = this.getPagination(page, size);
     const condition = prop || null;
-    return Event.findAndCountAll({ where: condition, limit, offset }).then((data) => this.getPagingData(data, page, limit))
+    return Event.findAndCountAll({
+      where: condition,
+      include: [{ model: Category }],
+      limit,
+      offset,
+      order: [
+        ['dateAndTimme', 'ASC'],
+      ],
+    }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
       });
@@ -43,10 +51,13 @@ class EventService extends MainService {
     const condition = prop || null;
     return Event.findAndCountAll({
       where: condition,
-      include: [{ model: Comment, order: [['createdAt', 'ASC']] }],
+      include: [{ model: Comment, order: [['createdAt', 'ASC']] }, { model: Category }],
       limit,
       offset,
       distinct: true,
+      order: [
+        ['dateAndTimme', 'ASC'],
+      ],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
@@ -67,9 +78,12 @@ class EventService extends MainService {
         order: [
           ['createdAt', 'ASC'],
         ],
-      }],
+      }, { model: Category }],
       limit,
       offset,
+      order: [
+        ['dateAndTimme', 'ASC'],
+      ],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
@@ -88,19 +102,14 @@ class EventService extends MainService {
     );
   }
 
-  static findByFilters(search, place, date, page, size) {
+  static findByFilters(title, category, date, page, size) {
     const { limit, offset } = this.getPagination(page, size);
     return Event.findAndCountAll({
       where: {
-        [Op.or]: [
+        [Op.and]: [
           {
             title: {
-              [Op.iLike]: `%${search}%`,
-            },
-          },
-          {
-            place: {
-              [Op.iLike]: `%${place}%`,
+              [Op.iLike]: `%${title}%`,
             },
           },
           {
@@ -108,10 +117,11 @@ class EventService extends MainService {
               [Op.between]: [date[0], date[1]],
             },
           },
-        ],
-        [Op.and]: [
           {
             status: 'Pending',
+          },
+          {
+            share: true,
           },
         ],
       },
@@ -120,9 +130,19 @@ class EventService extends MainService {
         order: [
           ['createdAt', 'ASC'],
         ],
+      }, {
+        model: Category,
+        where: {
+          name: {
+            [Op.iLike]: `%${category}%`,
+          },
+        },
       }],
       limit,
       offset,
+      order: [
+        ['dateAndTimme', 'ASC'],
+      ],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
@@ -131,7 +151,6 @@ class EventService extends MainService {
 
   static findByFilters2(name, place, category, dateRange, page, size) {
     const { limit, offset } = this.getPagination(page, size);
-    console.log(limit, offset);
     return Event.findAndCountAll({
       where: {
         [Op.and]: [
@@ -151,7 +170,7 @@ class EventService extends MainService {
             },
           },
           {
-            eventType: {
+            categoryId: {
               [Op.in]: category,
             },
           },
@@ -168,9 +187,12 @@ class EventService extends MainService {
         order: [
           ['createdAt', 'ASC'],
         ],
-      }],
+      }, { model: Category }],
       limit,
       offset,
+      order: [
+        ['dateAndTimme', 'ASC'],
+      ],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
@@ -192,9 +214,12 @@ class EventService extends MainService {
         order: [
           ['createdAt', 'ASC'],
         ],
-      }],
+      }, { model: Category }],
       limit,
       offset,
+      order: [
+        ['dateAndTimme', 'ASC'],
+      ],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');

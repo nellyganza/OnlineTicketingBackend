@@ -30,7 +30,9 @@ const newEvent = (req) => {
   }
 };
 const paymentM = (req) => {
-  const { paymentMethod } = req.body;
+  let { paymentMethod } = req.body;
+  paymentMethod = JSON.parse(paymentMethod);
+  req.body.paymentMethod=paymentMethod;
   const obj = {
     error: false,
     body: {},
@@ -57,7 +59,8 @@ const paymentM = (req) => {
   }
 };
 const sittiPlace = (req) => {
-  const { sittingPlace } = req.body;
+  let { sittingPlace } = req.body;
+  sittingPlace = JSON.parse(sittingPlace);
   const obj = {
     error: false,
     body: {},
@@ -84,7 +87,9 @@ const sittiPlace = (req) => {
   }
 };
 const paymentGrade = (req) => {
-  const { paymentGradeCost } = req.body;
+  let { paymentGradeCost } = req.body;
+  paymentGradeCost = JSON.parse(paymentGradeCost);
+  req.body.paymentGradeCost=paymentGradeCost;
   const obj = {
     error: false,
     body: {},

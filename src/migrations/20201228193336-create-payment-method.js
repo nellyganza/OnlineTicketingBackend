@@ -3,12 +3,18 @@ module.exports = {
     await queryInterface.createTable('PaymentMethods', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       eventId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Events',
+          key: 'id',
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+        },
       },
       name: {
         type: Sequelize.STRING,

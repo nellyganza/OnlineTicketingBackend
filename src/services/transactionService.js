@@ -13,12 +13,22 @@ class TransactionService {
    * @memberof TransactionService
    * @returns {object} data
    */
-  static createTransaction(newTransaction) {
-    return Transactions.create(newTransaction);
+  static async createTransaction(newTransaction) {
+    const transaction = Transactions.build({
+      eventId: newTransaction.eventId, ticketContent: newTransaction.customer, userId: newTransaction.userId, status: 'Pending', transaction_ref: newTransaction.tx_ref, order_id: newTransaction.order_id,
+    });
+    const saved = await transaction.save({ returning: true, attributes: ['id', 'transaction_ref', 'order_id', 'eventId', 'ticketContent', 'status', 'userId', 'createdAt', 'updatedAt'] });
+    return saved;
   }
 
   static findByProp(prop) {
     return Transactions.findAll({
+      where: prop,
+    });
+  }
+
+  static findByOneByPropd(prop) {
+    return Transactions.findOne({
       where: prop,
     });
   }

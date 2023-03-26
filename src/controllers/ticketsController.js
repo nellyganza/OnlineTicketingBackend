@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import ticketService from '../services/ticketService';
 import eventservice from '../services/eventService';
+import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import Util from '../helpers/utils';
 import {
   updatePaymentGrade, updateSittingPlace, updateEvent, getAndUpdateSittingPlace,
@@ -14,40 +15,55 @@ const util = new Util();
 export default class ticketController {
   static async saveTicket(req, res) {
     const userId = req.userInfo.id;
-    const { pay } = req.body;
+    const { pay, attender } = req.body;
     const eventId = req.params.eventId;
+    try {
+      const resp = await this.createTicket(userId, eventId, attender, pay);
+      util.setSuccess(200, resp);
+      return util.send(res);
+    } catch (error) {
+      util.setError(400, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async createTicket(userId, eventId, attender, pay) {
     const transaction = await sequelize.transaction();
     try {
-      const { attender } = req.body;
-
       const event = await eventservice.findById(eventId);
       if (!event) {
-        util.setError(404, 'selected Event not Exist');
-        return util.send(res);
+        throw new Error('selected Event not Exist');
       }
       const keys = Object.keys(attender).map((e) => e);
 
-      transaction.afterCommit(async () => {
-        util.setSuccess(200, 'Tickets Saved Success');
-        util.send(res);
-      });
+      transaction.afterCommit(async () => 'Tickets Saved Successfully');
+      const typePlace = [];
       for (let index = 0; index < keys.length; index++) {
         const att = attender[keys[index]];
-        const sittingPlace = await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces', transaction) - 1;
-        const savedTicket = await ticketService.createTicket({
+        const ind = _.findIndex(typePlace, { name: att.type });
+        const result = ind === -1 ? await getAndUpdateSittingPlace(eventId, att.type, 'updatePlaces') : typePlace[ind].value;
+        const { sittingPlace, place } = result;
+        const { sitting } = result;
+
+        if (ind > -1) {
+          typePlace[ind] = { name: att.type, value: { sittingPlace: sittingPlace + 1, place, sitting } }; // (2)
+        } else {
+          typePlace.push({ name: att.type, value: { sittingPlace: sittingPlace + 1, place, sitting } });
+        }
+        await ticketService.createTicket({
           ...att, eventId, userId, paymenttype: pay.paymenttype, sittingPlace,
         }, transaction);
         await updateEvent(eventId, transaction);
+        place[0][0].value = sittingPlace + 1;
+        await EventSittingPlaceService.updateAtt({ placeAvailable: place }, { id: sitting.id }, transaction);
         await updatePaymentGrade(att.type, transaction);
         await updateSittingPlace(eventId, att.type, transaction);
-        const { id, nationalId } = savedTicket.dataValues;
-        eventEmitter.emit('SendSucessfullPaymentNotification', id, { nationalId, names: att.fullName });
       }
       await transaction.commit();
+      eventEmitter.emit('SendSucessfullPaymentNotification', userId, event.dataValues.id);
     } catch (error) {
       await transaction.rollback();
-      util.setError(404, error.message);
-      return util.send(res);
+      throw new Error(error.message);
     }
   }
 

@@ -22,9 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   TransactionTickets.init({
-    transactionId: DataTypes.INTEGER,
+    transactionId: DataTypes.UUID,
     transaction_ref: DataTypes.STRING,
-    ticketId: DataTypes.INTEGER,
+    ticketId: DataTypes.UUID,
     nationalId: DataTypes.STRING,
   }, {
     sequelize,

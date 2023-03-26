@@ -11,42 +11,42 @@ const util = new Util();
 export default class EventController {
   static async saveEvent(req, res) {
     const { id } = req.userInfo;
-    const {
+    let {
       event, paymentMethod, sittingPlace, paymentGradeCost,
     } = req.body;
     if (!event || !paymentMethod || !sittingPlace || !paymentGradeCost) {
       util.setError(400, 'Bad Information Provided');
       return util.send(res);
     }
+    console.log(sittingPlace);
+    sittingPlace = JSON.parse(sittingPlace);
     const transaction = await sequelize.transaction();
     const saveEvent = { ...event, ticketLeft: event.numberofTicket, userId: id };
-    console.log(event, paymentMethod, sittingPlace, paymentGradeCost, saveEvent);
     try {
-      const savedEvent = await eventService.createEvent(saveEvent,transaction);
+      const savedEvent = await eventService.createEvent(saveEvent, transaction);
       if (!savedEvent) {
         util.setError(400, 'Event not Created');
         return util.send(res);
       }
 
-
-      let methodkeys = Object.keys(paymentMethod);
+      const methodkeys = Object.keys(paymentMethod);
       const savedMethods = [];
       for (let index = 0; index < methodkeys.length; index++) {
         const method = methodkeys[index];
-        const savedPayment = await eventPaymentMethodService.createPaymentMethod({ ...paymentMethod[method], eventId: savedEvent.id },transaction);
-        savedMethods.push({...savedPayment.dataValues});
+        const savedPayment = await eventPaymentMethodService.createPaymentMethod({ ...paymentMethod[method], eventId: savedEvent.id }, transaction);
+        savedMethods.push({ ...savedPayment.dataValues });
       }
 
-      let sittingkeys = Object.keys(sittingPlace);
+      const sittingkeys = Object.keys(sittingPlace);
       for (let index = 0; index < sittingkeys.length; index++) {
         const sitti = sittingkeys[index];
-        await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces },transaction);
+        await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces }, transaction);
       }
 
-      let gradeKeys = Object.keys(paymentGradeCost);
+      const gradeKeys = Object.keys(paymentGradeCost);
       for (let index = 0; index < gradeKeys.length; index++) {
         const grade = gradeKeys[index];
-        await eventPaymentService.createEventPayment({ ...paymentGradeCost[grade], eventId: savedEvent.id },transaction);
+        await eventPaymentService.createEventPayment({ ...paymentGradeCost[grade], eventId: savedEvent.id }, transaction);
       }
 
       transaction.afterCommit(async () => {
@@ -77,8 +77,11 @@ export default class EventController {
 
   static async getFillteredEvents1(req, res) {
     try {
-      const { search, place, date } = req.query;
-      const result = await eventService.findByFilters(search, place, date);
+      const {
+        title, category, page, size,
+      } = req.query;
+      const date = req.query.date ? req.query.date.split(',') : [];
+      const result = await eventService.findByFilters(title, category, date, page, size);
       if (result) {
         util.setSuccess(200, 'Events Found', result);
         return util.send(res);
@@ -96,9 +99,7 @@ export default class EventController {
       } = req.query;
       const { page, size } = req.query;
       const category = req.query.category ? req.query.category.split(',') : [];
-      console.log(page, size);
       const result = await eventService.findByFilters2(name, place, category, undefined, page, size);
-      console.log(result);
       if (result) {
         util.setSuccess(200, 'Events Found', result);
         return util.send(res);
@@ -174,12 +175,13 @@ export default class EventController {
 
   static async updateEvent(req, res) {
     try {
-      const { eventId } = req.params;
-      if (!eventId) {
+      console.log(req.files);
+      const { id } = req.body;
+      if (!id) {
         util.setError(400, 'Invalid Event Id');
         return util.send(res);
       }
-      const event = await eventService.updateAtt({ ...req.body }, { id: eventId });
+      const event = await eventService.updateAtt({ ...req.body }, { id });
       if (!event) {
         util.setError(404, 'Event not Updated');
         return util.send(res);
@@ -187,6 +189,7 @@ export default class EventController {
       util.setSuccess(200, 'Event Updated Success', event);
       return util.send(res);
     } catch (error) {
+      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }

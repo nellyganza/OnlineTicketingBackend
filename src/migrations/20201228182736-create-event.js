@@ -3,9 +3,9 @@ module.exports = {
     await queryInterface.createTable('Events', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
       title: {
         type: Sequelize.STRING,
@@ -14,7 +14,13 @@ module.exports = {
         type: Sequelize.STRING,
       },
       userId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       dateAndTimme: {
         type: Sequelize.STRING,
@@ -58,8 +64,14 @@ module.exports = {
       share: {
         type: Sequelize.BOOLEAN,
       },
-      eventType: {
-        type: Sequelize.STRING,
+      categoryId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'Categories',
+          key: 'id',
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        },
       },
       createdAt: {
         allowNull: false,

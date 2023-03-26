@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       models.Token.belongsTo(models.Users, {
-        foreignKey: 'user',
+        foreignKey: 'userId',
         onDelete: 'NO ACTION',
       });
     }
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       allowNull: false,
     },
-    user: DataTypes.INTEGER,
+    userId: DataTypes.UUID,
   }, {
     sequelize,
     modelName: 'Token',

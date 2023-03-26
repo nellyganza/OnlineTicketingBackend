@@ -28,7 +28,9 @@ class AdsService extends MainService {
   static getAds(page, size, prop) {
     const { limit, offset } = this.getPagination(page, size);
     const condition = prop || null;
-    return Ads.findAndCountAll({ where: condition, limit, offset }).then((data) => this.getPagingData(data, page, limit))
+    return Ads.findAndCountAll({
+      where: condition, include: [{ model: AdsPosition }], limit, offset,
+    }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
       });

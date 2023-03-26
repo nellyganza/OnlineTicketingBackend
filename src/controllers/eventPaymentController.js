@@ -5,7 +5,8 @@ const util = new Util();
 export default class EventPaymentController {
   static async createPaymentByEId(req, res) {
     try {
-      const { eventId } = req.params;
+      const { eventId } = req.body;
+      delete req.body.id;
       if (!eventId) {
         util.setError(400, 'Invalid Event Id');
         return util.send(res);
@@ -65,7 +66,7 @@ export default class EventPaymentController {
 
   static async updatePaymentPlaceByPId(req, res) {
     try {
-      const { id } = req.params;
+      const { id } = req.body;
       if (!id) {
         util.setError(400, 'Invalid Place Id');
         return util.send(res);

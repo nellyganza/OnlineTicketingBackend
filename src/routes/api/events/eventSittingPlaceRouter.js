@@ -4,9 +4,9 @@ import { isAuthenticated, allowedRoles } from '../../../middlewares/authorizatio
 
 const router = express.Router();
 
-router.post('/:eventId', isAuthenticated, allowedRoles([2, 3]), eventController.createSittinPlaces);
+router.post('/:eventId', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.createSittinPlaces);
 router.get('/:eventId', eventController.getAllSittinPlaces);
-router.put('/:id', isAuthenticated, allowedRoles([2, 3]), eventController.updateSittingPlace);
-router.delete('/:id', isAuthenticated, allowedRoles([2, 3]), eventController.deleteSittingPlace);
+router.put('/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.updateSittingPlace);
+router.delete('/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.deleteSittingPlace);
 
 export default router;
