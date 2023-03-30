@@ -11,14 +11,14 @@ const util = new Util();
 export default class EventController {
   static async saveEvent(req, res) {
     const { id } = req.userInfo;
-    let {
-      event, paymentMethod, sittingPlace, paymentGradeCost,
+    const {
+      event, paymentMethod, paymentGradeCost,
     } = req.body;
+    let { sittingPlace } = req.body;
     if (!event || !paymentMethod || !sittingPlace || !paymentGradeCost) {
       util.setError(400, 'Bad Information Provided');
       return util.send(res);
     }
-    console.log(sittingPlace);
     sittingPlace = JSON.parse(sittingPlace);
     const transaction = await sequelize.transaction();
     const saveEvent = { ...event, ticketLeft: event.numberofTicket, userId: id };

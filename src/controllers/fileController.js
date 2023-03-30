@@ -74,9 +74,9 @@ const setEventImages = async (req, res, next) => {
       const { filename } = req.files[index];
       urls.push(filename);
     }
-    if(eventId){
+    if (eventId) {
       req.body.image = urls;
-    }else{
+    } else {
       req.body.event.image = urls;
     }
     next();
