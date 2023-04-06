@@ -82,6 +82,7 @@ class EventService extends MainService {
       limit,
       offset,
       order: [
+        ['status', 'ASC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))
