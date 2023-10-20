@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { transporter } from '../helpers/mailHelper';
-import { sentTicket } from '../services/templates/sendTicketEmail';
+import { sentTicket } from '../helpers/templates/sendTicketEmail';
 
 dotenv.config();
 export const sendTicketEmail = async (ticketInfo) => {

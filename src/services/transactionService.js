@@ -15,9 +15,9 @@ class TransactionService {
    */
   static async createTransaction(newTransaction) {
     const transaction = Transactions.build({
-      eventId: newTransaction.eventId, ticketContent: newTransaction.customer, userId: newTransaction.userId, status: 'Pending', transaction_ref: newTransaction.tx_ref, order_id: newTransaction.order_id,
+      eventId: newTransaction.eventId, ticketContent: newTransaction.customer, userId: newTransaction.userId, status: 'Pending', transaction_ref: newTransaction.tx_ref, order_id: newTransaction.order_id, transactionId: newTransaction.transactionId,
     });
-    const saved = await transaction.save({ returning: true, attributes: ['id', 'transaction_ref', 'order_id', 'eventId', 'ticketContent', 'status', 'userId', 'createdAt', 'updatedAt'] });
+    const saved = await transaction.save({ returning: true, attributes: ['id', 'transaction_ref', 'transactionId', 'order_id', 'eventId', 'ticketContent', 'status', 'userId', 'createdAt', 'updatedAt'] });
     return saved;
   }
 

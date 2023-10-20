@@ -11,7 +11,6 @@ import ticketService from '../services/ticketService';
 import AuthTokenHelper from '../helpers/AuthTokenHelper';
 import tokenService from '../services/tokenService';
 // import { nexmo } from '../config/nexmo';
-import { sendSMS } from '../helpers/notifications/smsNotification';
 import {
   sendPasswordResetLink,
 } from '../utils/sendPasswordLInk';

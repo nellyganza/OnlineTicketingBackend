@@ -14,5 +14,5 @@ export const newTicketAttender = joi.object({
   fullName: joi.string().required().min(2),
   nationalId: joi.string().required(),
   sittingPlace: joi.any(),
-  isChild: joi.boolean(),
+  cardType: joi.string(),
 });

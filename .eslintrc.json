@@ -30,7 +30,8 @@
         "import/prefer-default-export": "off",
         "prefer-destructuring":"off",
         "import/no-mutable-exports":"off",
-        "no-underscore-dangle":"off"
+        "no-underscore-dangle":"off",
+        "no-case-declarations":"off"
     },
     "settings": {
         "import/resolver": {

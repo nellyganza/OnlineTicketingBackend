@@ -1,10 +1,9 @@
 import express from 'express';
-import open from 'open';
 import { propertiesToJson } from 'properties-file';
-import Util from '../../../helpers/utils';
-import TransactionService from '../../../services/transactionService';
-import { allowedRoles, isAuthenticated } from '../../../middlewares/authorization';
 import { eventEmitter } from '../../../helpers/notifications/eventEmitter';
+import Util from '../../../helpers/utils';
+import { isAuthenticated } from '../../../middlewares/authorization';
+import TransactionService from '../../../services/transactionService';
 
 const Flutterwave = require('flutterwave-node-v3');
 
@@ -90,9 +89,13 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
       ...data, tx_ref: generateTransactionReference('TX'), order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, subaccount: data.eventPaymentMethods,
     };
     const result = await flw.MobileMoney.rwanda(payload);
-    await TransactionService.createTransaction(payload);
-    open(result.meta.authorization.redirect);
-    util.setSuccess(200, 'Mobile Money Payment', result);
+    console.log(result);
+    if (result.status === 'success') {
+      await TransactionService.createTransaction({ ...payload, transactionId: payload.tx_ref });
+      util.setSuccess(200, 'Mobile Money Payment', result);
+      return util.send(res);
+    }
+    util.setError(400, 'Mobile Money Payment Failed');
     return util.send(res);
   } catch (error) {
     util.setError(400, error.message);
@@ -100,7 +103,7 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/bank-money', isAuthenticated, async (req, res) => {
+router.post('/bank-moneyaa', isAuthenticated, async (req, res) => {
   try {
     const data = { ...req.body };
     const { eventId } = req.query;
@@ -172,6 +175,232 @@ router.post('/mobile-money/redirect', async (req, res) => {
     util.setError(400, error.message);
     util.send(res);
   }
+});
+
+// In an Express-like app:
+
+// The route where we initiate payment (Steps 1 - 3)
+router.post('/bank-money', isAuthenticated, async (req, res) => {
+  try {
+    const data = { ...req.body };
+    const { eventId } = req.query;
+    const { card } = data;
+    // "card_number":"5531886652142950",
+    // "cvv":"564",
+    // "expiry_month":"09",
+    // "expiry_year":"32",
+    // "currency":"NGN",
+    // "amount":"100",
+    // "fullname":"Yolande Aglaé Colbert",
+    // "email":"user@example.com",
+    // "tx_ref":"MC-3243e",
+    // "redirect_url":"https://www,flutterwave.ng"
+
+    const card_number = card.cardNumber;
+    const cvv = card.cvv;
+    const expiry_month = card.exprationDate.split('-')[1];
+    const expiry_year = card.exprationDate.split('-')[0];
+    const currency = 'RWF';
+    const amount = data.amount;
+    const fullname = card.holderName;
+    const email = data.email;
+    const userPayload = data.payload;
+    const tx_ref = userPayload && userPayload.tx_ref ? userPayload.tx_ref : generateTransactionReference('TX');
+    const authorization = data.authorization;
+
+    console.log('authorization', authorization);
+    let payload = {
+      card_number,
+      cvv,
+      expiry_month,
+      expiry_year,
+      currency,
+      amount,
+      email,
+      fullname,
+      // Generate a unique transaction reference
+      tx_ref,
+      redirect_url: `${process.env.APP_BASE_URL}/pay/redirect`,
+      enckey: process.env.FRUTTER_ENCRIP_KEY,
+    };
+
+    if (authorization) {
+      payload = {
+        ...payload, authorization,
+      };
+    }
+    const response = await flw.Charge.card(payload);
+
+    console.log('response', response);
+    if (response.status === 'error') {
+      util.setError(400, response.message);
+      return util.send(res);
+    }
+
+    switch (response?.meta?.authorization?.mode) {
+      case 'pin':
+      case 'avs_noauth':
+        const respData = {
+          charge_payload: payload,
+          auth_mode: response.meta.authorization.mode,
+          eventId,
+          redirect: '/pay/authorize',
+        };
+        util.setSuccess(200, 'Please enter your pin', { ...respData });
+        return util.send(res);
+      case 'otp':
+        try {
+          console.log('transactionId', response.data.id);
+          await TransactionService.createTransaction({
+            ...data, tx_ref, order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, transactionId: response.data.id,
+          });
+          util.setSuccess(200, response.data.processor_response, {
+            action: 'otp', flw_ref: response.data.flw_ref, transactionId: response.data.id, tx_ref: response.data.tx_ref,
+          });
+          return util.send(res);
+        } catch (error) {
+          console.log('error', error);
+          util.setError(400, error.message);
+          return util.send(res);
+        }
+      case 'redirect':
+      // Store the transaction ID
+      // so we can look it up later with the flw_ref
+        const payloadData = {
+          ...data, tx_ref, order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, transactionId: response.data.id,
+        };
+        await TransactionService.createTransaction(payloadData);
+        // Auth type is redirect,
+        // so just redirect to the customer's bank
+        const authUrl = response.meta.authorization.redirect;
+        util.setSuccess(200, 'Confirm payment by your bank', { redirect: authUrl });
+        return util.send(res);
+      default:
+      // No authorization needed; just verify the payment
+        const transactionId = response.data.id;
+        const transaction = await flw.Transaction.verify({
+          id: transactionId,
+        });
+        if (transaction.data.status === 'successful') {
+          util.setSuccess(200, 'Payment successful', transaction);
+          return util.send(res);
+        } if (transaction.data.status === 'pending') {
+        // Schedule a job that polls for the status of the payment every 10 minutes
+        // transactionVerificationQueue.add({
+        //   id: transactionId,
+        // });
+          return util.send(res, { redirect: '/payment-processing' });
+        }
+        util.setError(400, 'Payment Failed', transaction);
+        return util.send(res);
+    }
+  } catch (error) {
+    util.setError(400, error.message);
+    return util.send(res);
+  }
+});
+
+// // The route where we send the user's auth details (Step 4)
+// router.post('/pay/authorize', async (req, res) => {
+//   const payload = req.session.charge_payload;
+//   console.log('payloadAuthriza', payload);
+//   // Add the auth mode and requested fields to the payload,
+//   // then call chargeCard again
+//   payload.authorization = {
+//     mode: req.session.auth_mode,
+//   };
+//   req.session.auth_fields.forEach((field) => {
+//     payload.authorization.field = req.body[field];
+//   });
+//   const response = await flw.Charge.card(payload);
+
+//   switch (response?.meta?.authorization?.mode) {
+//     case 'otp':
+//       // Show the user a form to enter the OTP
+//       req.session.flw_ref = response.data.flw_ref;
+//       return res.redirect('/pay/validate');
+//     case 'redirect':
+//       const payloadData = {
+//         ...data, tx_ref, order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, transactionId: response.data.id,
+//       };
+//       await TransactionService.createTransaction(payloadData);
+//       const authUrl = response.meta.authorization.redirect;
+//       return res.redirect(authUrl);
+//     default:
+//       // No validation needed; just verify the payment
+//       const transactionId = response.data.id;
+//       const transaction = await flw.Transaction.verify({
+//         id: transactionId,
+//       });
+//       if (transaction.data.status === 'successful') {
+//         return res.redirect('/payment-successful');
+//       } if (transaction.data.status === 'pending') {
+//         // Schedule a job that polls for the status of the payment every 10 minutes
+//         // transactionVerificationQueue.add({
+//         //   id: transactionId,
+//         // });
+//         return res.redirect('/payment-processing');
+//       }
+//       return res.redirect('/payment-failed');
+//   }
+// });
+
+// The route where we validate and verify the payment (Steps 5 - 6)
+router.post('/pay/validate', async (req, res) => {
+  console.log('req.body', req.body);
+  const response = await flw.Charge.validate({
+    otp: req.body.otp,
+    flw_ref: req.body.flw_ref,
+  });
+  if (response.status === 'success' || response.status === 'pending') {
+    // Verify the payment
+    const transactionId = response.data.id;
+    const transaction = await flw.Transaction.verify({
+      id: transactionId,
+    });
+    console.log('transaction', transaction);
+    if (transaction.status === 'success') {
+      eventEmitter.emit('confirmTicketAfterPayment', { data: { tx_ref: req.body.tx_ref } });
+      util.setSuccess(200, 'Payment successful', { transaction, action: 'completed' });
+      return util.send(res);
+    } if (transaction.status === 'pending') {
+      // Schedule a job that polls for the status of the payment every 10 minutes
+      // transactionVerificationQueue.add({
+      //   id: transactionId,
+      // });
+      util.setSuccess(200, 'Payment pending', transaction);
+      return util.send(res);
+    }
+  }
+  util.setError(400, 'Payment Failed', response);
+  return util.send(res);
+});
+
+// Our redirect_url. For 3DS payments, Flutterwave will redirect here after authorization,
+// and we can verify the payment (Step 6)
+router.post('/pay/redirect', async (req, res) => {
+  if (req.query.status === 'successful' || req.query.status === 'pending') {
+    // Verify the payment
+    const txRef = req.query.tx_ref;
+    const foundTransaction = await TransactionService.findByTransactionRef(txRef);
+    const transactionId = foundTransaction.dataValues.transactionId;
+    const transaction = flw.Transaction.verify({
+      id: transactionId,
+    });
+    if (transaction.data.status === 'successful') {
+      eventEmitter.emit('confirmTicketAfterPayment', { data: { tx_ref: txRef } });
+      util.setSuccess(200, 'Payment successful', { transaction, action: 'completed' });
+      return util.send(res);
+    } if (transaction.data.status === 'pending') {
+      // Schedule a job that polls for the status of the payment every 10 minutes
+      // transactionVerificationQueue.add({
+      //   id: transactionId,
+      // });
+      return res.redirect('/payment-processing');
+    }
+  }
+
+  return res.redirect('/payment-failed');
 });
 
 export default router;

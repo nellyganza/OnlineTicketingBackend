@@ -19,10 +19,6 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId',
         onDelete: 'NO ACTION',
       });
-      models.Ticket.hasMany(models.TransactionTickets, {
-        foreignKey: 'ticketId',
-        onDelete: 'NO ACTION',
-      });
       models.Ticket.belongsTo(models.EventPayment, {
         foreignKey: 'type',
       });
@@ -47,10 +43,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: 'not Attended',
     },
-    isChild: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
+    cardType: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Ticket',

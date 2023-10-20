@@ -67,9 +67,8 @@ module.exports = {
       currentSatus: {
         type: Sequelize.STRING,
       },
-      isChild: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+      cardType: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

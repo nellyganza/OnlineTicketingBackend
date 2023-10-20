@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import Util from '../helpers/utils';
 import { newJwtToken, getJwtToken } from '../helpers/tokenGenerator';
 import { transporter } from '../helpers/mailHelper';
-import { confirmEmail } from '../services/templates/confirmEmail';
+import { confirmEmail } from '../helpers/templates/confirmEmail';
 
 dotenv.config();
 

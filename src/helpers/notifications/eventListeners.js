@@ -13,12 +13,12 @@ import notificationService from '../../services/notifications';
 import { renderEmail, sendNotification } from './emailNotifier';
 import { sendSms, sendTwilloSms } from '../../config/sendSms';
 import { transporter } from '../mailHelper';
-import { successCreationTemplate } from '../../services/templates/succeCreatedEventEmail';
-import { successCreationPatTemplate } from '../../services/templates/eventCreatedPattern';
+import { successCreationTemplate } from '../templates/succeCreatedEventEmail';
+import { successCreationPatTemplate } from '../templates/eventCreatedPattern';
 import Util from '../utils';
 import { logger } from '../Logger';
 import htmlToPdf from '../htmlToPdf';
-import { sentTicket } from '../../services/templates/sendTicketEmail';
+import { sentTicket } from '../templates/sendTicketEmail';
 import ticketController from '../../controllers/ticketsController';
 
 const QRCode = require('qrcode');
@@ -137,19 +137,6 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
       const buyerMessage = `Buying Tickets for ${fullName} with NationalID/Passport ${nationalId} goes ok!! <br>   Thank you!!`;
       const sellerMessage = `Client ${buyer.firstName}  ${buyer.lastName} bought ticket for ${fullName} in event ${event.title}`;
 
-      const msg = `<div style="text-align:left;">
-                    Hello ${fullName}, <br>Here are the details for your ticket. 
-                    Event Name: ${title} <br>
-                    Place : ${place} <br>
-                    Date : ${dateAndTimme} <br>
-                    Sitting Position : ${sittingPlace} in  ${eventPay.name} <br>
-                    National ID : ${nationalId} <br>
-
-                    Please use attached QR code for entrance when you don't have a National ID card<br>
-                  
-                    Thank you for using Intercore Online Ticketing<br><br>
-                    </div>`;
-
       const ticketInfo = {
         email,
         emailData: {
@@ -170,15 +157,6 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
       });
       const attach = { fileName: `${fullName}ticket.pdf`, file: `${fullName}ticket.pdf`, cid: 'qrcode' };
 
-      const msms = `Hello ${fullName}, Here are the details for your ticket.
-                    Event Name: ${title}
-                    Place : ${place}
-                    Date : ${dateAndTimme}
-                    Sitting Position : ${sittingPlace} 
-                    Holders card : ${nationalId} 
-                                  
-                    Thank you for using Intercore Online Ticketing`;
-
       await notificationService.createNotification({
         receiver: email, userId, eventId, message: buyerMessage,
       });
@@ -191,9 +169,6 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
         email,
         attachement: attach,
       });
-
-      sendTwilloSms(phoneNumber, msms);
-      sendSms(phoneNumber, msms);
 
       logger.info(buyerMessage);
       logger.info(sellerMessage);
@@ -272,9 +247,8 @@ eventEmitter.on('confirmTicketAfterPayment', async (data) => {
       const pay = jsonData.pay;
       pay.paymenttype = data.data.payment_type;
       await ticketController.createTicket(userId, eventId, attender, pay);
+      await transactionService.updateAtt({ status: 'paid' }, { transaction_ref: tx_ref });
     }
-
-    // sendTwilloSms(phoneNumber, msms);
   } catch (error) {
     logger.error(error.message);
   }

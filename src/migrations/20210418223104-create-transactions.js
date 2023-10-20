@@ -13,6 +13,10 @@ module.exports = {
       order_id: {
         type: Sequelize.STRING,
       },
+      transactionId: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       eventId: {
         type: Sequelize.UUID,
         references: {

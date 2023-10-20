@@ -23,14 +23,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'eventId',
         onDelete: 'NO ACTION',
       });
-      models.Transactions.hasMany(models.TransactionTickets, {
-        foreignKey: 'transactionId',
-      });
     }
   }
   Transactions.init({
     transaction_ref: DataTypes.STRING,
     order_id: DataTypes.STRING,
+    transactionId: DataTypes.STRING,
     eventId: DataTypes.UUID,
     userId: DataTypes.UUID,
     ticketContent: {

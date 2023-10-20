@@ -6,6 +6,7 @@ import './config/passportSetup';
 import cors from 'cors';
 import swaggerDocument from './swagger/index';
 import router from './routes';
+import { sendNotification } from './helpers/mailHelper';
 
 require('./tasks/transactionVerificationTask');
 
@@ -20,6 +21,7 @@ app.use(cors({ origin: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.json({ limit: '50mb' }));
+app.use(express.static(`${__dirname}/public`));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 app.use((request, response, next) => {
   response.header('Access-Control-Allow-Origin', '*');
@@ -93,6 +95,27 @@ app.post('/webhook-url', (req, res) => {
   // Your customer is not seeing the response here at all
 
   res.send(200);
+});
+
+app.get('/testemail', async (req, res) => {
+  const data = {
+    userName: 'Nishimwe',
+    price: '1000',
+  };
+  const resp = await sendNotification({
+    to: 'nishimwelys@gmail.com',
+    subject: 'Test Email',
+    template: 'index',
+    attachments: [
+      {
+        name: '1679828937344-Fq8LDv1WIAEtN2f.jpeg',
+        path: 'images/1679828937344-Fq8LDv1WIAEtN2f.jpeg',
+      },
+    ],
+    data,
+  });
+  console.log(resp);
+  res.send('Hello World!');
 });
 
 export default app;

@@ -3,7 +3,7 @@ import Util from '../helpers/utils';
 import {
   transporter,
 } from '../helpers/mailHelper';
-import { resetPasswordTemplate } from '../services/templates/resetPassword';
+import { resetPasswordTemplate } from '../helpers/templates/resetPassword';
 
 dotenv.config();
 const util = new Util();
