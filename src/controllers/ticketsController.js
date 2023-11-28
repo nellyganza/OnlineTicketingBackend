@@ -1,14 +1,17 @@
 import _ from 'lodash';
-import ticketService from '../services/ticketService';
-import eventservice from '../services/eventService';
-import EventSittingPlaceService from '../services/eventSittingPlaceService';
-import Util from '../helpers/utils';
 import {
-  updatePaymentGrade, updateSittingPlace, updateEvent, getAndUpdateSittingPlace,
+  getAndUpdateSittingPlace,
+  updateEvent,
+  updatePaymentGrade, updateSittingPlace,
 } from '../helpers/ControllerFunctions';
 import { eventEmitter } from '../helpers/notifications/eventEmitter';
-import guestService from '../services/guestService';
+import Util from '../helpers/utils';
 import { sequelize } from '../models';
+import { ETicketCurrentStatus, ETicketStatus } from '../models/enum/ETicketStatus';
+import eventservice from '../services/eventService';
+import EventSittingPlaceService from '../services/eventSittingPlaceService';
+import guestService from '../services/guestService';
+import ticketService from '../services/ticketService';
 
 const util = new Util();
 
@@ -160,13 +163,13 @@ export default class ticketController {
 
       const isGuest = await guestService.findByName({ nationalId, eventId });
       if (isGuest) {
-        if (isGuest.status === 'not Attended') {
-          isGuest.status = 'Attended';
+        if (isGuest.status === ETicketStatus.NOT_ATTENDED) {
+          isGuest.status = ETicketStatus.ATTENDED;
           isGuest.save();
           util.setSuccess(200, 'You are verified, Please Enter', isGuest);
           return util.send(res);
         }
-        if (isGuest.status === 'Attended') {
+        if (isGuest.status === ETicketStatus.ATTENDED) {
           util.setError(400, `${isGuest.fullName} is already Entered`);
           return util.send(res);
         }
@@ -175,8 +178,8 @@ export default class ticketController {
       if (!sittingType) ticket = await ticketService.findBynationalId({ eventId, nationalId });
       else ticket = await ticketService.findBynationalId({ eventId, nationalId, type: sittingType });
       if (ticket) {
-        if (ticket.status === 'not Attended') {
-          const updatedticket = await ticketService.updateAtt({ status: 'Attended', currentStatus: 'IN' }, { id: ticket.id });
+        if (ticket.status === ETicketStatus.NOT_ATTENDED) {
+          const updatedticket = await ticketService.updateAtt({ status: ETicketStatus.ATTENDED, currentStatus: ETicketCurrentStatus.IN_EVENT }, { id: ticket.id });
           if (!updatedticket) {
             util.setError(400, 'Please Try again');
             return util.send(res);
@@ -184,8 +187,8 @@ export default class ticketController {
           util.setSuccess(200, 'You are verified, Please Enter', updatedticket);
           return util.send(res);
         }
-        if (ticket.currentStatus === 'IN') {
-          const outTicket = await ticketService.updateAtt({ currentStatus: 'OUT' }, { id: ticket.id });
+        if (ticket.currentStatus === ETicketCurrentStatus.IN_EVENT) {
+          const outTicket = await ticketService.updateAtt({ currentStatus: ETicketCurrentStatus.OUT_EVENT }, { id: ticket.id });
           if (!outTicket) {
             util.setError(400, 'Please Try again');
             return util.send(res);
@@ -194,7 +197,7 @@ export default class ticketController {
           return util.send(res);
         }
 
-        const inTicket = await ticketService.updateAtt({ currentStatus: 'IN' }, { id: ticket.id });
+        const inTicket = await ticketService.updateAtt({ currentStatus: ETicketCurrentStatus.IN_EVENT }, { id: ticket.id });
         if (!inTicket) {
           util.setError(400, 'Please Try again');
           return util.send(res);
@@ -227,5 +230,22 @@ export default class ticketController {
   static async returnValidated(req, res) {
     util.setSuccess(200, 'Ticket Validated');
     return util.send(res);
+  }
+
+  static async getTicketByHoster(req ,res){
+    try {
+      const { id } = req.userInfo;
+      const { page, size, keyword,...other} = req.query;
+      const tickets = await ticketService.filterByHoster(id , keyword,other, page, size);
+      if (!tickets) {
+        util.setError(404, 'Tickets Not Found');
+        return util.send(res);
+      }
+      util.setSuccess(200, 'Tickets Found', tickets);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
   }
 }

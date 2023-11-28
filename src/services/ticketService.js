@@ -95,5 +95,55 @@ class TicketService extends MainService {
       where: { id: modelId },
     });
   }
+
+  static filterByHoster(userId,keyword,prop, page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Ticket.findAndCountAll({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              {
+                paymenttype: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                fullName: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                nationalId: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                phoneNumber: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                email: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                status: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+            ],
+          }, prop],
+      },
+      limit,
+      offset,
+      include: [{ model: Users }, { model: Event,where:{userId} },{ model: EventPayment}
+      ],
+    }).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
+  }
 }
 export default TicketService;

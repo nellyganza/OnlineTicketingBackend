@@ -1,10 +1,11 @@
-import _, { at } from 'lodash';
-import transactionService from '../../services/transactionService';
-import ticketService from '../../services/ticketService';
-import transactionTicketService from '../../services/transactionTicketService';
+import _ from 'lodash';
 import Util from '../../helpers/utils';
+import { ETicketStatus } from '../../models/enum/ETicketStatus';
 import EventService from '../../services/eventService';
 import EventSittingPlaceService from '../../services/eventSittingPlaceService';
+import ticketService from '../../services/ticketService';
+import transactionService from '../../services/transactionService';
+import transactionTicketService from '../../services/transactionTicketService';
 
 const util = new Util();
 
@@ -59,7 +60,7 @@ export const checkPyament = async (req, res, next) => {
   const { nationalId } = req.body;
   const { eventId } = req.params;
 
-  const ticket = await ticketService.findBynationalId({ nationalId, eventId, status: 'not Attended' });
+  const ticket = await ticketService.findBynationalId({ nationalId, eventId, status: ETicketStatus.NOT_ATTENDED });
   if (!ticket) {
     util.statusCode = 400;
     return util.send(res);

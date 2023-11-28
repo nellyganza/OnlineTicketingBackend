@@ -1,11 +1,11 @@
+import { getAndUpdateSittingPlace } from '../helpers/ControllerFunctions';
+import { eventEmitter } from '../helpers/notifications/eventEmitter';
+import Util from '../helpers/utils';
+import { sequelize } from '../models';
+import eventPaymentService from '../services/eventPaymentService';
 import eventService from '../services/eventService';
 import eventStittingPlaceService from '../services/eventSittingPlaceService';
-import eventPaymentService from '../services/eventPaymentService';
 import eventPaymentMethodService from '../services/paymentMethodService';
-import { getAndUpdateSittingPlace } from '../helpers/ControllerFunctions';
-import Util from '../helpers/utils';
-import { eventEmitter } from '../helpers/notifications/eventEmitter';
-import { sequelize } from '../models';
 
 const util = new Util();
 export default class EventController {
@@ -132,8 +132,9 @@ export default class EventController {
   static async getAllEventByUser(req, res) {
     try {
       const { id } = req.userInfo;
-      const { page, size } = req.query;
-      const events = await eventService.findByName({ userId: id }, page, size);
+      const { page, size, keyword } = req.query;
+      const date = req.query.date ? req.query.date.split(',') : [];
+      const events = await eventService.findByName({ userId: id }, keyword, date, page, size);
       if (!events) {
         util.setError(404, 'Events Not Found');
         return util.send(res);

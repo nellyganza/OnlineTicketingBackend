@@ -1,6 +1,7 @@
 const {
   Model,
 } = require('sequelize');
+const { ETicketStatus, ETicketCurrentStatus } = require('./enum/ETicketStatus');
 
 module.exports = (sequelize, DataTypes) => {
   class Ticket extends Model {
@@ -37,11 +38,11 @@ module.exports = (sequelize, DataTypes) => {
     sittingPlace: DataTypes.INTEGER,
     currentSatus: {
       type: DataTypes.STRING,
-      defaultValue: 'OUT',
+      defaultValue: ETicketCurrentStatus.OUT_EVENT,
     },
     status: {
       type: DataTypes.STRING,
-      defaultValue: 'not Attended',
+      defaultValue:  ETicketStatus.NOT_ATTENDED,
     },
     cardType: DataTypes.STRING,
   }, {

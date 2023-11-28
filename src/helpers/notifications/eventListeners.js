@@ -1,31 +1,31 @@
 /* eslint-disable camelcase */
 import fs from 'fs';
-import { Logger } from 'logger';
 import moment from 'moment';
-import { eventEmitter } from './eventEmitter';
-import transactionService from '../../services/transactionService';
-import ticketService from '../../services/ticketService';
-import eventService from '../../services/eventService';
 import eventPaymentService from '../../services/eventPaymentService';
+import eventService from '../../services/eventService';
+import ticketService from '../../services/ticketService';
+import transactionService from '../../services/transactionService';
 import userService from '../../services/userService';
+import { eventEmitter } from './eventEmitter';
 
+import ticketController from '../../controllers/ticketsController';
 import notificationService from '../../services/notifications';
-import { renderEmail, sendNotification } from './emailNotifier';
-import { sendSms, sendTwilloSms } from '../../config/sendSms';
-import { transporter } from '../mailHelper';
-import { successCreationTemplate } from '../templates/succeCreatedEventEmail';
-import { successCreationPatTemplate } from '../templates/eventCreatedPattern';
-import Util from '../utils';
 import { logger } from '../Logger';
 import htmlToPdf from '../htmlToPdf';
+import { transporter } from '../mailHelper';
+import { successCreationPatTemplate } from '../templates/eventCreatedPattern';
 import { sentTicket } from '../templates/sendTicketEmail';
-import ticketController from '../../controllers/ticketsController';
+import { successCreationTemplate } from '../templates/succeCreatedEventEmail';
+import Util from '../utils';
+import { renderEmail, sendNotification } from './emailNotifier';
 
 const QRCode = require('qrcode');
 
 const unirest = require('unirest');
 
 const util = new Util();
+
+const dateFormat = "YYYY-MM-DD HH:mm:ss"
 
 const server_url = 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify';
 eventEmitter.on('verifyTransactionEvent', async () => {
@@ -58,15 +58,13 @@ eventEmitter.on('verifyTransactionEvent', async () => {
 
 eventEmitter.on('completeEvent', async () => {
   const events = await eventService.getAll();
-  const today = moment().format('llll');
-  const futureDate = moment().subtract(2, 'months').format('llll');
   events.data.forEach(async (evt) => {
-    const endtime = moment(evt.dateAndTimme).add(evt.duration, 'hours').format('llll');
-    if (moment().isAfter(endtime) && evt.status === 'Pending') {
+    const endtime = moment(evt.dateAndTimme,dateFormat).add(evt.duration, 'hours');
+    if (moment(dateFormat).isAfter(endtime) && evt.status === 'Pending') {
       evt.status = 'Done';
       await evt.save();
     }
-    if (moment().diff(moment(endtime), 'months', true) >= 2) {
+    if (moment(dateFormat).diff(endtime, 'months', true) >= 6) {
       evt.status = 'Complete Done';
       await evt.save();
     }
@@ -142,8 +140,8 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
         emailData: {
           eventName: title,
           price: eventPay.price,
-          date: moment(dateAndTimme).format('dd-MM-yyyy'),
-          time: moment(dateAndTimme).format('hh:mm:ss a'),
+          date: moment(dateAndTimme,'dd-MM-yyyy'),
+          time: moment(dateAndTimme,'hh:mm:ss a'),
           place,
           userName: fullName,
           seat: sittingPlace,
@@ -160,6 +158,7 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
       await notificationService.createNotification({
         receiver: email, userId, eventId, message: buyerMessage,
       });
+
       await notificationService.createNotification({
         receiver: event.dataValues.email, userId: event.dataValues.userId, eventId, message: sellerMessage,
       });

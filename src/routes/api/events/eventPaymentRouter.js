@@ -1,13 +1,14 @@
 import express from 'express';
+import { USER_ROLES } from '../../../UIConstants/UserRoles';
 import eventController from '../../../controllers/eventPaymentController';
-import { isAuthenticated, allowedRoles } from '../../../middlewares/authorization';
+import { allowedRoles, isAuthenticated } from '../../../middlewares/authorization';
 
 const router = express.Router();
 
-router.post('/', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.createPaymentByEId);
+router.post('/', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.createPaymentByEId);
 router.get('/:eventId', eventController.getAllPaymentByEId);
-router.put('/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.updatePaymentPlaceByPId);
-router.delete('/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.deletePaymentPlaceByPId);
-router.get('/find/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), eventController.findByID);
+router.put('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.updatePaymentPlaceByPId);
+router.delete('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.deletePaymentPlaceByPId);
+router.get('/find/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.findByID);
 
 export default router;

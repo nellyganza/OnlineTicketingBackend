@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import express from 'express';
-import swaggerUi from 'swagger-ui-express';
-import passport from 'passport';
-import './config/passportSetup';
 import cors from 'cors';
-import swaggerDocument from './swagger/index';
-import router from './routes';
+import express from 'express';
+import passport from 'passport';
+import swaggerUi from 'swagger-ui-express';
+import './config/passportSetup';
 import { sendNotification } from './helpers/mailHelper';
+import router from './routes';
+import swaggerDocument from './swagger/index';
 
 require('./tasks/transactionVerificationTask');
 
@@ -23,9 +23,11 @@ app.use(passport.session());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(`${__dirname}/public`));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
-app.use((request, response, next) => {
-  response.header('Access-Control-Allow-Origin', '*');
-  response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+app.use((req, res, next) => {
+  // Enabling CORS
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization');
   next();
 });
 app.use(expressWinston.logger({

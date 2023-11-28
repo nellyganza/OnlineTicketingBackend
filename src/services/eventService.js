@@ -38,6 +38,7 @@ class EventService extends MainService {
       limit,
       offset,
       order: [
+        ['status', 'DESC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))
@@ -56,6 +57,7 @@ class EventService extends MainService {
       offset,
       distinct: true,
       order: [
+        ['status', 'DESC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))
@@ -69,10 +71,31 @@ class EventService extends MainService {
    * @param {*} prop HTTP request
    * @returns {*} JSON data
    */
-  static findByName(prop, page, size) {
+  static findByName(prop, keyword, date, page, size) {
     const { limit, offset } = this.getPagination(page, size);
     return Event.findAndCountAll({
-      where: prop,
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              {
+                title: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                place: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+            ],
+          },
+          {
+            dateAndTimme: {
+              [Op.between]: [date[0], date[1]],
+            },
+          }, prop],
+      },
       include: [{
         model: Comment,
         order: [
@@ -82,7 +105,7 @@ class EventService extends MainService {
       limit,
       offset,
       order: [
-        ['status', 'ASC'],
+        ['status', 'DESC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))
@@ -142,6 +165,7 @@ class EventService extends MainService {
       limit,
       offset,
       order: [
+        ['status', 'DESC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))
@@ -192,6 +216,7 @@ class EventService extends MainService {
       limit,
       offset,
       order: [
+        ['status', 'DESC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))
@@ -219,6 +244,7 @@ class EventService extends MainService {
       limit,
       offset,
       order: [
+        ['status', 'DESC'],
         ['dateAndTimme', 'ASC'],
       ],
     }).then((data) => this.getPagingData(data, page, limit))

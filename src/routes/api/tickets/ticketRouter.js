@@ -1,8 +1,8 @@
 import express from 'express';
 import ticketController from '../../../controllers/ticketsController';
-import { isAuthenticated, allowedRoles } from '../../../middlewares/authorization';
-import { cardPay, rwMobileMoney } from '../../../middlewares/flutterwave/flutterwaveMiddleware';
 import { ValidationMiddleWare, checkPayments } from '../../../middlewares';
+import { allowedRoles, isAuthenticated } from '../../../middlewares/authorization';
+import { cardPay, rwMobileMoney } from '../../../middlewares/flutterwave/flutterwaveMiddleware';
 
 const { newTicketValidation } = ValidationMiddleWare;
 const { checkPyament, findTickets } = checkPayments;
@@ -20,4 +20,6 @@ router.get('/newTicket/payment/webhook', ticketController.paymentVerificationWeb
 router.get('/newTicket/failed/payment/webhook', ticketController.paymentVerificationWebhook);
 // router.put('/checkup/payment/:eventId', checkPyament, ticketController.entrance);
 router.put('/validate/entrance/:eventId', ticketController.entrance);
+
+router.get('/filterByHoster',isAuthenticated, allowedRoles(['manager', 'event_admin']), ticketController.getTicketByHoster);
 export default router;
