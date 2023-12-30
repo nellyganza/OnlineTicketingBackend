@@ -1,3 +1,5 @@
+const moment = require('moment/moment');
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Ads', {
@@ -24,6 +26,15 @@ module.exports = {
       },
       link: {
         type: Sequelize.TEXT,
+      },
+      startDate: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: new Date().toISOString(),
+      },
+      endDate: {
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

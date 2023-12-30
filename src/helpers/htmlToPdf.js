@@ -1,27 +1,11 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
+const html_to_pdf = require('html-pdf-node');
 
 const htmlToPdf = async (html, outputPath) => {
   let pdf;
   try {
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox'],
-      headless: true,
-      timeout: 0,
-    });
-    const page = await browser.newPage();
-    await page.emulateMediaType('screen');
-    await page.setContent(html, {
-      waitUntil: 'networkidle0',
-    });
-    pdf = await page.pdf({
-      path: outputPath,
-      width: '850',
-      height: '300',
-      printBackground: true,
-    });
-
-    await browser.close();
+    const options = { format: 'A5'};
+    const file = { content: html };
+    pdf = await html_to_pdf.generatePdf(file, options);
   } catch (error) {
     console.log(error);
   }

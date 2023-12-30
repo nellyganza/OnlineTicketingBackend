@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <style>
         .container {
-            width: 60%;
+            width: 100%;
             height: 100%;
         }
+
         .ticket {
             width: 100%;
             height: 100%;
@@ -20,11 +21,13 @@
             overflow: hidden;
             font-family: 'Roboto', sans-serif;
         }
+
         .ticket__main {
             width: 100%;
             height: 100%;
             padding: 20px;
         }
+
         .ticket__wrapper {
             width: 100%;
             height: 100%;
@@ -34,197 +37,284 @@
             overflow: hidden;
             font-family: 'Roboto', sans-serif;
         }
+
         .ticket__header {
             width: 100%;
             height: 100px;
             background-color: #f1f1f1;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between; 
             padding: 0 20px;
         }
-        .ticket__header__title {
-            width: 50%;
-            height: 100%;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
+
+        .ticket__header__title { 
+            height: 100%; 
         }
+
         .ticket__header__title h1 {
             font-size: 20px;
             font-weight: 700;
             color: #000;
         }
-        .ticket__header__qrcode {
-            width: 50%;
-            height: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
+
+        .ticket__header__qrcode { 
+            height: 100%;  
         }
+
         .ticket__header__qrcode img {
             width: 100px;
             height: 100px;
         }
+
         .ticket__body {
             width: 100%;
             height: 100%;
             padding: 20px;
         }
+
         .ticket__body__info {
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: repeat(3,auto);
+            grid-template-columns: repeat(3, auto);
         }
-        .ticket__body__info__item {
-            width: 30%;
+
+        .ticket__body__info__item { 
             display: flex;
             align-items: center;
         }
-        .ticket__body__info__item__title {
-            width: 30%;
+
+        .ticket__body__info__item__title { 
             display: flex;
             justify-content: flex-start;
             align-items: center;
         }
+
         .ticket__body__info__item__title h3 {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             color: #000;
             margin: 0 !important;
         }
-        .ticket__body__info__item__content {
-            width: 70%;
+
+        .ticket__body__info__item__content { 
             display: flex;
             justify-content: flex-start;
             align-items: center;
         }
+
         .ticket__body__info__item__content p {
-            font-size: 10px;
+            font-size: 14px;
             font-weight: 400;
             color: #000;
             margin: 0 !important;
         }
+
         .ticket__body__info__item__content p span {
             font-weight: 700;
         }
+
         .ticket-logo {
             width: 100%;
             background-color: #070515;
             opacity: 0.5;
         }
-
     </style>
 </head>
 
-<body>
-    <div class="container">
-        <div class="" style="margin-bottom: 100px;">
-          <h2 class="">Hello , {{emailData.userName}}</h2>
-          <p class="">Thank you for using Ticket rwanda application for buying your events, from below you will find all information about the event and ticket and you will be able to print your ticket.</p>
-          <p>Thank you !! </p>
-          <div class="ticket-logo">
-            <img src="img/favicon.jpg" alt="logo" style="width: 250px;">
-          </div>
-        </div>
-      </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="ticket">
-                    <div class="ticket__main">
-                        <div class="ticket__wrapper">
+<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #f2f3f8;padding:40px;" leftmargin="0">
+    <table cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8"
+        style="@import url(https://fonts.googleapis.com/css?family=Rubik:300,400,500,700|Open+Sans:300,400,600,700); font-family: 'Open Sans', sans-serif;">
+        <tr>
+            <td>
+                <table style="background-color: #f2f3f8; max-width:670px;  margin:0 auto;" width="100%" border="0"
+                    align="center" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="height:80px;">
+                            <div class="container">
+                                <div class="" style="margin-bottom: 10px;">
+                                    <h2 class="">Hello , {{emailData.fullName}}</h2>
+                                    <p class="">Thank you for using Ticket rwanda application for buying your events,
+                                        from below you will find
+                                        all information about the event and ticket and you will be able to print your
+                                        ticket.</p>
+                                    <p>Thank you !! </p>
+                                    <div class="ticket-logo">
+                                        <img src="cid:favicon" alt="logo" style="width: 250px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">
                             <div class="ticket__header">
                                 <div class="ticket__header__title">
-                                    <h1>Entrance Ticket - {{emailData.userName}}</h1>
+                                    <h1>Entrance Ticket - {{emailData.fullName}}</h1>
                                 </div>
                                 <div class="ticket__header__qrcode">
-                                    <img src="img/qrcode.png" alt="qrcode">
+                                    <img src="cid:barcode" alt="qrcode">
                                 </div>
                             </div>
-                            <div class="ticket__body">
-                                <div class="ticket__body__info">
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Date</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.date}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Time</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.time}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Place</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.place}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Name</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.userName}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Passport</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>123456789</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Buyer Name</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>Nishimwe Elysee</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Type</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.type}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Seat</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.seat}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="ticket__body__info__item">
-                                        <div class="ticket__body__info__item__title">
-                                            <h3>Price</h3>
-                                        </div>
-                                        <div class="ticket__body__info__item__content">
-                                            <p>{{emailData.price}} Rwf</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height:20px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0"
+                                style="max-width:670px;background:#fff; border-radius:3px; text-align:center;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
+                                <tr>
+                                    <td style="height:40px;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:0 35px;">
+                                        <table width="95%">
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Event</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.eventName}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Date</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.date}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Time</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.time}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Place</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.place}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Name</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.fullName}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>{{emailData.cardType}}</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.nationalId}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Buyer Name</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.userName}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Type</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.type}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Seat</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.seat}}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="ticket__body__info__item__title">
+                                                        <h3>Price</h3>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="ticket__body__info__item__content">
+                                                        <p>{{emailData.price}} Rwf</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height:40px;">&nbsp;</td>
+                                </tr>
+                            </table>
+                        </td>
+                    <tr>
+                        <td style="height:20px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">
+                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">
+                                &copy; <strong>TICKETICORE</strong></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height:80px;">&nbsp;</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 
 </html>

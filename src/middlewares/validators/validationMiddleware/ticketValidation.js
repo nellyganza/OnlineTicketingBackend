@@ -1,5 +1,5 @@
-import { TicketValidationSchemas } from '../../../helpers/validationSchemas';
 import Util from '../../../helpers/utils';
+import { TicketValidationSchemas } from '../../../helpers/validationSchemas';
 import cardService from '../../../services/cardService';
 import eventService from '../../../services/eventService';
 
@@ -18,7 +18,7 @@ export const newTicketValidation = async (req, res, next) => {
       }
       return true;
     } catch (error) {
-      util.setError(500, error);
+      util.setError(500, error.message);
       return util.send(res);
     }
   };
@@ -39,7 +39,7 @@ export const newTicketValidation = async (req, res, next) => {
       }
       return true;
     } catch (error) {
-      util.setError(500, error);
+      util.setError(500, error.message);
       util.send(res);
     }
   };

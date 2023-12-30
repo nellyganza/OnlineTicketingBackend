@@ -6,9 +6,11 @@ const util = new Util();
 export default class AdsController {
   static async saveAds(req, res) {
     try {
-      const { AdsPositionId, priority, link } = req.body;
+      const {
+        AdsPositionId, priority, link, startDate, endDate,
+      } = req.body;
       const savedAds = await adsService.createAds({
-        AdsPositionId, priority, link, image: req.files && req.files[0] ? req.files[0].filename : '',
+        AdsPositionId, priority, link, image: req.files && req.files[0] ? req.files[0].filename : '', startDate, endDate,
       });
       if (!savedAds) {
         util.setError(400, 'Failed to create an Ads');

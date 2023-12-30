@@ -1,5 +1,6 @@
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import nodemailer from 'nodemailer';
 
 const express = require('express');
 
@@ -32,7 +33,6 @@ export const sendNotification = async ({
     viewPath,
     extName: '.handlebars',
   }));
-  console.log(path.resolve(__dirname, '../public/'));
   const mailOptions = {
     from: process.env.EMAIL,
     to,
@@ -41,17 +41,25 @@ export const sendNotification = async ({
     context: {
       emailData: data,
     },
-    attachments: [
-      attachments.map((attachment) => ({ filename: attachment.name, path: path.resolve(__dirname, attachment.path) })),
-    ],
+    attachments,
   };
 
+  const deleteFileFromDisk = async (filename) => {
+    fs.rmSync(filename, {
+      force: true,
+    });
+  };
   return transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log(error);
       return false;
     }
     console.log(`Email sent: ${info.response}`);
+    attachments.forEach((attach) => {
+      if (attach.cid !== 'favicon') {
+        deleteFileFromDisk(attach.path);
+      }
+    });
     return true;
   });
 };

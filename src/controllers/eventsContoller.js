@@ -51,7 +51,7 @@ export default class EventController {
 
       transaction.afterCommit(async () => {
         util.setSuccess(201, 'Events Prepared Success', { savedEvent });
-        eventEmitter.emit('createdEvent', { user: req.userInfo, event: { ...savedEvent.dataValues }, savedMethods });
+        eventEmitter.emit('createdEvent', { user: req.userInfo, event: { ...savedEvent.dataValues }, paymentMethod: savedMethods });
         return util.send(res);
       });
       await transaction.commit();
@@ -112,11 +112,9 @@ export default class EventController {
 
   static async getAllEvent(req, res) {
     try {
-      const data = { ...req.query };
-      const { page, size } = req.query;
-      delete data.page;
-      delete data.size;
-      const events = await eventService.findByName({ ...data }, page, size);
+      const { page, size, ...others } = req.query;
+
+      const events = await eventService.getEvents({ ...others }, page, size);
       if (!events) {
         util.setError(404, 'Events Not Found');
         return util.send(res);
@@ -176,7 +174,6 @@ export default class EventController {
 
   static async updateEvent(req, res) {
     try {
-      console.log(req.files);
       const { id } = req.body;
       if (!id) {
         util.setError(400, 'Invalid Event Id');
@@ -190,7 +187,6 @@ export default class EventController {
       util.setSuccess(200, 'Event Updated Success', event);
       return util.send(res);
     } catch (error) {
-      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }

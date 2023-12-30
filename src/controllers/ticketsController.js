@@ -141,8 +141,10 @@ export default class ticketController {
   static async getTicketByUser(req, res) {
     const userId = req.userInfo.id;
     try {
-      const { page, size } = req.query;
-      const FoundTickets = await ticketService.findByName({ userId }, page, size);
+      const {
+        page, size, keyword, ...others
+      } = req.query;
+      const FoundTickets = await ticketService.filterUserTickets({ ...others, userId }, keyword, page, size);
       util.setSuccess(200, 'Tickets Found', FoundTickets);
       return util.send(res);
     } catch (error) {
@@ -232,11 +234,13 @@ export default class ticketController {
     return util.send(res);
   }
 
-  static async getTicketByHoster(req ,res){
+  static async getTicketByHoster(req, res) {
     try {
       const { id } = req.userInfo;
-      const { page, size, keyword,...other} = req.query;
-      const tickets = await ticketService.filterByHoster(id , keyword,other, page, size);
+      const {
+        page, size, keyword, ...other
+      } = req.query;
+      const tickets = await ticketService.filterByHoster(id, keyword, other, page, size);
       if (!tickets) {
         util.setError(404, 'Tickets Not Found');
         return util.send(res);

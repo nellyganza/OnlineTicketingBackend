@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import models from '../models';
+import MainService from './MainService';
 
 const {
   Users, Notification, Event, Comment, EventPayment, EventSittingPlace, PaymentMethod, Roles,
@@ -8,7 +9,7 @@ const {
  * @exports
  * @class UserService
  */
-class UserService {
+class UserService extends MainService {
   /**
    * create new user
    * @static createuser
@@ -20,10 +21,17 @@ class UserService {
     return Users.create(newUser);
   }
 
-  static findByProp(prop) {
-    return Users.findAll({
-      where: prop, include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
-    });
+  static findByProp(prop, page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Users.findAndCountAll({
+      where: prop,
+      include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
+      limit,
+      offset,
+    }).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
   }
 
   static numberOfUsers() {
@@ -33,21 +41,6 @@ class UserService {
   static findByAllData(prop) {
     return Users.findOne({
       where: prop,
-      include: [
-        {
-          model: Event,
-          include: [{
-            model: Comment,
-            order: [
-              ['createdAt', 'ASC'],
-            ],
-          }, { model: EventPayment }, { model: EventSittingPlace }, { model: PaymentMethod },
-          ],
-        },
-        {
-          model: Notification,
-        },
-      ],
       attributes: { exclude: ['password', 'authToken'] },
     });
   }
@@ -59,8 +52,9 @@ class UserService {
     });
   }
 
-  static getUsers() {
-    return Users.findAll(
+  static getUsers(page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Users.findAndCountAll(
       {
         where: {
           isVerified: true,
@@ -68,11 +62,17 @@ class UserService {
         include: [{ model: Roles, attributes: ['id', 'name', 'slug'] }],
         attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture'],
       },
-    );
+      limit,
+      offset,
+    ).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
   }
 
-  static getAdminUsers() {
-    return Users.findAll(
+  static getAdminUsers(page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Users.findAndCountAll(
       {
         include: [{
           model: Roles,
@@ -83,7 +83,12 @@ class UserService {
         }],
         attributes: ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture', 'share'],
       },
-    );
+      limit,
+      offset,
+    ).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
   }
 
   /**

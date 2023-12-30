@@ -1,11 +1,11 @@
-import { Enum } from '../../helpers/Enum'
+import { Enum } from '../../helpers/Enum';
 
 export const ETicketStatus = Enum({
-    ATTENDED: 'Attended',
-    NOT_ATTENDED: 'Not Attended'
-})
+  ATTENDED: 'Attended',
+  NOT_ATTENDED: 'Not Attended',
+});
 
 export const ETicketCurrentStatus = Enum({
-    IN_EVENT:'IN',
-    OUT_EVENT:'OUT'
-})
+  IN_EVENT: 'IN',
+  OUT_EVENT: 'OUT',
+});

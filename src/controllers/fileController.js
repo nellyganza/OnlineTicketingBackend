@@ -1,8 +1,8 @@
-import fs from 'fs';
-import eventService from '../services/eventService';
-import Util from '../helpers/utils';
-import { cloudinaryUploader } from '../helpers/cloudinaryUploader';
 import 'dotenv/config';
+import fs from 'fs';
+import { cloudinaryUploader } from '../helpers/cloudinaryUploader';
+import Util from '../helpers/utils';
+import eventService from '../services/eventService';
 
 const fsPromises = require('fs').promises;
 
@@ -48,7 +48,7 @@ const uploadEvents = async (req, res) => {
     util.setSuccess(200, message, updatedEvent);
     return util.send(res);
   } catch (error) {
-    util.setError(500, error);
+    util.setError(500, error.message);
     return util.send(res);
   }
 };
@@ -81,10 +81,43 @@ const setEventImages = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    util.setError(500, error);
+    util.setError(500, error.message);
     return util.send(res);
   }
 };
+
+// const setImageToUrl = async (req, res, next) => {
+//   try {
+//     let urls = [];
+//     const { eventId } = req.query;
+//     if (eventId) {
+//       const eventFound = await eventService.findById(eventId);
+//       if (!eventFound) {
+//         util.setError(400, 'Event Not Found');
+//         return util.send(res);
+//       }
+//       const data = eventFound.dataValues;
+//       if (Object.keys(data).length <= 0) {
+//         util.setError(400, 'Event Not Found');
+//         return util.send(res);
+//       }
+//       urls = data.image || [];
+//     }
+//     for (let index = 0; index < req.files.length; index++) {
+//       const { filename } = req.files[index];
+//       urls.push(filename);
+//     }
+//     if (eventId) {
+//       req.body.image = urls;
+//     } else {
+//       req.body.event.image = urls;
+//     }
+//     next();
+//   } catch (error) {
+//     util.setError(500, error.message);;
+//     return util.send(res);
+//   }
+// };
 
 module.exports = {
   upload,

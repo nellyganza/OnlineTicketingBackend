@@ -1,7 +1,7 @@
-import models from '../models';
+import models, { sequelize } from '../models';
 import MainService from './MainService';
 
-const { Op } = require('sequelize');
+const { Op, QueryTypes } = require('sequelize');
 
 const {
   Event, Comment, EventPayment, EventSittingPlace, PaymentMethod, Category,
@@ -52,7 +52,7 @@ class EventService extends MainService {
     const condition = prop || null;
     return Event.findAndCountAll({
       where: condition,
-      include: [{ model: Comment, order: [['createdAt', 'ASC']] }, { model: Category }],
+      include: [{ model: Category }],
       limit,
       offset,
       distinct: true,
@@ -101,7 +101,7 @@ class EventService extends MainService {
         order: [
           ['createdAt', 'ASC'],
         ],
-      }, { model: Category }],
+      }, { model: Category }, { model: EventPayment }],
       limit,
       offset,
       order: [
@@ -121,8 +121,9 @@ class EventService extends MainService {
           status: 'Pending',
           share: true,
         },
-        attributes: ['id', 'title', ['dateAndTimme', 'start']],
+        attributes: ['id', 'title', 'host', ['dateAndTimme', 'start']],
       },
+      { model: Category, attributes: ['id', 'name'] },
     );
   }
 
@@ -277,6 +278,15 @@ class EventService extends MainService {
     return Event.destroy({
       where: { id: modelId },
     });
+  }
+
+  static getEventsPerMonth(startDate, endDate, userId) {
+    return sequelize.query(`select to_char(m, 'Month') as month,COUNT(e) as value
+    from generate_series(
+        ?::date, ?, '1 month'
+    ) s(m) left join "Events" e on to_char(s.m::DATE, 'YYYY-MM') = to_char(e."dateAndTimme"::TIMESTAMP, 'YYYY-MM') and e."userId"=?
+    group by s.m
+    order by s.m,value`, { replacements: [startDate, endDate, userId], type: QueryTypes.SELECT });
   }
 }
 export default EventService;

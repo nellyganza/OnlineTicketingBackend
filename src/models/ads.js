@@ -21,6 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     AdsPositionId: DataTypes.UUID,
     priority: DataTypes.INTEGER,
     link: DataTypes.TEXT,
+    startDate: DataTypes.DATE,
+    endDate: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Ads',

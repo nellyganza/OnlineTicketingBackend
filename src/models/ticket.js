@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     status: {
       type: DataTypes.STRING,
-      defaultValue:  ETicketStatus.NOT_ATTENDED,
+      defaultValue: ETicketStatus.NOT_ATTENDED,
     },
     cardType: DataTypes.STRING,
   }, {

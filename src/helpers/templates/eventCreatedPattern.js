@@ -67,7 +67,7 @@ export const successCreationPatTemplate = (emailData) => {
                                                 <br/>
                                                 <a className="button" href="${process.env.FRONT_END_URL}/paterner-report/${emailData.eventId}/${emailData.id}">View your Report</a>
 
-                                                <p>Ticketrwanda <br/> Best regards !!!</p>
+                                                <p>TicketiCore <br/> Best regards !!!</p>
                                             </p>
                                             
                                         </td>
@@ -82,7 +82,7 @@ export const successCreationPatTemplate = (emailData) => {
                         </tr>
                         <tr>
                             <td style="text-align:center;">
-                                <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>TICKETRWANDA</strong></p>
+                                <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>TICKETICORE</strong></p>
                             </td>
                         </tr>
                         <tr>

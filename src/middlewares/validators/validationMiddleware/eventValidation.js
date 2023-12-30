@@ -1,6 +1,6 @@
-import { EventValidationSchemas } from '../../../helpers/validationSchemas';
-import Util from '../../../helpers/utils';
 import { cloudinaryUploader } from '../../../helpers/cloudinaryUploader';
+import Util from '../../../helpers/utils';
+import { EventValidationSchemas } from '../../../helpers/validationSchemas';
 
 const {
   newEventSchema, newPaymentMethodSchema, newStittingPlaceSchema, newPaymentGradeCost, oldEventSchema,
@@ -125,14 +125,15 @@ export const newEventEventValidation = (req, res, next) => {
     const pg = paymentGrade(req);
     if (n.error || pm.error || s.error || pg.error) {
       const errors = {
-        ...n.body, ...pm.error, ...s.body, ...pg.body,
+        ...n.body, ...pm.body, ...s.body, ...pg.body,
       };
-      util.setError(400, errors.Error);
+      const emessages = Object.values(errors).join(',');
+      util.setError(400, emessages);
       return util.send(res);
     }
     next();
   } catch (error) {
-    util.setError(500, error);
+    util.setError(500, error.message);
     return util.send(res);
   }
 };
@@ -163,7 +164,7 @@ export const checkDates = (req, res, next) => {
       return util.send(res);
     }
   } catch (error) {
-    util.setError(500, error);
+    util.setError(500, error.message);
     return util.send(res);
   }
 };

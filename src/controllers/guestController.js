@@ -66,4 +66,23 @@ export default class Guest {
       return util.send(res);
     }
   }
+
+  static async getGuestsByHoster(req, res) {
+    try {
+      const { id } = req.userInfo;
+      const {
+        page, size, keyword, ...other
+      } = req.query;
+      const guests = await guestService.filterByHoster(id, keyword, other, page, size);
+      if (!guests) {
+        util.setError(404, 'Guests Not Found');
+        return util.send(res);
+      }
+      util.setSuccess(200, 'Guests Found', guests);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
 }

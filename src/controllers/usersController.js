@@ -1,22 +1,22 @@
 import bcrypt from 'bcrypt';
+import 'dotenv/config';
 import { pick } from 'lodash';
 import { propertiesToJson } from 'properties-file';
-import { sendLink } from '../utils/sendVerificationLink';
+import { nexmo } from '../config/nexmo';
+import AuthTokenHelper from '../helpers/AuthTokenHelper';
 import { newJwtToken } from '../helpers/tokenGenerator';
 import Util from '../helpers/utils';
-import userService from '../services/userService';
-import eventService from '../services/eventService';
+import { deleteFileById } from '../middlewares/mongo/upload';
 import conactsService from '../services/contactService';
+import eventService from '../services/eventService';
+import RoleService from '../services/roleService';
 import ticketService from '../services/ticketService';
-import AuthTokenHelper from '../helpers/AuthTokenHelper';
 import tokenService from '../services/tokenService';
-// import { nexmo } from '../config/nexmo';
+import userService from '../services/userService';
 import {
   sendPasswordResetLink,
 } from '../utils/sendPasswordLInk';
-import 'dotenv/config';
-import { deleteFileById } from '../middlewares/mongo/upload';
-import RoleService from '../services/roleService';
+import { sendLink } from '../utils/sendVerificationLink';
 
 const PropertiesReader = require('properties-reader');
 
@@ -243,7 +243,8 @@ export default class User {
 
   static async getUsers(req, res) {
     try {
-      const users = await userService.getUsers();
+      const { page, size } = req.query;
+      const users = await userService.getUsers(page, size);
       const message = 'the users are found';
       util.setSuccess(200, message, users);
       return util.send(res);
@@ -255,7 +256,8 @@ export default class User {
 
   static async getManagerUsers(req, res) {
     try {
-      const users = await userService.getAdminUsers();
+      const { page, size } = req.query;
+      const users = await userService.getAdminUsers(page, size);
       const message = 'the users are found';
       util.setSuccess(200, message, users);
       return util.send(res);
@@ -268,12 +270,13 @@ export default class User {
   static async findByCategory(req, res) {
     try {
       const { name, value } = req.params;
+      const { page, size } = req.query;
       let users = [];
       if (name === 'category') {
-        users = await userService.findByProp({ category: value });
+        users = await userService.findByProp({ category: value }, page, size);
       }
       if (name === 'type') {
-        users = await userService.findByProp({ type: value });
+        users = await userService.findByProp({ type: value }, page, size);
       }
       const message = 'the users are found';
       util.setSuccess(200, message, users);
@@ -288,8 +291,12 @@ export default class User {
     try {
       const { id } = req.userInfo;
       const userExist = await userService.findById(id);
+      let filename = req.body.profilePicture;
+      for (let index = 0; index < req.files.length; index++) {
+        filename = req.files[index].filename;
+      }
       if (userExist) {
-        const update = await userService.updateAtt({ ...req.body }, { id });
+        const update = await userService.updateAtt({ profilePicture: filename, ...req.body }, { id });
         if (update) {
           util.setSuccess(200, 'user profile updated');
           return util.send(res);
@@ -367,58 +374,58 @@ export default class User {
     }
   }
 
-  // static async sendVerificationCode(req, res) {
-  //   // We verify that the client has included the `number` property in their JSON body
-  //   if (!req.body.number) {
-  //     util.setError(400, 'You must supply a `number` prop to send the request to');
-  //     util.send(res);
-  //     return;
-  //   }
-  //   // Send the request to Vonage's servers
-  //   nexmo.verify.request({
-  //     number: req.body.number,
-  //     // You can customize this to show the name of your company
-  //     brand: 'Intercore Events',
-  //     // We could put `'6'` instead of `'4'` if we wanted a longer verification code
-  //     code_length: '4',
-  //   }, (err, result) => {
-  //     if (err) {
-  //       // If there was an error, return it to the client
-  //       util.setError(500, err.error_text);
-  //       util.send(res);
-  //       return;
-  //     }
-  //     // Otherwise, send back the request id. This data is integral to the next step
-  //     const requestId = result.request_id;
-  //     util.setSuccess(200, 'Please Verfication code sent to your phon number, submit to verify your phone number', result);
-  //     util.send(res);
-  //   });
-  // }
+  static async sendVerificationCode(req, res) {
+    // We verify that the client has included the `number` property in their JSON body
+    if (!req.body.number) {
+      util.setError(400, 'You must supply a `number` prop to send the request to');
+      util.send(res);
+      return;
+    }
+    // Send the request to Vonage's servers
+    nexmo.verify.request({
+      number: req.body.number,
+      // You can customize this to show the name of your company
+      brand: 'Intercore Events',
+      // We could put `'6'` instead of `'4'` if we wanted a longer verification code
+      code_length: '4',
+    }, (err, result) => {
+      if (err) {
+        // If there was an error, return it to the client
+        util.setError(500, err.error_text);
+        util.send(res);
+        return;
+      }
+      // Otherwise, send back the request id. This data is integral to the next step
+      const requestId = result.request_id;
+      util.setSuccess(200, 'Please Verfication code sent to your phon number, submit to verify your phone number', result);
+      util.send(res);
+    });
+  }
 
-  // static async verifyPhoneNumber(req, res) {
-  //   // We require clients to submit a request id (for identification) and a code (to check)
-  //   if (!req.body.requestId || !req.body.code) {
-  //     util.setError(400, 'You must supply a `code` and `request_id` prop to send the request to');
-  //     util.send(res);
-  //     return;
-  //   }
-  //   // const info  = await sendSMS(req.body.number,"You have ticket to attend apr and rayon sport match");
-  //   // util.setSuccess(200, "Message Sent",{info});
-  //   // util.send(res);
-  //   // Run the check against Vonage's servers
-  //   nexmo.verify.check({
-  //     request_id: req.body.requestId,
-  //     code: req.body.code,
-  //   }, (err, result) => {
-  //     if (err) {
-  //       util.setError(500, err.error_text);
-  //       util.send(res);
-  //       return;
-  //     }
-  //     util.setSuccess(200, 'Phone Number Verified Success', { result });
-  //     util.send(res);
-  //   });
-  // }
+  static async verifyPhoneNumber(req, res) {
+    // We require clients to submit a request id (for identification) and a code (to check)
+    if (!req.body.requestId || !req.body.code) {
+      util.setError(400, 'You must supply a `code` and `request_id` prop to send the request to');
+      util.send(res);
+      return;
+    }
+    // const info  = await sendSMS(req.body.number,"You have ticket to attend apr and rayon sport match");
+    // util.setSuccess(200, "Message Sent",{info});
+    // util.send(res);
+    // Run the check against Vonage's servers
+    nexmo.verify.check({
+      request_id: req.body.requestId,
+      code: req.body.code,
+    }, (err, result) => {
+      if (err) {
+        util.setError(500, err.error_text);
+        util.send(res);
+        return;
+      }
+      util.setSuccess(200, 'Phone Number Verified Success', { result });
+      util.send(res);
+    });
+  }
 
   static async getNumberOfAllUsers(req, res) {
     try {
@@ -435,7 +442,7 @@ export default class User {
       util.setSuccess(200, 'Data Result', { ...data });
       return util.send(res);
     } catch (error) {
-      util.setError(500, error);
+      util.setError(500, error.message);
       return util.send(res);
     }
   }
@@ -460,6 +467,25 @@ export default class User {
     } catch (error) {
       util.setError(500, error.message);
       return util.send(res);
+    }
+  }
+
+  static async getChartNumbers(req, res) {
+    try {
+      const { id } = req.userInfo;
+      const { year } = req.params;
+      const eventData = await eventService.getEventsPerMonth(new Date(year, 0, 1), new Date(year, 11, 31), id);
+      const ticketData = await ticketService.getTicketsPerMonth(new Date(year, 0, 1), new Date(year, 11, 31), id);
+      const data = {
+        eventData,
+        ticketData,
+      };
+
+      util.setSuccess(200, 'Data Result', { ...data });
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      util.send(res);
     }
   }
 }

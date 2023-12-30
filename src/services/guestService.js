@@ -1,11 +1,13 @@
+import { Op } from 'sequelize';
 import models from '../models';
+import MainService from './MainService';
 
-const { Guest, EventPayment } = models;
+const { Guest, EventPayment, Event } = models;
 /**
  * @exports
  * @class GuestService
  */
-class GuestService {
+class GuestService extends MainService {
   /**
    * create new user
    * @static createGuest
@@ -54,6 +56,56 @@ class GuestService {
     return Guest.destroy({
       where: { id: modelId },
     });
+  }
+
+  static filterByHoster(userId, keyword, prop, page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Guest.findAndCountAll({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              {
+                fullName: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                email: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                phoneNumber: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                nationalId: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                organization: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                status: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+            ],
+          }, prop],
+      },
+      limit,
+      offset,
+      include: [{ model: Event, where: { userId } }, { model: EventPayment },
+      ],
+    }).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
   }
 }
 export default GuestService;

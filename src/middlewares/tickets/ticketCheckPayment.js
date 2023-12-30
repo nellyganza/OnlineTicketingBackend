@@ -50,7 +50,6 @@ export const findTickets = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    console.log(error);
     util.setError(400, error.message);
     return util.send(res);
   }

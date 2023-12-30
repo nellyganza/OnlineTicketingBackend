@@ -14,7 +14,6 @@ export default class CategoryController {
       util.setSuccess(200, 'Category saved Success', savedCategory);
       util.send(res);
     } catch (error) {
-      console.log(error);
       util.setError(500, error.message || error);
       util.send(res);
     }

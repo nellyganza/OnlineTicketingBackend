@@ -1,6 +1,8 @@
 import { Op } from 'sequelize';
-import models from '../models';
+import models, { sequelize } from '../models';
 import MainService from './MainService';
+
+const { QueryTypes } = require('sequelize');
 
 const {
   Ticket, Event, Users, EventPayment, PaymentMethod,
@@ -47,9 +49,7 @@ class TicketService extends MainService {
       where: prop,
       limit,
       offset,
-      include: [
-        { model: Users }, { model: Event, include: [{ model: PaymentMethod }, { model: EventPayment }] },
-      ],
+      include: [{ model: Users }, { model: Event }, { model: EventPayment }],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');
@@ -87,6 +87,7 @@ class TicketService extends MainService {
   static findById(modelId) {
     return Ticket.findOne({
       where: { id: modelId },
+      include: [{ model: Users }, { model: Event }, { model: EventPayment }],
     });
   }
 
@@ -96,7 +97,7 @@ class TicketService extends MainService {
     });
   }
 
-  static filterByHoster(userId,keyword,prop, page, size) {
+  static filterByHoster(userId, keyword, prop, page, size) {
     const { limit, offset } = this.getPagination(page, size);
     return Ticket.findAndCountAll({
       where: {
@@ -138,8 +139,65 @@ class TicketService extends MainService {
       },
       limit,
       offset,
-      include: [{ model: Users }, { model: Event,where:{userId} },{ model: EventPayment}
-      ],
+      include: [{ model: Users }, { model: Event, where: { userId } }, { model: EventPayment }],
+    }).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
+  }
+
+  static getTicketsPerMonth(startDate, endDate, userId) {
+    return sequelize.query(`select to_char(m, 'Month') as month,COUNT(t) as value
+    from generate_series(
+        ?::date, ?, '1 month'
+    ) s(m) left join "Tickets" t on to_char(s.m::DATE, 'YYYY-MM') = to_char(t."createdAt"::TIMESTAMP, 'YYYY-MM') left join "Events" e on t."eventId"=e.id and e."userId"=?
+    group by s.m
+    order by s.m,value`, { replacements: [startDate, endDate, userId], type: QueryTypes.SELECT });
+  }
+
+  static filterUserTickets(prop, keyword, page, size) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Ticket.findAndCountAll({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              {
+                paymenttype: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                fullName: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                nationalId: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                phoneNumber: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                email: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+              {
+                status: {
+                  [Op.iLike]: `%${keyword}%`,
+                },
+              },
+            ],
+          }, prop],
+      },
+      limit,
+      offset,
+      include: [{ model: Users }, { model: Event }, { model: EventPayment }],
     }).then((data) => this.getPagingData(data, page, limit))
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');

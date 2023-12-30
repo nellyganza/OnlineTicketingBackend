@@ -89,7 +89,6 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
       ...data, tx_ref: generateTransactionReference('TX'), order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, subaccount: data.eventPaymentMethods,
     };
     const result = await flw.MobileMoney.rwanda(payload);
-    console.log(result);
     if (result.status === 'success') {
       await TransactionService.createTransaction({ ...payload, transactionId: payload.tx_ref });
       util.setSuccess(200, 'Mobile Money Payment', result);
@@ -208,7 +207,6 @@ router.post('/bank-money', isAuthenticated, async (req, res) => {
     const tx_ref = userPayload && userPayload.tx_ref ? userPayload.tx_ref : generateTransactionReference('TX');
     const authorization = data.authorization;
 
-    console.log('authorization', authorization);
     let payload = {
       card_number,
       cvv,
@@ -231,7 +229,6 @@ router.post('/bank-money', isAuthenticated, async (req, res) => {
     }
     const response = await flw.Charge.card(payload);
 
-    console.log('response', response);
     if (response.status === 'error') {
       util.setError(400, response.message);
       return util.send(res);
@@ -250,7 +247,6 @@ router.post('/bank-money', isAuthenticated, async (req, res) => {
         return util.send(res);
       case 'otp':
         try {
-          console.log('transactionId', response.data.id);
           await TransactionService.createTransaction({
             ...data, tx_ref, order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, transactionId: response.data.id,
           });
@@ -259,7 +255,6 @@ router.post('/bank-money', isAuthenticated, async (req, res) => {
           });
           return util.send(res);
         } catch (error) {
-          console.log('error', error);
           util.setError(400, error.message);
           return util.send(res);
         }
@@ -347,7 +342,6 @@ router.post('/bank-money', isAuthenticated, async (req, res) => {
 
 // The route where we validate and verify the payment (Steps 5 - 6)
 router.post('/pay/validate', async (req, res) => {
-  console.log('req.body', req.body);
   const response = await flw.Charge.validate({
     otp: req.body.otp,
     flw_ref: req.body.flw_ref,
@@ -358,7 +352,6 @@ router.post('/pay/validate', async (req, res) => {
     const transaction = await flw.Transaction.verify({
       id: transactionId,
     });
-    console.log('transaction', transaction);
     if (transaction.status === 'success') {
       eventEmitter.emit('confirmTicketAfterPayment', { data: { tx_ref: req.body.tx_ref } });
       util.setSuccess(200, 'Payment successful', { transaction, action: 'completed' });

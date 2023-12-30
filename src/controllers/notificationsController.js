@@ -1,5 +1,6 @@
-import notificationService from '../services/notifications';
+import { logger } from '../helpers/Logger';
 import Util from '../helpers/utils';
+import notificationService from '../services/notifications';
 
 const util = new Util();
 
@@ -8,7 +9,7 @@ export default class Notifier {
     try {
       await notificationService.createNotification(notification);
     } catch (error) {
-      console.log(error.message);
+      logger.log('error', error.message);
     }
   }
 

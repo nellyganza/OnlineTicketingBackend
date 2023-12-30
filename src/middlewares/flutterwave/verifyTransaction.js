@@ -27,7 +27,7 @@ export const verifytx = async (req, res, next) => {
         return util.send(res);
       }
     }, (error) => {
-      util.setError(400, error);
+      util.setError(500, error.message);
       return util.send(res);
     });
 };

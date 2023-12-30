@@ -12,54 +12,20 @@ import ticketController from '../../controllers/ticketsController';
 import notificationService from '../../services/notifications';
 import { logger } from '../Logger';
 import htmlToPdf from '../htmlToPdf';
-import { transporter } from '../mailHelper';
+import { sendNotification as sendNewEmailNotification, transporter } from '../mailHelper';
 import { successCreationPatTemplate } from '../templates/eventCreatedPattern';
 import { sentTicket } from '../templates/sendTicketEmail';
 import { successCreationTemplate } from '../templates/succeCreatedEventEmail';
-import Util from '../utils';
 import { renderEmail, sendNotification } from './emailNotifier';
 
 const QRCode = require('qrcode');
 
-const unirest = require('unirest');
-
-const util = new Util();
-
-const dateFormat = "YYYY-MM-DD HH:mm:ss"
-
-const server_url = 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify';
-eventEmitter.on('verifyTransactionEvent', async () => {
-  const transactions = await transactionService.getTransactions();
-  transactions.forEach((tx) => {
-    if (tx.status === 'PENDING') {
-      try {
-        const payload = {
-          SECKEY: process.env.FRUTTER_SECRET_KEY,
-          txref: tx.transaction_ref,
-        };
-        unirest.post(server_url)
-          .headers({ 'Content-Type': 'application/json' })
-          .send(payload)
-          .end(async (response) => {
-            if (response.body.data.status === 'successful' && response.body.data.chargecode === '00') {
-              tx.status = 'PAYED';
-              await tx.save();
-              eventEmitter.emit('SendSucessfullPaymentNotification', tx);
-            }
-          }, (error) => {
-            console.log(error.message);
-          });
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
-  });
-});
+const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 eventEmitter.on('completeEvent', async () => {
   const events = await eventService.getAll();
   events.data.forEach(async (evt) => {
-    const endtime = moment(evt.dateAndTimme,dateFormat).add(evt.duration, 'hours');
+    const endtime = moment(evt.dateAndTimme, dateFormat).add(evt.duration, 'hours');
     if (moment(dateFormat).isAfter(endtime) && evt.status === 'Pending') {
       evt.status = 'Done';
       await evt.save();
@@ -73,7 +39,7 @@ eventEmitter.on('completeEvent', async () => {
 
 eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
   try {
-    const patt = `You have distributed shares for different Patterns 
+    const patt = `You have distributed shares for different Partners 
     <div>
      ${Object.values(paymentMethod).map((p, index) => `<br/><span>${index + 1}. ${p.name} who have ${p.value} %</span><br/>`)}
     </div>`;
@@ -88,7 +54,7 @@ eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
       html: emailTemplate,
     };
     await transporter.sendMail(mailOptions);
-    Object.values(paymentMethod).map(async (p, index) => {
+    Object.values(paymentMethod).forEach(async (p, index) => {
       const emailPatTemplate = successCreationPatTemplate({
         name: p.name, title: event.title, location: event.place, date: event.dateAndTimme, share: p.value, id: p.id, eventId: event.id,
       });
@@ -101,7 +67,7 @@ eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
       await transporter.sendMail(mailOptions2);
     });
   } catch (error) {
-    logger.error(error.message);
+    logger.error(`Error on Sent email${error.message}`);
   }
 });
 
@@ -140,8 +106,8 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
         emailData: {
           eventName: title,
           price: eventPay.price,
-          date: moment(dateAndTimme,'dd-MM-yyyy'),
-          time: moment(dateAndTimme,'hh:mm:ss a'),
+          date: moment(dateAndTimme, 'dd-MM-yyyy'),
+          time: moment(dateAndTimme, 'hh:mm:ss a'),
           place,
           userName: fullName,
           seat: sittingPlace,
@@ -168,6 +134,25 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
         email,
         attachement: attach,
       });
+
+      const resp = await sendNewEmailNotification({
+        to: email,
+        subject: 'Ticket from TicketiCore',
+        template: 'index',
+        attachments: attach,
+        data: {
+          eventName: title,
+          price: eventPay.price,
+          date: moment(dateAndTimme, 'dd-MM-yyyy'),
+          time: moment(dateAndTimme, 'hh:mm:ss a'),
+          place,
+          userName: fullName,
+          seat: sittingPlace,
+          type: eventPay.name,
+          fileName: res,
+        },
+      });
+      console.log(resp);
 
       logger.info(buyerMessage);
       logger.info(sellerMessage);

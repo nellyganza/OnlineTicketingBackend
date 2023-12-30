@@ -66,7 +66,7 @@ export const cardPay = async (req, res, next) => {
     util.setSuccess(200, 'Success', response);
     return util.send(res);
   } catch (error) {
-    util.setError(500, error);
+    util.setError(500, error.message);
     return util.send(res);
   }
 };

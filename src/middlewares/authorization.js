@@ -1,7 +1,7 @@
-import { decodeToken } from './verifications/verifyToken';
 import Util from '../helpers/utils';
-import tokenService from '../services/tokenService';
 import roleService from '../services/roleService';
+import tokenService from '../services/tokenService';
+import { decodeToken } from './verifications/verifyToken';
 
 const util = new Util();
 
@@ -38,7 +38,7 @@ export const allowedRoles = (roles) => {
       }
       next();
     } catch (error) {
-      util.setError(500, error);
+      util.setError(500, error.message);
       return util.send(res);
     }
   };
