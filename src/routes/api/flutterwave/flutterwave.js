@@ -91,7 +91,7 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
     const result = await flw.MobileMoney.rwanda(payload);
     if (result.status === 'success') {
       await TransactionService.createTransaction({ ...payload, transactionId: payload.tx_ref });
-      util.setSuccess(200, 'Mobile Money Payment', result);
+      util.setSuccess(200, 'Mobile Money Payment Initiated', result);
       return util.send(res);
     }
     util.setError(400, 'Mobile Money Payment Failed');

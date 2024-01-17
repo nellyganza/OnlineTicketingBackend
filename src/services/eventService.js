@@ -47,6 +47,38 @@ class EventService extends MainService {
       });
   }
 
+
+  static getAllByStatus(page, size, states) {
+    const { limit, offset } = this.getPagination(page, size);
+    return Event.findAndCountAll({
+      where: {
+        status:{
+          [Op.in]:states
+        }
+      },
+      include: [{ model: Category }],
+      limit,
+      offset,
+      order: [
+        ['status', 'DESC'],
+        ['dateAndTimme', 'ASC'],
+      ],
+    }).then((data) => this.getPagingData(data, page, limit))
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
+  }
+
+  static getAllCount(prop) { 
+    const condition = prop || null;
+    return Event.count({
+      where: condition, 
+    }).then((data) => data)
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
+  }
+
   static getEvents(prop, page, size) {
     const { limit, offset } = this.getPagination(page, size);
     const condition = prop || null;

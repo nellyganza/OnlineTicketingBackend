@@ -23,18 +23,22 @@ const QRCode = require('qrcode');
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 eventEmitter.on('completeEvent', async () => {
-  const events = await eventService.getAll();
-  events.data.forEach(async (evt) => {
-    const endtime = moment(evt.dateAndTimme, dateFormat).add(evt.duration, 'hours');
-    if (moment(dateFormat).isAfter(endtime) && evt.status === 'Pending') {
-      evt.status = 'Done';
-      await evt.save();
-    }
-    if (moment(dateFormat).diff(endtime, 'months', true) >= 6) {
-      evt.status = 'Complete Done';
-      await evt.save();
-    }
-  });
+  const total = await eventService.getAllByStatus(0, 1, ['Pending', 'Done']);
+  if (total.totalItems > 0) {
+    const events = await eventService.getAllByStatus(0, total.totalItems, ['Pending', 'Done']);
+    events.data.forEach(async (evt) => {
+      const endtime = moment(evt.dateAndTimme).add(evt.duration, 'hours');
+      const today =moment();
+      if (today.isAfter(endtime) && evt.status === 'Pending') {
+        evt.status = 'Done';
+        await evt.save();
+      }
+      if (today.diff(endtime, 'months', true) >= 6) {
+        evt.status = 'Complete Done';
+        await evt.save();
+      }
+    });
+  }
 });
 
 eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
