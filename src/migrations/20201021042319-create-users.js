@@ -9,23 +9,29 @@ module.exports = {
       },
       firstName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
       },
       phoneNumber: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       RoleId: {
         type: Sequelize.UUID,
+        allowNull: false,
         references: {
           model: 'Roles',
           key: 'id',
@@ -42,6 +48,7 @@ module.exports = {
       },
       type: {
         type: Sequelize.STRING,
+        allowNull: false,
         defaultValue: 'Attendee',
       },
       campanyName: {
@@ -77,6 +84,7 @@ module.exports = {
       share: {
         type: Sequelize.INTEGER,
       },
+      createdBy: Sequelize.STRING,
     });
   },
   down: async (queryInterface, Sequelize) => {

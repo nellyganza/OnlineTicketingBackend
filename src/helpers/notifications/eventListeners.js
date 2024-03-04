@@ -28,7 +28,7 @@ eventEmitter.on('completeEvent', async () => {
     const events = await eventService.getAllByStatus(0, total.totalItems, ['Pending', 'Done']);
     events.data.forEach(async (evt) => {
       const endtime = moment(evt.dateAndTimme).add(evt.duration, 'hours');
-      const today =moment();
+      const today = moment();
       if (today.isAfter(endtime) && evt.status === 'Pending') {
         evt.status = 'Done';
         await evt.save();

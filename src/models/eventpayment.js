@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'eventId',
         onDelete: 'CASCADE',
       });
+      models.EventPayment.hasMany(models.VaidatorEvent, {
+        foreignKey: 'eventPaymentId',
+      });
     }
   }
   EventPayment.init({

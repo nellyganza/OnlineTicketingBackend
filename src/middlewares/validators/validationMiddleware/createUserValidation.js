@@ -3,9 +3,9 @@ import { UserValidationSchemas } from '../../../helpers/validationSchemas';
 import userService from '../../../services/userService';
 // import rolePermissionService from '../../services/rolePermissionService';
 // import permissionService from '../../services/permissionService';
-import roleService from '../../../services/roleService';
-import Util from '../../../helpers/utils';
 import { joiValidationError } from '../../../helpers/joiErrorTemplate';
+import Util from '../../../helpers/utils';
+import roleService from '../../../services/roleService';
 import { decodeToken } from '../../verifications/verifyToken';
 
 const {
@@ -31,9 +31,7 @@ export const signupValidate = async (req, res, next) => {
       util.setError(409, 'Email already exists');
       return util.send(res);
     }
-    const {
-      error,
-    } = signupValidateSchema.validate({
+    const { error } = signupValidateSchema.validate({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       phoneNumber: req.body.phoneNumber,

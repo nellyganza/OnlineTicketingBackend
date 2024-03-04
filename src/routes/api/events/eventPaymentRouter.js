@@ -6,9 +6,10 @@ import { allowedRoles, isAuthenticated } from '../../../middlewares/authorizatio
 const router = express.Router();
 
 router.post('/', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.createPaymentByEId);
-router.get('/:eventId', eventController.getAllPaymentByEId);
+router.get('/all/:eventId', eventController.getAllPaymentByEId);
 router.put('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.updatePaymentPlaceByPId);
 router.delete('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.deletePaymentPlaceByPId);
 router.get('/find/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.findByID);
-
+router.post('/eventvalidator', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.createEventValidator);
+router.get('/list/validator', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.getEventValidatorsByProp);
 export default router;

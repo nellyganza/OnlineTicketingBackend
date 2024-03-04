@@ -488,4 +488,52 @@ export default class User {
       util.send(res);
     }
   }
+
+  static async createValidator(req, res) {
+    try {
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      const { id, campanyName } = req.userInfo;
+      const defaulRole = await RoleService.findByName({ slug: 'validator_user' });
+      if (!defaulRole) {
+        util.setError(400, 'Validator role doesn\'t exist');
+        util.send(res);
+        return;
+      }
+      const newUser = {
+        campanyName,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        phoneNumber: req.body.phoneNumber,
+        password: hashedPassword,
+        category: 'validator',
+        document: '',
+        type: 'validator',
+        RoleId: defaulRole.dataValues.id,
+        createdBy: id,
+        share: 0,
+      };
+      console.log(newUser);
+      const createdUser = await userService.createuser(newUser);
+      return sendLink(res, createdUser);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async findValidator(req, res) {
+    try {
+      const { id } = req.userInfo;
+      const { page, size } = req.query;
+      const defaulRole = await RoleService.findByName({ slug: 'validator_user' });
+      const validators = await userService.findByProp({ RoleId: defaulRole.dataValues.id, createdBy: id }, page, size);
+      const message = 'Validators Found';
+      util.setSuccess(200, message, validators);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
 }

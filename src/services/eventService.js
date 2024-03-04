@@ -47,14 +47,13 @@ class EventService extends MainService {
       });
   }
 
-
   static getAllByStatus(page, size, states) {
     const { limit, offset } = this.getPagination(page, size);
     return Event.findAndCountAll({
       where: {
-        status:{
-          [Op.in]:states
-        }
+        status: {
+          [Op.in]: states,
+        },
       },
       include: [{ model: Category }],
       limit,
@@ -69,10 +68,10 @@ class EventService extends MainService {
       });
   }
 
-  static getAllCount(prop) { 
+  static getAllCount(prop) {
     const condition = prop || null;
     return Event.count({
-      where: condition, 
+      where: condition,
     }).then((data) => data)
       .catch((err) => {
         throw new Error(err.message || 'Some error occurred while retrieving Data.');

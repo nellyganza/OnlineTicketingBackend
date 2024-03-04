@@ -39,6 +39,12 @@ module.exports = {
       slug: 'attender_user',
       createdAt: new Date(),
       updatedAt: new Date(),
+    }, {
+      name: 'Validator user',
+      description: 'Validator user',
+      slug: 'validator_user',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }], {});
   },
 

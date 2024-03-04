@@ -30,6 +30,9 @@ module.exports = (sequelize, DataTypes) => {
       models.Users.hasMany(models.Token, {
         foreignKey: 'userId',
       });
+      models.Users.hasMany(models.VaidatorEvent, {
+        foreignKey: 'userId',
+      });
     }
   }
   Users.init({
@@ -53,6 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     provider: DataTypes.STRING,
     authToken: DataTypes.TEXT,
     share: DataTypes.INTEGER,
+    createdBy: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Users',
