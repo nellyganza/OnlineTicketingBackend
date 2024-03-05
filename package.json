@@ -32,7 +32,7 @@
     "africastalking": "^0.5.4",
     "barc": "^0.0.4",
     "barcode-generator": "^0.1.0",
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^5.1.1",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "cloudinary": "^1.23.0",
