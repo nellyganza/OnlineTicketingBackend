@@ -123,7 +123,7 @@ export default class EventPaymentController {
       }
       util.setSuccess(201, 'Event Validator Assigned', savedValidator);
       return util.send(res);
-    } catch (error) { 
+    } catch (error) {
       util.setError(500, error.message);
       return util.send(res);
     }

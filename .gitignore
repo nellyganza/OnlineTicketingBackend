@@ -106,3 +106,4 @@ dist
 
 #vs code auto file
 .vs
+package-lock.json

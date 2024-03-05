@@ -88,7 +88,7 @@ class EventPaymentService extends MainService {
     const eventId = id ? { eventId: id } : null;
     return VaidatorEvent.findAndCountAll({
       where: condition,
-      include: [{ model: EventPayment, where: eventId,include: [{ model: Event }] }, { model: Users, attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'profilePicture'] }],
+      include: [{ model: EventPayment, where: eventId, include: [{ model: Event }] }, { model: Users, attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'profilePicture'] }],
       limit,
       offset,
     }).then((data) => this.getPagingData(data, page, limit))
