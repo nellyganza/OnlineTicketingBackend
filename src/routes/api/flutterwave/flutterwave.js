@@ -88,7 +88,18 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
     const payload = {
       ...data, tx_ref: generateTransactionReference('TX'), order_id: generateTransactionReference('OD'), userId: req.userInfo.id, eventId, subaccount: data.eventPaymentMethods,
     };
-    const result = await flw.MobileMoney.rwanda(payload);
+    const momoPayload = {
+      tx_ref: payload.tx_ref,
+      order_id: payload.order_id,
+      amount: payload.amount,
+      currency: payload.currency,
+      email: payload.email,
+      phone_number: payload.phone_number,
+      fullname: payload.fullname,
+    };
+    console.log(momoPayload, payload);
+    const result = await flw.MobileMoney.rwanda(momoPayload);
+    console.log(result, 'Complete - Result');
     if (result.status === 'success') {
       await TransactionService.createTransaction({ ...payload, transactionId: payload.tx_ref });
       util.setSuccess(200, 'Mobile Money Payment Initiated', result);
@@ -97,6 +108,7 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
     util.setError(400, 'Mobile Money Payment Failed');
     return util.send(res);
   } catch (error) {
+    console.log(error);
     util.setError(400, error.message);
     return util.send(res);
   }

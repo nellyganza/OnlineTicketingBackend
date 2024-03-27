@@ -26,10 +26,10 @@ export default class Util {
       data: this.data,
     };
     if (this.type === 'success') {
-      return res.status(this.statusCode).json(result);
+      return res.status(Number(this.statusCode)).json(result);
     }
-    return res.status(this.statusCode).json({
-      status: this.statusCode,
+    return res.status(Number(this.statusCode)).json({
+      status: Number(this.statusCode),
       message: this.message,
     });
   }

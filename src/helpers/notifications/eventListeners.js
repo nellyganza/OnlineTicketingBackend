@@ -9,12 +9,11 @@ import userService from '../../services/userService';
 import { eventEmitter } from './eventEmitter';
 
 import ticketController from '../../controllers/ticketsController';
+import { sendTicketEmail } from '../../routes/api/tickets/ticketRouter';
 import notificationService from '../../services/notifications';
 import { logger } from '../Logger';
-import htmlToPdf from '../htmlToPdf';
-import { sendNotification as sendNewEmailNotification, transporter } from '../mailHelper';
+import { transporter } from '../mailHelper';
 import { successCreationPatTemplate } from '../templates/eventCreatedPattern';
-import { sentTicket } from '../templates/sendTicketEmail';
 import { successCreationTemplate } from '../templates/succeCreatedEventEmail';
 import { renderEmail, sendNotification } from './emailNotifier';
 
@@ -23,22 +22,18 @@ const QRCode = require('qrcode');
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 eventEmitter.on('completeEvent', async () => {
-  const total = await eventService.getAllByStatus(0, 1, ['Pending', 'Done']);
-  if (total.totalItems > 0) {
-    const events = await eventService.getAllByStatus(0, total.totalItems, ['Pending', 'Done']);
-    events.data.forEach(async (evt) => {
-      const endtime = moment(evt.dateAndTimme).add(evt.duration, 'hours');
-      const today = moment();
-      if (today.isAfter(endtime) && evt.status === 'Pending') {
-        evt.status = 'Done';
-        await evt.save();
-      }
-      if (today.diff(endtime, 'months', true) >= 6) {
-        evt.status = 'Complete Done';
-        await evt.save();
-      }
-    });
-  }
+  const events = await eventService.getAll();
+  events.data.forEach(async (evt) => {
+    const endtime = moment(evt.dateAndTimme, dateFormat).add(evt.duration, 'hours');
+    if (moment(dateFormat).isAfter(endtime) && evt.status === 'Pending') {
+      evt.status = 'Done';
+      await evt.save();
+    }
+    if (moment(dateFormat).diff(endtime, 'months', true) >= 6) {
+      evt.status = 'Complete Done';
+      await evt.save();
+    }
+  });
 });
 
 eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
@@ -88,76 +83,19 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
     const tickets = await ticketService.findByUserANDEvent({ userId: user, eventId: eventData });
     tickets.forEach(async (ticket) => {
       const {
-        fullName, nationalId, phoneNumber, email, sittingPlace, eventId, userId, type,
+        fullName, nationalId, email, eventId, userId,
       } = ticket.dataValues;
       const buyer = await userService.findById(userId);
-      const eventPay = await eventPaymentService.findOneById(type);
       const event = await eventService.findById(eventId);
-      const { title, place, dateAndTimme } = event.dataValues;
-      const segs = [
-        { data: nationalId, mode: 'alphanumeric' },
-      ];
-
-      const res = await QRCode.toDataURL(segs);
-      const data = res.replace(/^data:image\/\w+;base64,/, '');
-      const fileName = `${__dirname}/${fullName.replace(/\s/g, '')}barcode.png`;
-      await saveFileToDisk(data, fileName);
+      await sendTicketEmail(ticket);
       const buyerMessage = `Buying Tickets for ${fullName} with NationalID/Passport ${nationalId} goes ok!! <br>   Thank you!!`;
       const sellerMessage = `Client ${buyer.firstName}  ${buyer.lastName} bought ticket for ${fullName} in event ${event.title}`;
-
-      const ticketInfo = {
-        email,
-        emailData: {
-          eventName: title,
-          price: eventPay.price,
-          date: moment(dateAndTimme, 'dd-MM-yyyy'),
-          time: moment(dateAndTimme, 'hh:mm:ss a'),
-          place,
-          userName: fullName,
-          seat: sittingPlace,
-          type: eventPay.name,
-          fileName: res,
-        },
-      };
-      const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), `${fullName}ticket.pdf`);
-      fs.writeFile(`${fullName}ticket.pdf`, Buffer.from(pdf, 'base64'), { encoding: 'base64' }, (err) => {
-        // Finished
-      });
-      const attach = { fileName: `${fullName}ticket.pdf`, file: `${fullName}ticket.pdf`, cid: 'qrcode' };
-
       await notificationService.createNotification({
         receiver: email, userId, eventId, message: buyerMessage,
       });
-
       await notificationService.createNotification({
         receiver: event.dataValues.email, userId: event.dataValues.userId, eventId, message: sellerMessage,
       });
-
-      await sendNotification({
-        message: sentTicket(ticketInfo.emailData),
-        email,
-        attachement: attach,
-      });
-
-      const resp = await sendNewEmailNotification({
-        to: email,
-        subject: 'Ticket from TicketiCore',
-        template: 'index',
-        attachments: attach,
-        data: {
-          eventName: title,
-          price: eventPay.price,
-          date: moment(dateAndTimme, 'dd-MM-yyyy'),
-          time: moment(dateAndTimme, 'hh:mm:ss a'),
-          place,
-          userName: fullName,
-          seat: sittingPlace,
-          type: eventPay.name,
-          fileName: res,
-        },
-      });
-      console.log(resp);
-
       logger.info(buyerMessage);
       logger.info(sellerMessage);
     });

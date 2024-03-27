@@ -64,7 +64,7 @@ module.exports = {
       status: {
         type: Sequelize.STRING,
       },
-      currentSatus: {
+      currentStatus: {
         type: Sequelize.STRING,
       },
       cardType: {

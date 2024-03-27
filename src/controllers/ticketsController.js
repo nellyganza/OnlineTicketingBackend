@@ -180,8 +180,9 @@ export default class ticketController {
       if (!sittingType) ticket = await ticketService.findBynationalId({ eventId, nationalId });
       else ticket = await ticketService.findBynationalId({ eventId, nationalId, type: sittingType });
       if (ticket) {
-        if (ticket.status === ETicketStatus.NOT_ATTENDED) {
-          const updatedticket = await ticketService.updateAtt({ status: ETicketStatus.ATTENDED, currentStatus: ETicketCurrentStatus.IN_EVENT }, { id: ticket.id });
+        const { id, status, currentStatus } = ticket.dataValues;
+        if (status === ETicketStatus.NOT_ATTENDED) {
+          const updatedticket = await ticketService.updateAtt({ status: ETicketStatus.ATTENDED, currentStatus: ETicketCurrentStatus.IN_EVENT }, { id });
           if (!updatedticket) {
             util.setError(400, 'Please Try again');
             return util.send(res);
@@ -189,22 +190,21 @@ export default class ticketController {
           util.setSuccess(200, 'You are verified, Please Enter', updatedticket);
           return util.send(res);
         }
-        if (ticket.currentStatus === ETicketCurrentStatus.IN_EVENT) {
-          const outTicket = await ticketService.updateAtt({ currentStatus: ETicketCurrentStatus.OUT_EVENT }, { id: ticket.id });
+        if (currentStatus === ETicketCurrentStatus.IN_EVENT) {
+          const outTicket = await ticketService.updateAtt({ currentStatus: ETicketCurrentStatus.OUT_EVENT }, { id });
           if (!outTicket) {
             util.setError(400, 'Please Try again');
             return util.send(res);
           }
-          util.setSuccess(200, 'Your are in now', outTicket);
+          util.setSuccess(200, 'Your are out now', outTicket);
           return util.send(res);
         }
-
-        const inTicket = await ticketService.updateAtt({ currentStatus: ETicketCurrentStatus.IN_EVENT }, { id: ticket.id });
+        const inTicket = await ticketService.updateAtt({ currentStatus: ETicketCurrentStatus.IN_EVENT }, { id });
         if (!inTicket) {
           util.setError(400, 'Please Try again');
           return util.send(res);
         }
-        util.setSuccess(200, 'Your are out now', inTicket);
+        util.setSuccess(200, 'Your are in now', inTicket);
         return util.send(res);
       }
       util.setError(400, 'Please, If you know that you have bought the ticket,Check the Tapping Device if match with your Ticket or Contact the Administrators');
