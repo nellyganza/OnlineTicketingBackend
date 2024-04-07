@@ -50,8 +50,10 @@ export default class User {
 
   static async socialSignup(userInfo, res) {
     try {
+      console.log(userInfo);
+      const defaulRole = await RoleService.findByName({ slug: 'attender_user' });
       const {
-        given_name, family_name, email, provider, id,
+        given_name, family_name, email, provider, id, picture,
       } = userInfo;
       const userData = {
         firstName: given_name,
@@ -60,20 +62,24 @@ export default class User {
         provider,
         email,
         isVerified: true,
+        profilePicture: picture,
+        category: 'Individual',
+        type: 'Attendee',
+        RoleId: defaulRole.dataValues.id,
+        share: 0,
       };
-      const newUser = await userService.createuser(userData);
-      if (newUser) {
-        const payload = {
-          email: newUser.email,
-          id: newUser.id,
-          roleId: newUser.roleId,
-        };
-        const token = await newJwtToken(payload);
-        await tokenService.createToken({ token, user: newUser.id });
-        const encodedToken = Buffer.from(token).toString('base64');
+
+      const currentUser = await userService.createuser(userData);
+      if (currentUser) {
+        const displayData = pick(currentUser.dataValues, ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture', 'Role', 'share', 'socialId', 'provider']);
+        const authToken = AuthTokenHelper.generateToken(displayData);
+        userService.updateAtt({ authToken }, { id: displayData.id });
+        await tokenService.createToken({ token: authToken, userId: displayData.id });
+        const encodedToken = Buffer.from(authToken).toString('base64');
         return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
       }
     } catch (error) {
+      console.log(error);
       return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/failure/error`);
     }
   }
@@ -338,14 +344,9 @@ export default class User {
       const { token } = req.params;
       if (token) {
         const foundToken = await tokenService.findByToken({ token });
-        const userInfo = await userService.findById(foundToken.user);
+        const userInfo = await userService.findById(foundToken.userId);
         if (userInfo) {
-          const {
-            id, email, firstName, lastName, RoleId, isVerified, status, phoneNumber, category, campanyName, profilePicture, authToken,
-          } = userInfo;
-          const displayData = {
-            id, email, firstName, lastName, RoleId, isVerified, status, phoneNumber, category, campanyName, profilePicture,
-          };
+          const displayData = pick(userInfo.dataValues, ['id', 'email', 'firstName', 'lastName', 'RoleId', 'isVerified', 'status', 'phoneNumber', 'category', 'campanyName', 'profilePicture', 'Role', 'share', 'socialId', 'provider']);
           util.setSuccess(200, 'User LoggedIn Successfully', { displayData, authToken: foundToken.token });
         } else {
           util.setError(401, 'Authentication failed');
@@ -530,6 +531,21 @@ export default class User {
       const validators = await userService.findByProp({ RoleId: defaulRole.dataValues.id, createdBy: id }, page, size);
       const message = 'Validators Found';
       util.setSuccess(200, message, validators);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async saveBusinessInfo(req, res) {
+    try {
+      const userId = req.userInfo.id;
+      const userExist = await userService.findById(userId);
+      if (userExist) {
+        console.log('hh');
+      }
+      util.setError(400, 'The user doesn\'t exist');
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);

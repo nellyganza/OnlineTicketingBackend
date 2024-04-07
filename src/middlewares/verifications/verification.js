@@ -1,23 +1,23 @@
-import userService from '../../services/userService';
+import { getJwtToken } from '../../helpers/tokenGenerator';
 import Util from '../../helpers/utils';
-import { getJwtToken, newJwtToken } from '../../helpers/tokenGenerator';
-import { decodeToken } from './verifyToken';
 import { tokenValid } from '../../helpers/validationSchemas/userValidationSchemas/validateUser';
+import userService from '../../services/userService';
+import { decodeToken } from './verifyToken';
 
 const util = new Util();
 export default class verifications {
   static async email(req, res, next) {
     try {
-      const user = await userService.findByProp({ email: req.body.email });
-      if (user[0]) {
+      const user = await userService.findByEmail(req.body.email);
+      if (user) {
         const payload = {
-          userId: user[0].id,
-          email: user[0].email,
+          userId: user.id,
+          email: user.email,
           resetpassword: true,
         };
-        const token = await getJwtToken(payload, '72h');
+        const token = await getJwtToken(payload, '5m');
         res.token = token;
-        res.userInfo = user[0];
+        res.userInfo = user;
         next();
       } else {
         util.setError(404, 'User with that  email doesn\'t exist');
@@ -33,6 +33,7 @@ export default class verifications {
     try {
       const decoded = await decodeToken(req.params.token);
       const { error } = tokenValid.validate(decoded);
+      console.log(error);
       if (error) {
         const Error = 'Invalid link';
         util.setError(400, Error);

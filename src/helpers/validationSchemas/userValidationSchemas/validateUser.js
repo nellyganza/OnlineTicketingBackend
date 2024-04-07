@@ -25,7 +25,7 @@ export const passwordSchema = joi.object({
 });
 
 export const tokenValid = joi.object({
-  userId: joi.number().required(),
+  userId: joi.string().required(),
   email: joi.string().email().required(),
   resetpassword: joi.boolean().valid(true).required(),
   iat: joi.number().required(),

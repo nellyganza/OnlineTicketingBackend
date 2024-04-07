@@ -33,6 +33,9 @@ module.exports = (sequelize, DataTypes) => {
       models.Users.hasMany(models.VaidatorEvent, {
         foreignKey: 'userId',
       });
+      models.Users.hasOne(models.BusinessInfo, {
+        foreignKey: 'userId',
+      });
     }
   }
   Users.init({
