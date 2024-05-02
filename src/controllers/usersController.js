@@ -313,6 +313,7 @@ export default class User {
       util.setError(400, 'The user doesn\'t exist');
       return util.send(res);
     } catch (error) {
+      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }

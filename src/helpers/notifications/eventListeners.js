@@ -25,11 +25,11 @@ eventEmitter.on('completeEvent', async () => {
   const events = await eventService.getAll();
   events.data.forEach(async (evt) => {
     const endtime = moment(evt.dateAndTimme, dateFormat).add(evt.duration, 'hours');
-    if (moment(dateFormat).isAfter(endtime) && evt.status === 'Pending') {
+    if (moment().isAfter(endtime) && evt.status === 'Pending') {
       evt.status = 'Done';
       await evt.save();
     }
-    if (moment(dateFormat).diff(endtime, 'months', true) >= 6) {
+    if (moment().diff(endtime, 'months', true) >= 6) {
       evt.status = 'Complete Done';
       await evt.save();
     }

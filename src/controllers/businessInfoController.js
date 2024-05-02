@@ -48,7 +48,7 @@ export default class BusinessInfoController {
   static async updateBusinessInfo(req, res) {
     try {
       const { id } = req.params;
-      const updatedBusinessInfo = await businessInfoService.updateAtt({ ...req.body }, {id});
+      const updatedBusinessInfo = await businessInfoService.updateAtt({ ...req.body }, { id });
       util.setSuccess(200, 'BusinessInfo updated successfully', updatedBusinessInfo);
       return util.send(res);
     } catch (error) {

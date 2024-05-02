@@ -48,16 +48,21 @@ export const signupValidate = async (req, res, next) => {
 
 export const verifyEmail = async (req, res, next) => {
   try {
+    console.log(req.params.token);
     const data = await decodeToken(req.params.token);
+    console.log(data);
     const userExist = await userService.findByProp({
       id: data.userId,
     });
-    if (userExist[0]) {
+    console.log(userExist);
+    const existUser = userExist && userExist.data && userExist.data[0] ? userExist.data[0] : null;
+    if (existUser) {
       const isVerified = await userService.findByProp({
         isVerified: true,
         id: data.userId,
       });
-      if (isVerified[0]) {
+      const verifyUser = isVerified && isVerified.data && isVerified.data[0] ? isVerified.data[0] : null;
+      if (verifyUser) {
         return res.redirect(422, `${process.env.FRONT_END_URL}/login`);
       }
       res.id = data.userId;

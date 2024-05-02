@@ -1,7 +1,7 @@
 import models from '../models';
 import MainService from './MainService';
 
-const { BusinessInfo,Account,Representative } = models;
+const { BusinessInfo, Account, Representative } = models;
 /**
  * @exports
  * @class BusinessInfoService
@@ -38,7 +38,7 @@ class BusinessInfoService extends MainService {
 
   static findByUserId(modelId) {
     return BusinessInfo.findOne({
-      where: { userId: modelId },include: [{ model: Account },{ model: Representative }],
+      where: { userId: modelId }, include: [{ model: Account }, { model: Representative }],
     });
   }
 

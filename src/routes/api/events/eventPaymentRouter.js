@@ -11,5 +11,5 @@ router.put('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER
 router.delete('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.deletePaymentPlaceByPId);
 router.get('/find/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.findByID);
 router.post('/eventvalidator', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.createEventValidator);
-router.get('/list/validator', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.getEventValidatorsByProp);
+router.get('/list/validator', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN, USER_ROLES.EVENT_VALIDATOR]), eventController.getEventValidatorsByProp);
 export default router;
