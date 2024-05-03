@@ -56,7 +56,7 @@ storage.on('connectionFailed', (err) => {
 });
 
 export const upload = multer({
-  storage,
+  storage, limits: { fieldSize: 2 * 1024 * 1024 },
 });
 
 export const deleteFileById = (id) => {

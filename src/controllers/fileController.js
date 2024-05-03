@@ -55,21 +55,8 @@ const uploadEvents = async (req, res) => {
 
 const setEventImages = async (req, res, next) => {
   try {
-    let urls = [];
+    const urls = [];
     const { eventId } = req.query;
-    if (eventId) {
-      const eventFound = await eventService.findById(eventId);
-      if (!eventFound) {
-        util.setError(400, 'Event Not Found');
-        return util.send(res);
-      }
-      const data = eventFound.dataValues;
-      if (Object.keys(data).length <= 0) {
-        util.setError(400, 'Event Not Found');
-        return util.send(res);
-      }
-      urls = data.image || [];
-    }
     for (let index = 0; index < req.files.length; index++) {
       const { filename } = req.files[index];
       urls.push(filename);

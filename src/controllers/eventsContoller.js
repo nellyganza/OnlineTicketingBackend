@@ -57,6 +57,7 @@ export default class EventController {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
+      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }
@@ -184,6 +185,7 @@ export default class EventController {
         util.setError(404, 'Event not Updated');
         return util.send(res);
       }
+      console.log(event);
       util.setSuccess(200, 'Event Updated Success', event);
       return util.send(res);
     } catch (error) {
