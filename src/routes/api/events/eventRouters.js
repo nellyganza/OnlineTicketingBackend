@@ -12,12 +12,12 @@ const {
 } = ValidationMiddleWare;
 const router = express.Router();
 
-router.post('/', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), upload.array('file', 10), checkBlocked, newEventEventValidation, checkDates, fileController.setEventImages, eventController.saveEvent);
+router.post('/', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), upload.array('file', 6), checkBlocked, newEventEventValidation, checkDates, fileController.setEventImages, eventController.saveEvent);
 router.get('/', eventController.getAllEvent);
 router.get('/calender', eventController.getEventCalenderDate);
 router.get('/find/:eventId', eventController.getEventById);
 router.get('/findByDates', eventController.findBetween);
-router.put('/edit/', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), upload.array('file', 10), checkBlocked, eventUpdate, fileController.setEventImages, eventController.updateEvent);
+router.put('/edit/', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), upload.array('file', 6), checkBlocked, eventUpdate, fileController.setEventImages, eventController.updateEvent);
 router.delete('/:eventId', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), checkBlocked, eventController.deleteEvent);
 router.put('/upload/:eventId', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), fileUploader.any(), fileController.uploadEvents);
 router.get('/numberofTicket/:eventId', eventController.getTicketNumber);

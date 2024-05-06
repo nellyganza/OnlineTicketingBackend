@@ -55,6 +55,7 @@ const uploadEvents = async (req, res) => {
 
 const setEventImages = async (req, res, next) => {
   try {
+    console.log(req.body?.event?.image);
     const urls = [];
     const { eventId } = req.query;
     for (let index = 0; index < req.files.length; index++) {

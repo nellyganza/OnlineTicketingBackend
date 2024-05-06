@@ -185,7 +185,6 @@ export default class EventController {
         util.setError(404, 'Event not Updated');
         return util.send(res);
       }
-      console.log(event);
       util.setSuccess(200, 'Event Updated Success', event);
       return util.send(res);
     } catch (error) {
