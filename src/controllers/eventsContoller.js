@@ -37,18 +37,23 @@ export default class EventController {
         savedMethods.push({ ...savedPayment.dataValues });
       }
 
-      const sittingkeys = Object.keys(sittingPlace);
-      for (let index = 0; index < sittingkeys.length; index++) {
-        const sitti = sittingkeys[index];
-        await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces }, transaction);
-      }
-
+      const savedGradeCosts = [];
       const gradeKeys = Object.keys(paymentGradeCost);
       for (let index = 0; index < gradeKeys.length; index++) {
         const grade = gradeKeys[index];
-        await eventPaymentService.createEventPayment({ ...paymentGradeCost[grade], eventId: savedEvent.id }, transaction);
+        const savedGrade = await eventPaymentService.createEventPayment({ ...paymentGradeCost[grade], eventId: savedEvent.id }, transaction);
+        savedGradeCosts.push(savedGrade);
       }
 
+
+      const sittingkeys = Object.keys(sittingPlace);
+      if(savedGradeCosts.length>0){
+        for (let index = 0; index < sittingkeys.length; index++) {
+          const sitti = sittingkeys[index];
+          let seatGrade = savedGradeCosts.find(m=>m.name===sittingPlace[sitti].name);
+          await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces ,seatGradeId:seatGrade.id}, transaction);
+        }
+      }
       transaction.afterCommit(async () => {
         util.setSuccess(201, 'Events Prepared Success', { savedEvent });
         eventEmitter.emit('createdEvent', { user: req.userInfo, event: { ...savedEvent.dataValues }, paymentMethod: savedMethods });
@@ -57,8 +62,7 @@ export default class EventController {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
-      util.setError(500, error.message);
+      util.setError(400, error.message);
       return util.send(res);
     }
   }
@@ -188,6 +192,7 @@ export default class EventController {
       util.setSuccess(200, 'Event Updated Success', event);
       return util.send(res);
     } catch (error) {
+      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }

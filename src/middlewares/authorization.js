@@ -6,7 +6,7 @@ import { decodeToken } from './verifications/verifyToken';
 const util = new Util();
 
 export const isAuthenticated = async (req, res, next) => {
-  try {
+  try { 
     const token = req.headers.authorization;
     await decodeToken(token);
     const loggedIn = await tokenService.findByToken({ token });

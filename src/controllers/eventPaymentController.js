@@ -67,17 +67,17 @@ export default class EventPaymentController {
 
   static async updatePaymentPlaceByPId(req, res) {
     try {
-      const { id } = req.params;
+      const { id } = req.params; 
       if (!id) {
         util.setError(400, 'Invalid Place Id');
         return util.send(res);
       }
-      const PaymentEvents = await eventPaymentService.updateAtt({ ...req.body }, { id });
-      if (!PaymentEvents) {
+      const paymentEvents = await eventPaymentService.updateAtt({ ...req.body }, { id });
+      if (!paymentEvents) {
         util.setError(404, 'Event Payment  Not Updated');
         return util.send(res);
       }
-      util.setSuccess(200, 'Event Payment  Update', PaymentEvents);
+      util.setSuccess(200, 'Event Payment  Update', paymentEvents[0]);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);

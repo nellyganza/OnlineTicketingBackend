@@ -31,6 +31,15 @@ module.exports = {
       placeAvailable: {
         type: Sequelize.ARRAY(Sequelize.RANGE(Sequelize.INTEGER)),
       },
+      seatGradeId:{
+        type: Sequelize.UUID,
+        references: {
+          model: 'EventPayments',
+          key: 'id',
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+        },
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
