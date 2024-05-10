@@ -6,7 +6,8 @@ import { decodeToken } from './verifications/verifyToken';
 const util = new Util();
 
 export const isAuthenticated = async (req, res, next) => {
-  try { 
+  try {
+    console.log(req.headers['content-length']);
     const token = req.headers.authorization;
     await decodeToken(token);
     const loggedIn = await tokenService.findByToken({ token });
@@ -27,7 +28,7 @@ export const isAuthenticated = async (req, res, next) => {
   }
 };
 
-export const allowedRoles = (roles) => {
+export const allowedRoles = (roles) => { 
   const allow = async (req, res, next) => {
     try {
       const { RoleId } = req.userInfo;

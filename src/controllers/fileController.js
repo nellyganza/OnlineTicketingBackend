@@ -68,9 +68,9 @@ const setEventImages = async (req, res, next) => {
         util.setError(400, 'Event Not Found');
         util.send(res);
       }
-      if(!req.files || req.files.length === 0){
+      if (!req.files || req.files.length === 0) {
         urls = data.image || [];
-      } 
+      }
     }
     if (req.files) {
       for (let index = 0; index < req.files.length; index++) {

@@ -1,3 +1,5 @@
+import Util from '../../helpers/utils';
+
 const multer = require('multer');
 const crypto = require('crypto');
 const path = require('path');
@@ -56,8 +58,26 @@ storage.on('connectionFailed', (err) => {
 });
 
 export const upload = multer({
-  storage, limits: { fieldSize: 2 * 1024 * 1024 },
+  storage, limits: { fieldSize: 5 * 1024 * 1024 },
 });
+
+const util = new Util();
+export function uploadArrayMiddleware(req, res, next) {
+  console.log('uploading');
+  try {
+    upload.array('file', 10)(req, res, (err) => {
+      if (err) {
+        console.log(err);
+        util.setError(400, err.message);
+        return util.send(res);
+      } next();
+    });
+  } catch (error) {
+    console.log(error);
+    util.setError(500, error.message);
+    return util.send(res);
+  }
+}
 
 export const deleteFileById = (id) => {
   gfs.delete(new mongoose.Types.ObjectId(id), (err, data) => ({ err, data }));

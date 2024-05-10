@@ -19,9 +19,9 @@ expressWinston.requestWhitelist.push('body');
 app.use(cors({ origin: true }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
 app.use(express.static(`${__dirname}/public`));
-app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use((req, res, next) => {
   // Enabling CORS
   res.header('Access-Control-Allow-Origin', '*');

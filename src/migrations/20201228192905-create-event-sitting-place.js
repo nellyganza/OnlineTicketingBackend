@@ -31,7 +31,7 @@ module.exports = {
       placeAvailable: {
         type: Sequelize.ARRAY(Sequelize.RANGE(Sequelize.INTEGER)),
       },
-      seatGradeId:{
+      seatGradeId: {
         type: Sequelize.UUID,
         references: {
           model: 'EventPayments',

@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     placeAvailable: DataTypes.ARRAY(DataTypes.RANGE(DataTypes.INTEGER)),
-    seatGradeId: DataTypes.UUID
+    seatGradeId: DataTypes.UUID,
   }, {
     sequelize,
     modelName: 'EventSittingPlace',

@@ -45,13 +45,14 @@ export default class EventController {
         savedGradeCosts.push(savedGrade);
       }
 
-
       const sittingkeys = Object.keys(sittingPlace);
-      if(savedGradeCosts.length>0){
+      if (savedGradeCosts.length > 0) {
         for (let index = 0; index < sittingkeys.length; index++) {
           const sitti = sittingkeys[index];
-          let seatGrade = savedGradeCosts.find(m=>m.name===sittingPlace[sitti].name);
-          await eventStittingPlaceService.createEventSittingPlace({ ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces ,seatGradeId:seatGrade.id}, transaction);
+          const seatGrade = savedGradeCosts.find((m) => m.name === sittingPlace[sitti].name);
+          await eventStittingPlaceService.createEventSittingPlace({
+            ...sittingPlace[sitti], eventId: savedEvent.id, placesLeft: sittingPlace[sitti].totalPlaces, seatGradeId: seatGrade.id,
+          }, transaction);
         }
       }
       transaction.afterCommit(async () => {

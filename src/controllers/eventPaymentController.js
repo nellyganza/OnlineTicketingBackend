@@ -67,7 +67,7 @@ export default class EventPaymentController {
 
   static async updatePaymentPlaceByPId(req, res) {
     try {
-      const { id } = req.params; 
+      const { id } = req.params;
       if (!id) {
         util.setError(400, 'Invalid Place Id');
         return util.send(res);
