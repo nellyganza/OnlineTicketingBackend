@@ -28,7 +28,7 @@ export const isAuthenticated = async (req, res, next) => {
   }
 };
 
-export const allowedRoles = (roles) => { 
+export const allowedRoles = (roles) => {
   const allow = async (req, res, next) => {
     try {
       const { RoleId } = req.userInfo;
