@@ -8,6 +8,7 @@ import { eventEmitter } from '../helpers/notifications/eventEmitter';
 import Util from '../helpers/utils';
 import { sequelize } from '../models';
 import { ETicketCurrentStatus, ETicketStatus } from '../models/enum/ETicketStatus';
+import { sendTicketEmail } from '../routes/api/tickets/ticketRouter';
 import eventservice from '../services/eventService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import guestService from '../services/guestService';
@@ -41,6 +42,7 @@ export default class ticketController {
 
       transaction.afterCommit(async () => 'Tickets Saved Successfully');
       const typePlace = [];
+      let ticket ;
       for (let index = 0; index < keys.length; index++) {
         const att = attender[keys[index]];
         const ind = _.findIndex(typePlace, { name: att.type });
@@ -53,7 +55,7 @@ export default class ticketController {
         } else {
           typePlace.push({ name: att.type, value: { sittingPlace: sittingPlace + 1, place, sitting } });
         }
-        await ticketService.createTicket({
+        ticket = await ticketService.createTicket({
           ...att, eventId, userId, paymenttype: pay.paymenttype, sittingPlace,
         }, transaction);
         await updateEvent(eventId, transaction);
@@ -63,7 +65,9 @@ export default class ticketController {
         await updateSittingPlace(eventId, att.type, transaction);
       }
       await transaction.commit();
-      eventEmitter.emit('SendSucessfullPaymentNotification', userId, event.dataValues.id);
+      if(ticket){
+        sendTicketEmail(ticket);
+      }
     } catch (error) {
       await transaction.rollback();
       throw new Error(error.message);
@@ -83,9 +87,10 @@ export default class ticketController {
       const sittingPlace = await getAndUpdateSittingPlace(eventId, attender.type, 'updatePlaces') - 1;
       const savedTicket = await ticketService.createTicket({
         ...attender, eventId, paymenttype: pay.paymenttype, sittingPlace,
-      });
-      const { id, nationalId } = savedTicket.dataValues;
-      eventEmitter.emit('SendSucessfullPaymentNotification', id, { nationalId, names: attender.fullName });
+      }); 
+      if(savedTicket){
+        sendTicketEmail(savedTicket);
+      }
       await updateEvent(eventId);
       await updatePaymentGrade(attender.type);
       await updateSittingPlace(eventId, attender.type);
