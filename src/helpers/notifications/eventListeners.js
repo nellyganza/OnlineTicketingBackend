@@ -9,7 +9,6 @@ import userService from '../../services/userService';
 import { eventEmitter } from './eventEmitter';
 
 import ticketController from '../../controllers/ticketsController';
-import { sendTicketEmail } from '../../routes/api/tickets/ticketRouter';
 import notificationService from '../../services/notifications';
 import { logger } from '../Logger';
 import { transporter } from '../mailHelper';
@@ -87,7 +86,7 @@ eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...
       } = ticket.dataValues;
       const buyer = await userService.findById(userId);
       const event = await eventService.findById(eventId);
-      await sendTicketEmail(ticket);
+      await ticketController.sendTicketEmail(ticket);
       const buyerMessage = `Buying Tickets for ${fullName} with NationalID/Passport ${nationalId} goes ok!! <br>   Thank you!!`;
       const sellerMessage = `Client ${buyer.firstName}  ${buyer.lastName} bought ticket for ${fullName} in event ${event.title}`;
       await notificationService.createNotification({

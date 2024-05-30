@@ -1,20 +1,32 @@
+import fs from 'fs';
 import _ from 'lodash';
+import moment from 'moment';
+import path from 'path';
 import {
   getAndUpdateSittingPlace,
   updateEvent,
   updatePaymentGrade, updateSittingPlace,
 } from '../helpers/ControllerFunctions';
-import { eventEmitter } from '../helpers/notifications/eventEmitter';
+import htmlToPdf from '../helpers/htmlToPdf';
+import { sendNotification } from '../helpers/mailHelper';
+import { sentTicket } from '../helpers/templates/sendTicketEmail';
 import Util from '../helpers/utils';
 import { sequelize } from '../models';
 import { ETicketCurrentStatus, ETicketStatus } from '../models/enum/ETicketStatus';
-import { sendTicketEmail } from '../routes/api/tickets/ticketRouter';
 import eventservice from '../services/eventService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import guestService from '../services/guestService';
 import ticketService from '../services/ticketService';
 
+const QRCode = require('qrcode');
+
 const util = new Util();
+
+const saveFileToDisk = async (data, fileName) => fs.writeFileSync(fileName, data, 'base64', (err) => {
+  if (err) {
+    console.log(err);
+  }
+});
 
 export default class ticketController {
   static async saveTicket(req, res) {
@@ -42,7 +54,7 @@ export default class ticketController {
 
       transaction.afterCommit(async () => 'Tickets Saved Successfully');
       const typePlace = [];
-      let ticket ;
+      let ticket;
       for (let index = 0; index < keys.length; index++) {
         const att = attender[keys[index]];
         const ind = _.findIndex(typePlace, { name: att.type });
@@ -65,8 +77,8 @@ export default class ticketController {
         await updateSittingPlace(eventId, att.type, transaction);
       }
       await transaction.commit();
-      if(ticket){
-        sendTicketEmail(ticket);
+      if (ticket) {
+        this.sendTicketEmail(ticket);
       }
     } catch (error) {
       await transaction.rollback();
@@ -87,9 +99,9 @@ export default class ticketController {
       const sittingPlace = await getAndUpdateSittingPlace(eventId, attender.type, 'updatePlaces') - 1;
       const savedTicket = await ticketService.createTicket({
         ...attender, eventId, paymenttype: pay.paymenttype, sittingPlace,
-      }); 
-      if(savedTicket){
-        sendTicketEmail(savedTicket);
+      });
+      if (savedTicket) {
+        this.sendTicketEmail(savedTicket);
       }
       await updateEvent(eventId);
       await updatePaymentGrade(attender.type);
@@ -255,6 +267,67 @@ export default class ticketController {
     } catch (error) {
       util.setError(500, error.message);
       return util.send(res);
+    }
+  }
+
+  static async sendTicketEmail(foundTicket) {
+    try {
+      const {
+        User, Event, EventPayment, ...ticket
+      } = foundTicket.dataValues;
+      const segs = [
+        { data: Event.dataValues.nationalId, mode: 'alphanumeric' },
+      ];
+
+      const qr = await QRCode.toDataURL(segs);
+      const data = qr.replace(/^data:image\/\w+;base64,/, '');
+      const generalPath = `${path.resolve()}/src/public/images/`;
+      const fileName = `${generalPath + ticket.fullName.replace(/\s/g, '')}barcode.png`;
+      await saveFileToDisk(data, fileName);
+
+      const ticketInfo = {
+        email: ticket.email,
+        emailData: {
+          eventName: Event.dataValues.title,
+          price: EventPayment.dataValues.price,
+          date: moment(Event.dataValues.dateAndTimme).format('LL'),
+          time: moment(Event.dataValues.dateAndTimme).format('LT'),
+          place: Event.dataValues.place,
+          fullName: ticket.fullName,
+          userName: `${User.dataValues.firstName} ${User.dataValues.lastName}`,
+          seat: ticket.sittingPlace,
+          type: EventPayment.dataValues.name,
+          cardType: ticket.cardType,
+          nationalId: ticket.nationalId,
+          fileName: qr,
+        },
+      };
+      const pdfTicketPathFile = `${generalPath + ticket.fullName}ticket.pdf`;
+      const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), pdfTicketPathFile);
+      fs.writeFile(pdfTicketPathFile, Buffer.from(pdf, 'base64'), { encoding: 'base64' }, (err) => {
+        // Finished
+      });
+      const attach = { fileName: `${ticket.fullName}ticket.pdf`, path: pdfTicketPathFile, cid: 'ticket' };
+      sendNotification({
+        to: ticketInfo.email,
+        subject: 'Ticket Email from TicketiCore',
+        template: 'index',
+        attachments: [
+          attach, {
+            filename: 'favicon.jpg',
+            path: `${generalPath}favicon.jpg`,
+            cid: 'favicon',
+          },
+          {
+            filename: `${ticket.fullName.replace(/\s/g, '')}barcode.png`,
+            path: fileName,
+            cid: 'barcode',
+          },
+        ],
+        data: { ...ticketInfo.emailData },
+      });
+    } catch (error) {
+      throw new Error(error.message);
     }
   }
 }
