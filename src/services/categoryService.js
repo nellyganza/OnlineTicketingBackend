@@ -26,6 +26,16 @@ class CategoryService extends MainService {
       });
   }
 
+  static getCategoriesWithNoPagination(prop) {
+    const condition = prop || null;
+    return Category.findAll({
+      where: condition,
+    }).then((data) => data)
+      .catch((err) => {
+        throw new Error(err.message || 'Some error occurred while retrieving Data.');
+      });
+  }
+
   static findById(modelId) {
     return Category.findOne({
       where: { id: modelId },
