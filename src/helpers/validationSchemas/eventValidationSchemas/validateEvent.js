@@ -13,7 +13,7 @@ export const newEventSchema = joi.object({
   numberofTicket: joi.number().required().min(1),
   categoryId: joi.any().required(),
   country: joi.string().required(),
-  share: joi.boolean().required(),
+  share: joi.any(),
   placeImage: joi.any(),
 });
 
