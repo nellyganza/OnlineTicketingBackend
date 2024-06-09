@@ -9,5 +9,6 @@ router.post('/:eventId', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER
 router.get('/:eventId', eventController.getAllSittinPlaces);
 router.put('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.updateSittingPlace);
 router.delete('/:id', isAuthenticated, allowedRoles([USER_ROLES.EVENT_MANAGER, USER_ROLES.EVENT_ADMIN]), eventController.deleteSittingPlace);
+router.get('/:eventId/:seatGradeId', eventController.getSeatPlaceByEventAndType);
 
 export default router;

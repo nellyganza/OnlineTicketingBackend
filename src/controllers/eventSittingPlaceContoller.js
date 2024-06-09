@@ -1,5 +1,5 @@
-import eventStittingPlaceService from '../services/eventSittingPlaceService';
 import Util from '../helpers/utils';
+import eventStittingPlaceService from '../services/eventSittingPlaceService';
 
 const util = new Util();
 export default class EventSittingController {
@@ -36,6 +36,31 @@ export default class EventSittingController {
         return util.send(res);
       }
       util.setSuccess(200, 'Events Sitting Found', sittiEvents);
+      return util.send(res);
+    } catch (error) {
+      util.setError(500, error.message);
+      return util.send(res);
+    }
+  }
+
+  static async getSeatPlaceByEventAndType(req, res) {
+    try {
+      const { eventId, seatGradeId } = req.params;
+      if (!eventId) {
+        util.setError(400, 'Invalid Event Id');
+        return util.send(res);
+      }
+
+      if (!seatGradeId) {
+        util.setError(400, 'Invalid Seat Grade Id');
+        return util.send(res);
+      }
+      const sittiEvents = await eventStittingPlaceService.findOneByName({ eventId, seatGradeId });
+      if (!sittiEvents) {
+        util.setError(404, 'Seat Not Found');
+        return util.send(res);
+      }
+      util.setSuccess(200, 'Seat Found', sittiEvents);
       return util.send(res);
     } catch (error) {
       util.setError(500, error.message);
