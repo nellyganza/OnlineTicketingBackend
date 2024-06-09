@@ -14,6 +14,7 @@ export default class EventController {
     const {
       event, paymentMethod, paymentGradeCost,
     } = req.body;
+    console.log(event);
     let { sittingPlace } = req.body;
     if (!event || !paymentMethod || !sittingPlace || !paymentGradeCost) {
       util.setError(400, 'Bad Information Provided');
@@ -21,7 +22,7 @@ export default class EventController {
     }
     sittingPlace = JSON.parse(sittingPlace);
     const transaction = await sequelize.transaction();
-    const saveEvent = { ...event, ticketLeft: event.numberofTicket, userId: id };
+    const saveEvent = { ...event,share:Boolean(event.share), ticketLeft: event.numberofTicket, userId: id };
     try {
       const savedEvent = await eventService.createEvent(saveEvent, transaction);
       if (!savedEvent) {
