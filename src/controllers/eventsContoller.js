@@ -17,16 +17,18 @@ export default class EventController {
     console.log(event);
     let { sittingPlace } = req.body;
     if (!event || !paymentMethod || !sittingPlace || !paymentGradeCost) {
-      util.setError(400, 'Bad Information Provided');
+      util.setError(400, 'Bad information provided');
       return util.send(res);
     }
     sittingPlace = JSON.parse(sittingPlace);
     const transaction = await sequelize.transaction();
-    const saveEvent = { ...event,share:Boolean(event.share), ticketLeft: event.numberofTicket, userId: id };
+    const saveEvent = {
+      ...event, share: Boolean(event.share), ticketLeft: event.numberofTicket, userId: id,
+    };
     try {
       const savedEvent = await eventService.createEvent(saveEvent, transaction);
       if (!savedEvent) {
-        util.setError(400, 'Event not Created');
+        util.setError(400, 'Event not created');
         return util.send(res);
       }
 
@@ -57,7 +59,7 @@ export default class EventController {
         }
       }
       transaction.afterCommit(async () => {
-        util.setSuccess(201, 'Events Prepared Success', { savedEvent });
+        util.setSuccess(201, 'Events prepared success', { savedEvent });
         eventEmitter.emit('createdEvent', { user: req.userInfo, event: { ...savedEvent.dataValues }, paymentMethod: savedMethods });
         return util.send(res);
       });
@@ -76,7 +78,7 @@ export default class EventController {
       if (event) {
         return res.send({ event });
       }
-      return res.status(400).send({ message: 'Event Not Found' });
+      return res.status(400).send({ message: 'Event not found' });
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -90,7 +92,7 @@ export default class EventController {
       const date = req.query.date ? req.query.date.split(',') : [];
       const result = await eventService.findByFilters(title, category, date, page, size);
       if (result) {
-        util.setSuccess(200, 'Events Found', result);
+        util.setSuccess(200, 'Events found', result);
         return util.send(res);
       }
     } catch (error) {
@@ -108,7 +110,7 @@ export default class EventController {
       const category = req.query.category ? req.query.category.split(',') : [];
       const result = await eventService.findByFilters2(name, place, category, undefined, page, size);
       if (result) {
-        util.setSuccess(200, 'Events Found', result);
+        util.setSuccess(200, 'Events found', result);
         return util.send(res);
       }
     } catch (error) {
