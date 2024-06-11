@@ -17,6 +17,7 @@ import eventservice from '../services/eventService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import guestService from '../services/guestService';
 import ticketService from '../services/ticketService';
+const nodeHtmlToImage = require('node-html-to-image')
 
 const QRCode = require('qrcode');
 
@@ -301,13 +302,19 @@ export default class ticketController {
           nationalId: ticket.nationalId,
           fileName: qr,
         },
-      };
+      }; 
       const pdfTicketPathFile = `${generalPath + ticket.fullName}ticket.pdf`;
+      const pngTicketPathFile = `${generalPath + ticket.fullName}ticket.png`;
       const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), pdfTicketPathFile);
+      nodeHtmlToImage({
+        output: pngTicketPathFile,
+        html: sentTicket(ticketInfo.emailData)
+      })
+        .then(() => console.log('The image was created successfully!'));
       fs.writeFile(pdfTicketPathFile, Buffer.from(pdf, 'base64'), { encoding: 'base64' }, (err) => {
         // Finished
       });
-      const attach = { fileName: `${ticket.fullName}ticket.pdf`, path: pdfTicketPathFile, cid: 'ticket' };
+      const attach = { fileName: `${ticket.fullName}ticket.png`, path: pngTicketPathFile, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
         subject: 'Ticket Email from TicketiCore',

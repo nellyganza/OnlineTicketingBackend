@@ -77,7 +77,7 @@ const saveFileToDisk = async (data, fileName) => {
   });
 };
 
-eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData, ...list) => {
+eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData) => {
   try {
     const tickets = await ticketService.findByUserANDEvent({ userId: user, eventId: eventData });
     tickets.forEach(async (ticket) => {

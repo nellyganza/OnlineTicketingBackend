@@ -1,5 +1,4 @@
 import express from 'express';
-import fs from 'fs';
 import ticketController from '../../../controllers/ticketsController';
 import Util from '../../../helpers/utils';
 import { ValidationMiddleWare, checkPayments } from '../../../middlewares';
