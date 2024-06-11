@@ -1,3 +1,4 @@
+import { ImageType, PdfDocument } from "@ironsoftware/ironpdf";
 import fs from 'fs';
 import _ from 'lodash';
 import moment from 'moment';
@@ -7,7 +8,6 @@ import {
   updateEvent,
   updatePaymentGrade, updateSittingPlace,
 } from '../helpers/ControllerFunctions';
-import htmlToPdf from '../helpers/htmlToPdf';
 import { sendNotification } from '../helpers/mailHelper';
 import { sentTicket } from '../helpers/templates/sendTicketEmail';
 import Util from '../helpers/utils';
@@ -17,7 +17,6 @@ import eventservice from '../services/eventService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import guestService from '../services/guestService';
 import ticketService from '../services/ticketService';
-const nodeHtmlToImage = require('node-html-to-image')
 
 const QRCode = require('qrcode');
 
@@ -302,19 +301,18 @@ export default class ticketController {
           nationalId: ticket.nationalId,
           fileName: qr,
         },
-      }; 
-      const pdfTicketPathFile = `${generalPath + ticket.fullName}ticket.pdf`;
-      const pngTicketPathFile = `${generalPath + ticket.fullName}ticket.png`;
-      const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), pdfTicketPathFile);
-      nodeHtmlToImage({
-        output: pngTicketPathFile,
-        html: sentTicket(ticketInfo.emailData)
-      })
-        .then(() => console.log('The image was created successfully!'));
-      fs.writeFile(pdfTicketPathFile, Buffer.from(pdf, 'base64'), { encoding: 'base64' }, (err) => {
-        // Finished
+      };
+      const imgTicketPathFile = `${generalPath + ticket.fullName}-ticket`;
+      // Convert PDF to JPEG Format using ImageType.JPG
+      const options = {
+        type: ImageType.PNG,
+        height: '200',
+      };
+      await PdfDocument.fromHtml(sentTicket(ticketInfo.emailData)).then((resolve) => {
+        resolve.rasterizeToImageFiles(imgTicketPathFile, options);
+        return resolve;
       });
-      const attach = { fileName: `${ticket.fullName}ticket.png`, path: pngTicketPathFile, cid: 'ticket' };
+      const attach = { fileName: `${ticket.fullName}-ticket.png`, path: imgTicketPathFile+".png", cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
         subject: 'Ticket Email from TicketiCore',
@@ -334,6 +332,7 @@ export default class ticketController {
         data: { ...ticketInfo.emailData },
       });
     } catch (error) {
+      console.log(error);
       throw new Error(error.message);
     }
   }
