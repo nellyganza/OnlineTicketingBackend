@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const sentTicket = (emailData) => {
-    const template2 = `<!DOCTYPE html>
+  const template2 = `<!DOCTYPE html>
         <html>
         <head>
             <style>
@@ -162,5 +162,5 @@ export const sentTicket = (emailData) => {
         </body>
         </html>
         `;
-    return template2;
+  return template2;
 };

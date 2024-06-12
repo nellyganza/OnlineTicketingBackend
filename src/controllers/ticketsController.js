@@ -3,6 +3,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import moment from 'moment';
 import path from 'path';
+import cloudinary from '../config/claudinary';
 import {
   getAndUpdateSittingPlace,
   updateEvent,
@@ -306,12 +307,14 @@ export default class ticketController {
       // Convert PDF to JPEG Format using ImageType.JPG
       const options = {
         type: ImageType.PNG,
-        height: '200',
+        size: '200',
       };
       await PdfDocument.fromHtml(sentTicket(ticketInfo.emailData)).then((resolve) => {
         resolve.rasterizeToImageFiles(imgTicketPathFile, options);
         return resolve;
       });
+      const image = await cloudinary.uploader.upload(sentTicket(ticketInfo.emailData), {height: 300, gravity: "auto", crop: "fill"});
+      console.log(image);
       const attach = { fileName: `${ticket.fullName}-ticket.png`, path: `${imgTicketPathFile}.png`, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
