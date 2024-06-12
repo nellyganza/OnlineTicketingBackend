@@ -1,4 +1,4 @@
-import { ImageType, PdfDocument } from "@ironsoftware/ironpdf";
+import { ImageType, PdfDocument } from '@ironsoftware/ironpdf';
 import fs from 'fs';
 import _ from 'lodash';
 import moment from 'moment';
@@ -312,7 +312,7 @@ export default class ticketController {
         resolve.rasterizeToImageFiles(imgTicketPathFile, options);
         return resolve;
       });
-      const attach = { fileName: `${ticket.fullName}-ticket.png`, path: imgTicketPathFile+".png", cid: 'ticket' };
+      const attach = { fileName: `${ticket.fullName}-ticket.png`, path: `${imgTicketPathFile}.png`, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
         subject: 'Ticket Email from TicketiCore',
