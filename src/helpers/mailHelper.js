@@ -56,7 +56,7 @@ export const sendNotification = async ({
     }
     console.log(`Email sent: ${info.response}`);
     attachments.forEach((attach) => {
-      if (attach.cid !== 'favicon') {
+      if (!['favicon','ticket'].includes(attach.cid)) {
         deleteFileFromDisk(attach.path);
       }
     });

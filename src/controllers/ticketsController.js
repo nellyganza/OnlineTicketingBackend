@@ -1,4 +1,3 @@
-import { ImageType, PdfDocument } from '@ironsoftware/ironpdf';
 import fs from 'fs';
 import _ from 'lodash';
 import moment from 'moment';
@@ -9,6 +8,7 @@ import {
   updateEvent,
   updatePaymentGrade, updateSittingPlace,
 } from '../helpers/ControllerFunctions';
+import htmlToPdf from '../helpers/htmlToPdf';
 import { sendNotification } from '../helpers/mailHelper';
 import { sentTicket } from '../helpers/templates/sendTicketEmail';
 import Util from '../helpers/utils';
@@ -303,19 +303,16 @@ export default class ticketController {
           fileName: qr,
         },
       };
-      const imgTicketPathFile = `${generalPath + ticket.fullName}-ticket`;
-      // Convert PDF to JPEG Format using ImageType.JPG
-      const options = {
-        type: ImageType.PNG,
-        size: '200',
-      };
-      await PdfDocument.fromHtml(sentTicket(ticketInfo.emailData)).then((resolve) => {
-        resolve.rasterizeToImageFiles(imgTicketPathFile, options);
-        return resolve;
-      });
-      const image = await cloudinary.uploader.upload(sentTicket(ticketInfo.emailData), {height: 300, gravity: "auto", crop: "fill"});
-      console.log(image);
-      const attach = { fileName: `${ticket.fullName}-ticket.png`, path: `${imgTicketPathFile}.png`, cid: 'ticket' };
+      const pdfTicketPathFile = `${generalPath + ticket.fullName}ticket.pdf`;
+      const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), pdfTicketPathFile);
+      const byteArrayBuffer = Buffer.from(pdf, 'base64');
+      const saveimg = await new Promise((resolve) => {
+        cloudinary.uploader.upload_stream({ format: 'png',crop: "fill"},(error, uploadResult) => {
+          return resolve(uploadResult);
+        }).end(byteArrayBuffer);
+      })
+      await foundTicket.save();
+      const attach = { fileName: `${ticket.fullName}-ticket.png`, path: saveimg.secure_url, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
         subject: 'Ticket Email from TicketiCore',
