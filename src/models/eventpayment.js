@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     eventId: DataTypes.UUID,
     name: DataTypes.STRING,
     price: DataTypes.FLOAT,
+    bgTicket: DataTypes.STRING,
     boughtTickets: {
       type: DataTypes.INTEGER,
       defaultValue: 0,

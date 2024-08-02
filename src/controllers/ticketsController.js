@@ -4,16 +4,17 @@ import moment from 'moment';
 import path from 'path';
 import cloudinary from '../config/claudinary';
 import {
-  getAndUpdateSittingPlace,
-  updateEvent,
-  updatePaymentGrade, updateSittingPlace,
+    getAndUpdateSittingPlace,
+    updateEvent,
+    updatePaymentGrade, updateSittingPlace,
 } from '../helpers/ControllerFunctions';
 import htmlToPdf from '../helpers/htmlToPdf';
 import { sendNotification } from '../helpers/mailHelper';
-import { sentTicket } from '../helpers/templates/sendTicketEmail';
+import { sentGuestTicket, sentTicket } from '../helpers/templates/sendTicketEmail';
 import Util from '../helpers/utils';
 import { sequelize } from '../models';
 import { ETicketCurrentStatus, ETicketStatus } from '../models/enum/ETicketStatus';
+import eventPaymentService from '../services/eventPaymentService';
 import eventservice from '../services/eventService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import guestService from '../services/guestService';
@@ -291,6 +292,7 @@ export default class ticketController {
         emailData: {
           eventName: Event.dataValues.title,
           price: EventPayment.dataValues.price,
+          bgTicket: EventPayment.dataValues.bgTicket,
           date: moment(Event.dataValues.dateAndTimme).format('LL'),
           time: moment(Event.dataValues.dateAndTimme).format('LT'),
           place: Event.dataValues.place,
@@ -299,7 +301,7 @@ export default class ticketController {
           seat: ticket.sittingPlace,
           type: EventPayment.dataValues.name,
           cardType: ticket.cardType,
-          nationalId: ticket.nationalId,
+          nationalId: ticket.nationalId.replace(/.(?=.{4})/g, 'x'),
           fileName: qr,
         },
       };
@@ -307,15 +309,14 @@ export default class ticketController {
       const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), pdfTicketPathFile);
       const byteArrayBuffer = Buffer.from(pdf, 'base64');
       const saveimg = await new Promise((resolve) => {
-        cloudinary.uploader.upload_stream({ format: 'png',crop: "fill"},(error, uploadResult) => {
-          return resolve(uploadResult);
-        }).end(byteArrayBuffer);
-      })
+        cloudinary.uploader.upload_stream({ format: 'png', crop: 'fill' }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
+      });
+      foundTicket.ticketImg = saveimg.secure_url;
       await foundTicket.save();
       const attach = { fileName: `${ticket.fullName}-ticket.png`, path: saveimg.secure_url, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
-        subject: 'Ticket Email from TicketiCore',
+        subject: 'Ticket Email from EventIcore',
         template: 'index',
         attachments: [
           attach, {
@@ -325,6 +326,70 @@ export default class ticketController {
           },
           {
             filename: `${ticket.fullName.replace(/\s/g, '')}barcode.png`,
+            path: fileName,
+            cid: 'barcode',
+          },
+        ],
+        data: { ...ticketInfo.emailData },
+      });
+    } catch (error) { 
+      throw new Error(error.message);
+    }
+  }
+
+
+  static async sendGuestBadgeEmail(guest) {
+    try {
+      const seatGrade = await eventPaymentService.findById(guest.type);
+      const {
+        Event,...type
+      } = seatGrade.dataValues;
+      const segs = [
+        { data: guest.nationalId, mode: 'alphanumeric' },
+      ]; 
+      const qr = await QRCode.toDataURL(segs);
+      const data = qr.replace(/^data:image\/\w+;base64,/, '');
+      const generalPath = `${path.resolve()}/src/public/images/`;
+      const fileName = `${generalPath + guest.fullName.replace(/\s/g, '')}barcode.png`;
+      await saveFileToDisk(data, fileName);
+
+      const ticketInfo = {
+        email: guest.email,
+        emailData: {
+          eventName: Event.dataValues.title,
+          price: type.price,
+          bgTicket: type.bgTicket,
+          date: moment(Event.dataValues.dateAndTimme).format('LL'),
+          time: moment(Event.dataValues.dateAndTimme).format('LT'),
+          place: Event.dataValues.place,
+          fullName: guest.fullName,
+          type: type.name,
+          institution: seatGrade.organization,
+          nationalId: guest.nationalId.replace(/.(?=.{4})/g, 'x'),
+          fileName: qr,
+        },
+      };
+      const pdfTicketPathFile = `${generalPath + guest.fullName}guest.pdf`;
+      const pdf = await htmlToPdf(sentGuestTicket(ticketInfo.emailData), pdfTicketPathFile);
+      const byteArrayBuffer = Buffer.from(pdf, 'base64');
+      const saveimg = await new Promise((resolve) => {
+        cloudinary.uploader.upload_stream({ format: 'png'}, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
+      }); 
+      // foundTicket.ticketImg = saveimg.secure_url;
+      // await foundTicket.save();
+      const attach = { fileName: `${guest.fullName}-guest.png`, path: saveimg.secure_url, cid: 'ticket' };
+      sendNotification({
+        to: ticketInfo.email,
+        subject: 'Badge Email from eventicore',
+        template: 'index',
+        attachments: [
+          attach, {
+            filename: 'favicon.jpg',
+            path: `${generalPath}favicon.jpg`,
+            cid: 'favicon',
+          },
+          {
+            filename: `${guest.fullName.replace(/\s/g, '')}barcode.png`,
             path: fileName,
             cid: 'barcode',
           },

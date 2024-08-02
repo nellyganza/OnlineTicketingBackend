@@ -36,6 +36,7 @@ export const newStittingPlaceSchema = joi.object({
 export const newPaymentGradeCost = joi.object({
   name: joi.string().required(),
   price: joi.number().required(),
+  bgTicket: joi.any(),
 });
 
 export const oldEventSchema = joi.object({

@@ -52,6 +52,7 @@
     "joi": "^17.2.1",
     "joi-phone-number": "^5.0.0",
     "jsonwebtoken": "^8.5.1",
+    "jspdf": "^2.5.1",
     "lodash": "^4.17.20",
     "logger": "0.0.1",
     "mocha": "^8.1.3",

@@ -1,5 +1,6 @@
 import Util from '../helpers/utils';
 import guestService from '../services/guestService';
+import ticketController from './ticketsController';
 
 const util = new Util();
 export default class Guest {
@@ -23,6 +24,7 @@ export default class Guest {
         return util.send(res);
       }
       const createdGuest = await guestService.createGuest({ ...req.body });
+      await ticketController.sendGuestBadgeEmail(createdGuest);
       util.setSuccess(200, 'Guest created', createdGuest);
       return util.send(res);
     } catch (error) {

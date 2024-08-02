@@ -72,9 +72,18 @@ const setEventImages = async (req, res, next) => {
         urls = data.image || [];
       }
     }
+
     if (req.files) {
-      for (let index = 0; index < req.files.length; index++) {
-        const { filename } = req.files[index];
+      const eventFiles = req.files.filter((f) => f.originalname.includes('event'));
+      const gradeFiles = req.files.filter((f) => f.originalname.includes('paymentGradeCost'));
+      for (let index = 0; index < eventFiles.length; index++) {
+        const { filename } = eventFiles[index];
+        urls.push(filename);
+      }
+      for (let index = 0; index < gradeFiles.length; index++) {
+        const { filename, originalname } = gradeFiles[index];
+        const bgPath = originalname.split('|');
+        req.body[bgPath[0]][[bgPath[1]]].bgTicket = filename;
         urls.push(filename);
       }
     }

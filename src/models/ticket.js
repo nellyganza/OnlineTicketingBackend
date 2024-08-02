@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: DataTypes.STRING,
     email: DataTypes.STRING,
     sittingPlace: DataTypes.INTEGER,
+    ticketImg: DataTypes.STRING,
     currentStatus: {
       type: DataTypes.STRING,
       defaultValue: ETicketCurrentStatus.OUT_EVENT,

@@ -70,6 +70,9 @@ module.exports = {
       cardType: {
         type: Sequelize.STRING,
       },
+      ticketImg: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

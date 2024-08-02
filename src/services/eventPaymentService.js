@@ -45,6 +45,7 @@ class EventPaymentService extends MainService {
   static findById(modelId) {
     return EventPayment.findOne({
       where: { id: modelId },
+      include: [{ model: Event }]
     });
   }
 

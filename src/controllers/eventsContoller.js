@@ -14,7 +14,7 @@ export default class EventController {
     const {
       event, paymentMethod, paymentGradeCost,
     } = req.body;
-    console.log(event);
+    console.log(paymentGradeCost);
     let { sittingPlace } = req.body;
     if (!event || !paymentMethod || !sittingPlace || !paymentGradeCost) {
       util.setError(400, 'Bad information provided');

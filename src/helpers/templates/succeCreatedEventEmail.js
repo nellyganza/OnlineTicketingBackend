@@ -46,7 +46,7 @@ export const successCreationTemplate = (emailData) => {
                                             <span
                                                 style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                             <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                                You have created an Event @ticketicore.com  with the Below Information :<br/>
+                                                You have created an Event @eventicore.com  with the Below Information :<br/>
                                                 <code>
                                                     Name: ${emailData.title}<br/>
                                                     Location : ${emailData.location} <br/>
@@ -69,7 +69,7 @@ export const successCreationTemplate = (emailData) => {
                         </tr>
                         <tr>
                             <td style="text-align:center;">
-                                <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>TICKETICORE</strong></p>
+                                <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>EVENTICORE</strong></p>
                             </td>
                         </tr>
                         <tr>

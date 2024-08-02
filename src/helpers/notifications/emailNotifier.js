@@ -48,7 +48,7 @@ export const renderEmail = ($message) => {
     <body>
         <div className="wrapper">
            <div className="logo">
-            <div>TicketiCore</div>
+            <div>EventIcore</div>
            </div>
           <center> <div className="content">
             <p>${$message}</p>
@@ -63,7 +63,7 @@ export const sendNotification = async (email) => {
   const mailOpt = {
     from: process.env.EMAIL,
     to: email.email,
-    subject: 'TicketiCore Notification',
+    subject: 'EventIcore Notification',
     html: email.message,
     attachments: [{
       filename: email.attachement.file,

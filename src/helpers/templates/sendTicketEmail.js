@@ -7,9 +7,8 @@ export const sentTicket = (emailData) => {
         <html>
         <head>
             <style>
-                html { -webkit-print-color-adjust: exact; }
+                html { -webkit-print-color-adjust: exact;zoom: 0.75; }
                 @import url('https://fonts.googleapis.com/css?family=Oswald');
-
                 * {
                     margin: 0 !important;
                     padding: 0 !important;
@@ -20,6 +19,7 @@ export const sentTicket = (emailData) => {
                 body {
                     background-color: #dadde6 !important;
                     font-family: arial !important;
+                    height:100px !important;
                 }
                     
                 h1 {
@@ -31,31 +31,33 @@ export const sentTicket = (emailData) => {
                 }
 
                 .row {
-                    overflow: hidden !important;
-                    padding-top: 50px !important;
-                    padding-left: 10% !important;
-                    padding-bottom: 50px !important;
-                    background-image: url(${emailData.fileName}) !important;
-                    background-repeat: no-repeat !important;
-                    background-position: center !important;
-                    background-size: cover !important;
-                    width: 100% !important;
+                    overflow: hidden;
+                    padding-top: 50px;
+                    margin:30px;
+                    padding: 50px;
+                    padding-left: 10%;
+                    background-image: url(${process.env.HOST}/api/v1/files/${emailData.bgTicket}) !important;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-size: cover;
+                    width: 100%;
                     /* adjust as needed */
-                    height: 100% !important;
+                    height: 450px;
                     /* adjust as needed */
-                    border-radius: 5px !important;
-                    box-shadow: #989898 2px !important;
+                    border-radius: 10px;
+                    box-shadow: #989898 2px;
+                    border: 3px white solid;
                 }
 
-                .card {
-                    display: grid !important;
-                    grid-template-areas: 'info info qr' !important;
-                    width: 100% !important;
-                    background-color: #fff !important;
-                    color: #989898 !important;
-                    margin-bottom: 10px !important;
-                    border-radius: 4px !important;
-                    position: relative !important;
+                 .card {
+                    display: grid;
+                    grid-template-areas: 'info info info info qr';
+                    width: 50%;
+                    right: 0 !important;
+                    position: absolute;
+                    background-color: #fff;
+                    color: #989898;
+                    border-radius: 4px; 
                 }
                 .vericaltext {
                     writing-mode: vertical-lr !important;
@@ -74,7 +76,7 @@ export const sentTicket = (emailData) => {
                     grid-area: info !important;
                     font-size: 85% !important;
                     position: relative !important;
-                    padding: 10px 10px 30px 50px !important;
+                    padding: 5px 5px 15px 15px !important;
                     border-right: 2px dashed #dadde6 !important;
                     border: 2px solid black !important;
                     display: flex !important;
@@ -161,3 +163,152 @@ export const sentTicket = (emailData) => {
         `;
   return template2;
 };
+
+
+export const sentGuestTicket = (emailData) => {
+    const template2 = `<!DOCTYPE html>
+          <html>
+          <head>
+              <style>
+                  html { -webkit-print-color-adjust: exact; }
+                  @import url('https://fonts.googleapis.com/css?family=Oswald');
+                  * {
+                        margin: 0;
+                        padding: 0;
+                        border: 0;
+                        box-sizing: border-box
+                    }
+
+                    .SmallerPage {
+            -webkit-transform: scale(0.67);
+            -moz-transform: scale(0.67);
+            -ms-transform: scale(0.67);
+            transform: scale(0.67);
+            -ms-transform-origin: 0 0;
+            -webkit-transform-origin: 0 0;
+            -moz-transform-origin: 0 0;
+            transform-origin: 0 0;
+        }
+
+                    body {
+                        background-color: #dadde6;
+                        font-family: arial
+                    }
+
+                    .fl-left {
+                        float: left
+                    }
+
+                    .fl-right {
+                        float: right
+                    }
+
+                    h1 {
+                        text-transform: uppercase;
+                        font-weight: 900;
+                        border-left: 10px solid #fec500;
+                        padding-left: 10px;
+                        margin-bottom: 30px
+                    }
+
+                    .row {
+                        overflow: hidden; 
+                        background-image: url('./tick-bg.jpeg');
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-size: cover;
+                        padding: 50px;
+                        width: 40vh; 
+                        height: 50vh;
+                        /* adjust as needed */
+                        border-radius: 10px;
+                        box-shadow: #989898 2px;
+                        border: 3px white solid;
+                    }
+
+                    .card { 
+                        right: 0 !important; 
+                        background-color: #fff;
+                        color: #989898;
+                        border-radius: 4px; 
+                    }
+                    .vericaltext {  
+                        background-color: green; 
+                        text-align: center;
+                        color: white;
+                        padding: 5px 5px; 
+                    }
+
+                    .card-cont { 
+                        font-size: 85%;
+                        position: relative;
+                        padding: 10px;
+                        border-right: 2px dashed #dadde6;
+                        border: 2px solid black;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        text-transform: uppercase;
+                        font-family: 'Oswald', sans-serif;
+                    }
+
+                    .barcode {
+                        text-align: center;
+                        padding: 10px;
+                    }
+                    .barcode > .footer {
+                        display: flex;
+                        font-size: 8px;
+                        justify-content: space-between;
+                    }
+
+                    .date>div {
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .card-cont >h3 {
+                        font: bold;
+                    }
+
+                </style>
+            </head>
+
+            <body class="SmallerPage">
+                <section>
+                    <div class="row">
+                        <div>
+                            <article class="card">
+                                <section class="card-cont">
+                                    <h3>${emailData.eventName}</h3>
+                                    <div class="event-date">
+                                        <p>Full Name: ${emailData.fullName}</p>
+                                        <p>Institution: ${emailData.organization}</p>
+                                        <p>Title: Guest</p>
+                                        <p>Country: Rwanda</p>
+                                        <p>Date: ${emailData.date} ${emailData.time}</p>
+                                        <p>Venue: ${emailData.place}</p>
+                                        <p>Badge ID: ${emailData.nationalId}</p>
+                                    </div>
+                                    <div class="vericaltext">
+                                        ${emailData.type}
+                                    </div>
+                                </section>
+                                <section class="barcode">
+                                    <div class="container-img">
+                                        <img src="./barcode.png" alt="" />
+                                    </div>
+                                    <div class="footer">
+                                        <div>www.eventicore.com</div>
+                                        <div>From INTERCORE GROUP</div>
+                                    </div>
+                                </section>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+            </body>
+
+            </html>`;
+    return template2;
+  };
