@@ -84,7 +84,6 @@ const setEventImages = async (req, res, next) => {
         const { filename, originalname } = gradeFiles[index];
         const bgPath = originalname.split('|');
         req.body[bgPath[0]][[bgPath[1]]].bgTicket = filename;
-        urls.push(filename);
       }
     }
     if (eventId) {

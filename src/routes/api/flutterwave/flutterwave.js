@@ -104,9 +104,13 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
       await TransactionService.createTransaction({ ...payload, transactionId: payload.tx_ref });
       util.setSuccess(200, 'Mobile Money Payment Initiated', result);
       return util.send(res);
-    }
-    util.setError(400, 'Mobile Money Payment Failed');
-    return util.send(res);
+    }else if(result.status === 'error'){
+      util.setError(400, result.message );
+      return util.send(res);
+    }else{
+      util.setError(400, 'Mobile Money Payment Failed');
+      return util.send(res);
+    } 
   } catch (error) {
     console.log(error);
     util.setError(400, error.message);

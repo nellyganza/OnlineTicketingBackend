@@ -164,9 +164,8 @@ export const sentTicket = (emailData) => {
   return template2;
 };
 
-
 export const sentGuestTicket = (emailData) => {
-    const template2 = `<!DOCTYPE html>
+  const template2 = `<!DOCTYPE html>
           <html>
           <head>
               <style>
@@ -310,5 +309,5 @@ export const sentGuestTicket = (emailData) => {
             </body>
 
             </html>`;
-    return template2;
-  };
+  return template2;
+};

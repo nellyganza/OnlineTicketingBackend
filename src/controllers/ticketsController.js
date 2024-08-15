@@ -4,9 +4,9 @@ import moment from 'moment';
 import path from 'path';
 import cloudinary from '../config/claudinary';
 import {
-    getAndUpdateSittingPlace,
-    updateEvent,
-    updatePaymentGrade, updateSittingPlace,
+  getAndUpdateSittingPlace,
+  updateEvent,
+  updatePaymentGrade, updateSittingPlace,
 } from '../helpers/ControllerFunctions';
 import htmlToPdf from '../helpers/htmlToPdf';
 import { sendNotification } from '../helpers/mailHelper';
@@ -332,21 +332,20 @@ export default class ticketController {
         ],
         data: { ...ticketInfo.emailData },
       });
-    } catch (error) { 
+    } catch (error) {
       throw new Error(error.message);
     }
   }
-
 
   static async sendGuestBadgeEmail(guest) {
     try {
       const seatGrade = await eventPaymentService.findById(guest.type);
       const {
-        Event,...type
+        Event, ...type
       } = seatGrade.dataValues;
       const segs = [
         { data: guest.nationalId, mode: 'alphanumeric' },
-      ]; 
+      ];
       const qr = await QRCode.toDataURL(segs);
       const data = qr.replace(/^data:image\/\w+;base64,/, '');
       const generalPath = `${path.resolve()}/src/public/images/`;
@@ -373,8 +372,8 @@ export default class ticketController {
       const pdf = await htmlToPdf(sentGuestTicket(ticketInfo.emailData), pdfTicketPathFile);
       const byteArrayBuffer = Buffer.from(pdf, 'base64');
       const saveimg = await new Promise((resolve) => {
-        cloudinary.uploader.upload_stream({ format: 'png'}, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
-      }); 
+        cloudinary.uploader.upload_stream({ format: 'png' }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
+      });
       // foundTicket.ticketImg = saveimg.secure_url;
       // await foundTicket.save();
       const attach = { fileName: `${guest.fullName}-guest.png`, path: saveimg.secure_url, cid: 'ticket' };

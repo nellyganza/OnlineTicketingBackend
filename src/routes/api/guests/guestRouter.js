@@ -14,20 +14,20 @@ router.put('/update/:id', isAuthenticated, allowedRoles(['manager', 'event_admin
 router.delete('/delete/:id', isAuthenticated, allowedRoles(['manager', 'event_admin']), guestsController.deleteGuest);
 router.get('/filterByHoster', isAuthenticated, allowedRoles(['manager', 'event_admin']), guestsController.getGuestsByHoster);
 router.get('/resentemail/:guestId', isAuthenticated, allowedRoles(['manager', 'event_admin']), async (req, res) => {
-    try {
-      const { guestId } = req.params;
-      const foundGuest = await GuestService.findById(guestId);
-      if (foundGuest) {
-        await ticketController.sendGuestBadgeEmail(foundGuest);
-        util.setSuccess(200, 'E-mail sent !');
-        return util.send(res);
-      }
-  
-      util.setError(400, 'E-mail not sent !');
+  try {
+    const { guestId } = req.params;
+    const foundGuest = await GuestService.findById(guestId);
+    if (foundGuest) {
+      await ticketController.sendGuestBadgeEmail(foundGuest);
+      util.setSuccess(200, 'E-mail sent !');
       return util.send(res);
-    } catch (error) {
-      util.setError(400, error.message);
-      util.send(res);
     }
-  });
+
+    util.setError(400, 'E-mail not sent !');
+    return util.send(res);
+  } catch (error) {
+    util.setError(400, error.message);
+    util.send(res);
+  }
+});
 export default router;
