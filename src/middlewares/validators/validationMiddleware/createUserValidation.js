@@ -48,13 +48,10 @@ export const signupValidate = async (req, res, next) => {
 
 export const verifyEmail = async (req, res, next) => {
   try {
-    console.log(req.params.token);
     const data = await decodeToken(req.params.token);
-    console.log(data);
     const userExist = await userService.findByProp({
       id: data.userId,
     });
-    console.log(userExist);
     const existUser = userExist && userExist.data && userExist.data[0] ? userExist.data[0] : null;
     if (existUser) {
       const isVerified = await userService.findByProp({

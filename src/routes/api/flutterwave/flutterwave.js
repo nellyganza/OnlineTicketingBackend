@@ -97,22 +97,19 @@ router.post('/mobile-money', isAuthenticated, async (req, res) => {
       phone_number: payload.phone_number,
       fullname: payload.fullname,
     };
-    console.log(momoPayload, payload);
     const result = await flw.MobileMoney.rwanda(momoPayload);
     console.log(result, 'Complete - Result');
     if (result.status === 'success') {
       await TransactionService.createTransaction({ ...payload, transactionId: payload.tx_ref });
       util.setSuccess(200, 'Mobile Money Payment Initiated', result);
       return util.send(res);
-    }else if(result.status === 'error'){
-      util.setError(400, result.message );
+    } if (result.status === 'error') {
+      util.setError(400, result.message);
       return util.send(res);
-    }else{
-      util.setError(400, 'Mobile Money Payment Failed');
-      return util.send(res);
-    } 
+    }
+    util.setError(400, 'Mobile Money Payment Failed');
+    return util.send(res);
   } catch (error) {
-    console.log(error);
     util.setError(400, error.message);
     return util.send(res);
   }

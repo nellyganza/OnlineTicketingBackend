@@ -14,7 +14,6 @@ export default class EventController {
     const {
       event, paymentMethod, paymentGradeCost,
     } = req.body;
-    console.log(paymentGradeCost);
     let { sittingPlace } = req.body;
     if (!event || !paymentMethod || !sittingPlace || !paymentGradeCost) {
       util.setError(400, 'Bad information provided');
@@ -196,7 +195,6 @@ export default class EventController {
       util.setSuccess(200, 'Event Updated Success', event);
       return util.send(res);
     } catch (error) {
-      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }

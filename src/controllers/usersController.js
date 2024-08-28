@@ -50,7 +50,6 @@ export default class User {
 
   static async socialSignup(userInfo, res) {
     try {
-      console.log(userInfo);
       const defaulRole = await RoleService.findByName({ slug: 'attender_user' });
       const {
         given_name, family_name, email, provider, id, picture,
@@ -79,7 +78,6 @@ export default class User {
         return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
       }
     } catch (error) {
-      console.log(error);
       return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/failure/error`);
     }
   }
@@ -313,7 +311,6 @@ export default class User {
       util.setError(400, 'The user doesn\'t exist');
       return util.send(res);
     } catch (error) {
-      console.log(error);
       util.setError(500, error.message);
       return util.send(res);
     }
@@ -515,7 +512,6 @@ export default class User {
         createdBy: id,
         share: 0,
       };
-      console.log(newUser);
       const createdUser = await userService.createuser(newUser);
       return sendLink(res, createdUser);
     } catch (error) {

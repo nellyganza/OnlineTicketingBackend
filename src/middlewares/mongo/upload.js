@@ -63,17 +63,14 @@ export const upload = multer({
 
 const util = new Util();
 export function uploadArrayMiddleware(req, res, next) {
-  console.log('uploading');
   try {
     upload.array('file', 10)(req, res, (err) => {
       if (err) {
-        console.log(err);
         util.setError(400, err.message);
         return util.send(res);
       } next();
     });
   } catch (error) {
-    console.log(error);
     util.setError(500, error.message);
     return util.send(res);
   }

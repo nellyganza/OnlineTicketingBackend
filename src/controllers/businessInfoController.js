@@ -19,7 +19,6 @@ export default class BusinessInfoController {
 
   static async saveBusinessInfo(req, res) {
     try {
-      console.log(req.body);
       const createdBusinessInfo = await businessInfoService.createBusinessInfo({ ...req.body, userId: req.userInfo.id });
       util.setSuccess(200, 'BusinessInfo created', createdBusinessInfo);
       return util.send(res);
@@ -52,7 +51,6 @@ export default class BusinessInfoController {
       util.setSuccess(200, 'BusinessInfo updated successfully', updatedBusinessInfo);
       return util.send(res);
     } catch (error) {
-      console.log(error.message);
       util.setError(500, 'Sorry BusinessInfo not updated');
       return util.send(res);
     }
@@ -73,7 +71,6 @@ export default class BusinessInfoController {
   static async findBusinessInfoByUser(req, res) {
     try {
       const businessInfo = await businessInfoService.findByUserId(req.userInfo.id);
-      console.log(businessInfo, req.userInfo.id);
       if (businessInfo) {
         util.setSuccess(200, 'BusinessInfo Found', businessInfo);
       } else {

@@ -7,7 +7,6 @@ const util = new Util();
 
 export const isAuthenticated = async (req, res, next) => {
   try {
-    console.log(req.headers['content-length']);
     const token = req.headers.authorization;
     await decodeToken(token);
     const loggedIn = await tokenService.findByToken({ token });

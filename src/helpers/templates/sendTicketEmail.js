@@ -4,310 +4,328 @@ dotenv.config();
 
 export const sentTicket = (emailData) => {
   const template2 = `<!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                html { -webkit-print-color-adjust: exact;zoom: 0.75; }
-                @import url('https://fonts.googleapis.com/css?family=Oswald');
-                * {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    border: 0 !important;
-                    box-sizing: border-box !important;
-                }
+<html>
 
-                body {
-                    background-color: #dadde6 !important;
-                    font-family: arial !important;
-                    height:100px !important;
-                }
-                    
-                h1 {
-                    text-transform: uppercase !important;
-                    font-weight: 900 !important;
-                    border-left: 10px solid #fec500 !important;
-                    padding-left: 10px !important;
-                    margin-bottom: 30px !important;
-                }
+<head>
+    <style>
+        html {
+            -webkit-print-color-adjust: exact;
+            zoom: 0.75;
+        }
 
-                .row {
-                    overflow: hidden;
-                    padding-top: 50px;
-                    margin:30px;
-                    padding: 50px;
-                    padding-left: 10%;
-                    background-image: url(${process.env.HOST}/api/v1/files/${emailData.bgTicket}) !important;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    background-size: cover;
-                    width: 100%;
-                    /* adjust as needed */
-                    height: 450px;
-                    /* adjust as needed */
-                    border-radius: 10px;
-                    box-shadow: #989898 2px;
-                    border: 3px white solid;
-                }
+        @import url('https://fonts.googleapis.com/css?family=Oswald');
 
-                 .card {
-                    display: grid;
-                    grid-template-areas: 'info info info info qr';
-                    width: 50%;
-                    right: 0 !important;
-                    position: absolute;
-                    background-color: #fff;
-                    color: #989898;
-                    border-radius: 4px; 
-                }
-                .vericaltext {
-                    writing-mode: vertical-lr !important;
-                    text-orientation: upright !important;
-                    position: absolute !important;
-                    right: 0 !important;
-                    background-color: green !important;
-                    height: 90% !important;
-                    text-align: center !important;
-                    color: white !important;
-                    padding: 5px 5px 0px 0px !important;
-                    margin-right: -13px !important;
-                }
+        * { 
+            box-sizing: border-box !important;
+        }
 
-                .card-cont {
-                    grid-area: info !important;
-                    font-size: 85% !important;
-                    position: relative !important;
-                    padding: 5px 5px 15px 15px !important;
-                    border-right: 2px dashed #dadde6 !important;
-                    border: 2px solid black !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: center !important;
-                    text-transform: uppercase !important;
-                    font-family: 'Oswald', sans-serif !important;
-                }
+        body {
+            background-color: #dadde6 !important; 
+            font-family: arial !important;
+            height: 100px !important;
+        }
 
-                .date {
-                    grid-area: qr !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                } 
+        h1 {
+            text-transform: uppercase !important;
+            font-weight: 900 !important;
+            border-left: 10px solid #fec500 !important;
+            padding-left: 10px !important;
+            padding-bottom: 10px !important;
+        }
 
-                .card-cont >h3 {
-                    font: bold !important;
-                }
+        .mrow {
+            overflow: hidden; 
+            background-image: url(${process.env.HOST}/api/v1/files/${emailData.bgTicket}) !important;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover; 
+            /* adjust as needed */
+            border-radius: 10px;
+            box-shadow: #989898 2px;
+            border: 3px white solid;
+        }
 
-                .card-cont:before,
-                .card-cont:after {
-                    content: "" !important;
-                    display: block !important;
-                    width: 30px !important;
-                    height: 30px !important;
-                    background-color: dimgrey !important;
-                    position: absolute !important;
-                    top: -15px !important;
-                    right: -15px !important;
-                    z-index: 1 !important;
-                    border-radius: 50% !important;
-                }
+        .mcard { 
+            width: 50%;
+            right: 0 !important;
+            position: absolute;
+            background-color: #fff;
+            color: #989898;
+            border-radius: 4px;
+        }
 
-                .card-cont:after {
-                    top: auto !important;
-                    bottom: -15px !important;
-                }
+        .vericaltext {
+            writing-mode: vertical-lr !important;
+            text-orientation: upright !important;
+            position: absolute !important;
+            right: 0 !important;
+            background-color: green !important;
+            height: 90% !important;
+            text-align: center !important;
+            color: white !important;
+            padding: 5px 5px 0px 0px !important;
+            margin-right: -13px !important;
+        }
 
-                .card-cont>div>p {
-                    padding: 10px 10px 0px 0px !important;
-                }
-            </style>
-        </head>
+        .card-cont {
+            grid-area: info !important;
+            font-size: 85% !important;
+            position: relative !important;
+            padding: 5px 5px 15px 15px !important;
+            border-right: 2px dashed #dadde6 !important;
+            border: 2px solid black !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-transform: uppercase !important;
+            font-family: 'Oswald', sans-serif !important;
+        }
 
-        <body>
-            <section class="container">
-                <div class="row">
-                    <div>
-                        <article class="card">
-                            <section class="card-cont">
-                                <h3>${emailData.eventName}</h3>
-                                <div class="event-date">
-                                    <p>Price: ${emailData.price}</p>
-                                    <p>Date: ${emailData.date} ${emailData.time}</p>
-                                    <p>Venue: ${emailData.place}</p>
-                                    <p>Order: ${emailData.userName}</p>
-                                    <p>Category: ${emailData.type}</p>
-                                    <p>Seat: ${emailData.seat}</p>
-                                    <p>Ticket ID: ${emailData.nationalId}</p>
-                                </div>
-                                <div class="vericaltext">
-                                    ${emailData.type}
-                                </div>
-                            </section>
-                            <section class="date">
-                                <div>
-                                    <p>www.eventicore.com</p>
-                                </div>
-                                <div>
-                                    <img src="${emailData.fileName}" alt="" height="400" />
-                                </div>
-                                <div>
-                                    <p>From INTERCORE GROUP</p>
-                                </div>
-                            </section>
-                        </article>
+        .date {
+            grid-area: qr !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .card-cont>h3 {
+            font: bold !important;
+        }
+
+        .card-cont:before,
+        .card-cont:after {
+            content: "" !important;
+            display: block !important;
+            width: 30px !important;
+            height: 30px !important;
+            background-color: dimgrey !important;
+            position: absolute !important;
+            top: -15px !important;
+            right: -15px !important;
+            z-index: 1 !important;
+            border-radius: 50% !important;
+        }
+
+        .card-cont:after {
+            top: auto !important;
+            bottom: -15px !important;
+        } 
+    </style>
+</head>
+
+<body>
+    <div>
+        <div class="mrow" style="align-items: center !important;justify-content: center !important;display: flex !important;--bs-aspect-ratio: 42.8571428571%;position: relative;width: 100%;" >
+            <div class="container" style="--bs-card-spacer-y: 1rem;
+            --bs-card-spacer-x: 1rem;
+            --bs-card-title-spacer-y: 0.5rem;
+            --bs-card-title-color: ;
+            --bs-card-subtitle-color: ;
+            --bs-card-border-width: var(--bs-border-width);
+            --bs-card-border-color: var(--bs-border-color-translucent);
+            --bs-card-border-radius: var(--bs-border-radius);
+            --bs-card-box-shadow: ;
+            --bs-card-inner-border-radius: calc(var(--bs-border-radius) - (var(--bs-border-width)));
+            --bs-card-cap-padding-y: 0.5rem;
+            --bs-card-cap-padding-x: 1rem;
+            --bs-card-cap-bg: rgba(var(--bs-body-color-rgb), 0.03);
+            --bs-card-cap-color: ;
+            --bs-card-height: ;
+            --bs-card-color: ;
+            --bs-card-bg: var(--bs-body-bg);
+            --bs-card-img-overlay-padding: 1rem;
+            --bs-card-group-margin: 0.75rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: var(--bs-card-height);
+            color: white; 
+            word-wrap: break-word;
+            background-color: var(--bs-card-bg);
+            background-clip: border-box;
+            border: var(--bs-card-border-width) solid var(--bs-card-border-color);
+            border-radius: var(--bs-card-border-radius); 
+            padding: 20px !important;">
+                <div style="flex-direction: row !important; display: flex !important;margin-right: 1.5rem !important;margin-left: 1.5rem !important;">
+                   <div class="card-cont" style="width: 400px;">
+                        <h3>${emailData.eventName}</h3>
+                        <div>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Price: ${emailData.price}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Date: ${emailData.date} ${emailData.time}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Venue: ${emailData.place}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Order: ${emailData.userName}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Category: ${emailData.type}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Seat: ${emailData.seat}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Ticket ID: ${emailData.nationalId}</p>
+                        </div>
+                        <label class="vericaltext">
+                            ${emailData.type}
+                        </>
+                    </div>
+                    <div style="align-items: center !important;justify-content: center !important;flex-direction: column !important;display: flex !important;">
+                        <div>
+                            <p>   www.eventicore.com</p>
+                        </div>
+                        <div>
+                            <img class="object-fit-contain" src="${emailData.fileName}" alt="" />
+                            <!-- <img class="object-fit-contain" src="./barcode.png" alt="" /> -->
+                        </div>
+                        <div>
+                            <p>   From INTERCORE GROUP</p>
+                        </div>
                     </div>
                 </div>
-            </section>
-        </body>
-        </html>
-        `;
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>`;
   return template2;
 };
 
 export const sentGuestTicket = (emailData) => {
   const template2 = `<!DOCTYPE html>
-          <html>
-          <head>
-              <style>
-                  html { -webkit-print-color-adjust: exact; }
-                  @import url('https://fonts.googleapis.com/css?family=Oswald');
-                  * {
-                        margin: 0;
-                        padding: 0;
-                        border: 0;
-                        box-sizing: border-box
-                    }
+<html>
 
-                    .SmallerPage {
-            -webkit-transform: scale(0.67);
-            -moz-transform: scale(0.67);
-            -ms-transform: scale(0.67);
-            transform: scale(0.67);
-            -ms-transform-origin: 0 0;
-            -webkit-transform-origin: 0 0;
-            -moz-transform-origin: 0 0;
-            transform-origin: 0 0;
+<head>
+    <style>
+        html {
+            -webkit-print-color-adjust: exact;
+            zoom: 0.75;
         }
 
-                    body {
-                        background-color: #dadde6;
-                        font-family: arial
-                    }
+        @import url('https://fonts.googleapis.com/css?family=Oswald');
 
-                    .fl-left {
-                        float: left
-                    }
+        * { 
+            box-sizing: border-box !important;
+        }
 
-                    .fl-right {
-                        float: right
-                    }
+        body {
+            background-color: #dadde6 !important;
+            font-family: arial !important;
+            height: 100px !important;
+        }
 
-                    h1 {
-                        text-transform: uppercase;
-                        font-weight: 900;
-                        border-left: 10px solid #fec500;
-                        padding-left: 10px;
-                        margin-bottom: 30px
-                    }
+        h1 {
+            text-transform: uppercase !important;
+            font-weight: 900 !important;
+            border-left: 10px solid #fec500 !important;
+            padding-left: 10px !important;
+            padding-bottom: 10px !important;
+        }
 
-                    .row {
-                        overflow: hidden; 
-                        background-image: url('./tick-bg.jpeg');
-                        background-repeat: no-repeat;
-                        background-position: center;
-                        background-size: cover;
-                        padding: 50px;
-                        width: 40vh; 
-                        height: 50vh;
-                        /* adjust as needed */
-                        border-radius: 10px;
-                        box-shadow: #989898 2px;
-                        border: 3px white solid;
-                    }
+        .mrow {
+            overflow: hidden; 
+            background-image: url(${process.env.HOST}/api/v1/files/${emailData.bgTicket}) !important;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover; 
+            /* adjust as needed */
+            border-radius: 10px;
+            box-shadow: #989898 2px;
+            border: 3px white solid;
+        }
 
-                    .card { 
-                        right: 0 !important; 
-                        background-color: #fff;
-                        color: #989898;
-                        border-radius: 4px; 
-                    }
-                    .vericaltext {  
-                        background-color: green; 
-                        text-align: center;
-                        color: white;
-                        padding: 5px 5px; 
-                    }
+        .mcard { 
+            width: 50%;
+            right: 0 !important;
+            position: absolute;
+            background-color: #fff;
+            color: #989898;
+            border-radius: 4px;
+        }
 
-                    .card-cont { 
-                        font-size: 85%;
-                        position: relative;
-                        padding: 10px;
-                        border-right: 2px dashed #dadde6;
-                        border: 2px solid black;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        text-transform: uppercase;
-                        font-family: 'Oswald', sans-serif;
-                    }
+        .vericaltext {  
+            background-color: green !important;
+            height: 90% !important;
+            text-align: center !important;
+            color: white !important;
+            padding: 10px !important; 
+        }
 
-                    .barcode {
-                        text-align: center;
-                        padding: 10px;
-                    }
-                    .barcode > .footer {
-                        display: flex;
-                        font-size: 8px;
-                        justify-content: space-between;
-                    }
+        .card-cont { 
+            font-size: 85% !important;
+            position: relative !important;
+            padding: 5px 5px 15px 15px !important;
+            border-right: 2px dashed #dadde6 !important;
+            border: 2px solid black !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-transform: uppercase !important;
+            font-family: 'Oswald', sans-serif !important;
+        }
 
-                    .date>div {
-                        display: flex;
-                        flex-direction: column;
-                    }
+        .date { 
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
 
-                    .card-cont >h3 {
-                        font: bold;
-                    }
+        .card-cont>h3 {
+            font: bold !important;
+        }
 
-                </style>
-            </head>
+        .card-cont>div>p {
+            padding: 5px 5px 0px 0px !important;
+        }
+    </style>
+</head>
 
-            <body class="SmallerPage">
-                <section>
-                    <div class="row">
+<body>
+    <div>
+        <div class="mrow" style="align-items: center !important;justify-content: center !important;display: flex !important;--bs-aspect-ratio: 12.8571428571%;position: relative;width: 100%;padding: 20px;" >
+            <div class="container" style="">
+                <div style="flex-direction: column !important; display: flex !important;margin-right: 1.5rem !important;margin-left: 1.5rem !important;">
+                    <div class="card-cont">
+                        <h3>${emailData.eventName}</h3>
                         <div>
-                            <article class="card">
-                                <section class="card-cont">
-                                    <h3>${emailData.eventName}</h3>
-                                    <div class="event-date">
-                                        <p>Full Name: ${emailData.fullName}</p>
-                                        <p>Institution: ${emailData.organization}</p>
-                                        <p>Title: Guest</p>
-                                        <p>Country: Rwanda</p>
-                                        <p>Date: ${emailData.date} ${emailData.time}</p>
-                                        <p>Venue: ${emailData.place}</p>
-                                        <p>Badge ID: ${emailData.nationalId}</p>
-                                    </div>
-                                    <div class="vericaltext">
-                                        ${emailData.type}
-                                    </div>
-                                </section>
-                                <section class="barcode">
-                                    <div class="container-img">
-                                        <img src="./barcode.png" alt="" />
-                                    </div>
-                                    <div class="footer">
-                                        <div>www.eventicore.com</div>
-                                        <div>From INTERCORE GROUP</div>
-                                    </div>
-                                </section>
-                            </article>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Price: ${emailData.price}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Date: ${emailData.date} ${emailData.time}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Venue: ${emailData.place}</p> 
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Category: ${emailData.type}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Seat: ${emailData.seat}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Badge ID: ${emailData.nationalId}</p>
+                        </div>
+                        <div class="vericaltext">
+                            ${emailData.type}
+                        </>
+                    </div>
+                    <div style="align-items: center !important;justify-content: center !important;flex-direction: column !important;display: flex !important;">
+                        <div>
+                            <p>www.eventicore.com</p>
+                        </div>
+                        <div>
+                            <img class="object-fit-contain" src="${emailData.fileName}" alt="" height="400" />
+                            <!-- <img class="object-fit-contain" src="./barcode.png" alt="" height="400" /> -->
+                        </div>
+                        <div>
+                            <p>From INTERCORE GROUP</p>
                         </div>
                     </div>
-                </section>
-            </body>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 
-            </html>`;
+</html>`;
   return template2;
 };

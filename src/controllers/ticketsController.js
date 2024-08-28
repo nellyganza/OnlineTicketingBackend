@@ -19,6 +19,7 @@ import eventservice from '../services/eventService';
 import EventSittingPlaceService from '../services/eventSittingPlaceService';
 import guestService from '../services/guestService';
 import ticketService from '../services/ticketService';
+import UserService from '../services/userService';
 
 const QRCode = require('qrcode');
 
@@ -36,7 +37,7 @@ export default class ticketController {
     const { pay, attender } = req.body;
     const eventId = req.params.eventId;
     try {
-      const resp = await this.createTicket(userId, eventId, attender, pay);
+      const resp = await ticketController.createTicket(userId, eventId, attender, pay);
       util.setSuccess(200, resp);
       return util.send(res);
     } catch (error) {
@@ -53,10 +54,9 @@ export default class ticketController {
         throw new Error('selected Event not Exist');
       }
       const keys = Object.keys(attender).map((e) => e);
-
-      transaction.afterCommit(async () => 'Tickets Saved Successfully');
-      const typePlace = [];
       let ticket;
+      transaction.afterCommit(async (a) => {});
+      const typePlace = [];
       for (let index = 0; index < keys.length; index++) {
         const att = attender[keys[index]];
         const ind = _.findIndex(typePlace, { name: att.type });
@@ -80,7 +80,7 @@ export default class ticketController {
       }
       await transaction.commit();
       if (ticket) {
-        this.sendTicketEmail(ticket);
+        this.sendTicketEmail({ ...ticket });
       }
     } catch (error) {
       await transaction.rollback();
@@ -273,12 +273,14 @@ export default class ticketController {
   }
 
   static async sendTicketEmail(foundTicket) {
+    foundTicket = await ticketService.findById(foundTicket.dataValues.id);
     try {
-      const {
-        User, Event, EventPayment, ...ticket
-      } = foundTicket.dataValues;
+      const { ...ticket } = foundTicket.dataValues;
+      const Event = await eventservice.findById(ticket.eventId);
+      const User = await UserService.findById(ticket.userId);
+      const EventPayment = await eventPaymentService.findById(ticket.type);
       const segs = [
-        { data: Event.dataValues.nationalId, mode: 'alphanumeric' },
+        { data: ticket.nationalId, mode: 'alphanumeric' },
       ];
 
       const qr = await QRCode.toDataURL(segs);
@@ -291,7 +293,7 @@ export default class ticketController {
         email: ticket.email,
         emailData: {
           eventName: Event.dataValues.title,
-          price: EventPayment.dataValues.price,
+          price: EventPayment.dataValues.price==0?'FREE':EventPayment.dataValues.price+' RWF',
           bgTicket: EventPayment.dataValues.bgTicket,
           date: moment(Event.dataValues.dateAndTimme).format('LL'),
           time: moment(Event.dataValues.dateAndTimme).format('LT'),
@@ -305,18 +307,26 @@ export default class ticketController {
           fileName: qr,
         },
       };
-      const pdfTicketPathFile = `${generalPath + ticket.fullName}ticket.pdf`;
-      const pdf = await htmlToPdf(sentTicket(ticketInfo.emailData), pdfTicketPathFile);
+      const pdf = await new Promise((resolve) => {
+        htmlToPdf(sentTicket(ticketInfo.emailData), resolve);
+      });
       const byteArrayBuffer = Buffer.from(pdf, 'base64');
+      // const image = await resizeImg(pdf, {
+      //   width: 128,
+      //   height: 128,
+      // });
+      // console.log(image);
       const saveimg = await new Promise((resolve) => {
-        cloudinary.uploader.upload_stream({ format: 'png', crop: 'fill' }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
+        cloudinary.uploader.upload_stream({
+          format: 'png', aspect_ratio: '2.0', gravity: 'north', height: 410, crop: 'crop',
+        }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
       });
       foundTicket.ticketImg = saveimg.secure_url;
       await foundTicket.save();
       const attach = { fileName: `${ticket.fullName}-ticket.png`, path: saveimg.secure_url, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
-        subject: 'Ticket Email from EventIcore',
+        subject: 'Event - Ticket',
         template: 'index',
         attachments: [
           attach, {
@@ -368,18 +378,19 @@ export default class ticketController {
           fileName: qr,
         },
       };
-      const pdfTicketPathFile = `${generalPath + guest.fullName}guest.pdf`;
-      const pdf = await htmlToPdf(sentGuestTicket(ticketInfo.emailData), pdfTicketPathFile);
+      const pdf = await new Promise((resolve) => {
+        htmlToPdf(sentGuestTicket(ticketInfo.emailData), resolve);
+      });
       const byteArrayBuffer = Buffer.from(pdf, 'base64');
       const saveimg = await new Promise((resolve) => {
-        cloudinary.uploader.upload_stream({ format: 'png' }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
+        cloudinary.uploader.upload_stream({ format: 'png',gravity: 'north', height: 1024,width:590, crop: 'crop' }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
       });
       // foundTicket.ticketImg = saveimg.secure_url;
       // await foundTicket.save();
       const attach = { fileName: `${guest.fullName}-guest.png`, path: saveimg.secure_url, cid: 'ticket' };
       sendNotification({
         to: ticketInfo.email,
-        subject: 'Badge Email from eventicore',
+        subject: 'Event - Badge',
         template: 'index',
         attachments: [
           attach, {
@@ -396,7 +407,6 @@ export default class ticketController {
         data: { ...ticketInfo.emailData },
       });
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   }

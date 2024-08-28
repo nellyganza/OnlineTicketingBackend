@@ -69,14 +69,6 @@ eventEmitter.on('createdEvent', async ({ user, event, paymentMethod }) => {
   }
 });
 
-const saveFileToDisk = async (data, fileName) => {
-  fs.writeFile(fileName, data, 'base64', (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-};
-
 eventEmitter.on('SendSucessfullPaymentNotification', async (user, eventData) => {
   try {
     const tickets = await ticketService.findByUserANDEvent({ userId: user, eventId: eventData });

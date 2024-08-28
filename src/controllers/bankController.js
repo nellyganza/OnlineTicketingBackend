@@ -47,7 +47,6 @@ export default class BankController {
   static async updateBank(req, res) {
     try {
       const { id } = req.params;
-      console.log(id);
       const updatedBank = await bankService.updateAtt({ ...req.body }, { id });
       util.setSuccess(200, 'Bank updated successfully', updatedBank);
       return util.send(res);

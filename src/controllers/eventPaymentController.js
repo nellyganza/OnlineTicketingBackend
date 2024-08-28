@@ -32,7 +32,6 @@ export default class EventPaymentController {
         return util.send(res);
       }
       const paymentEvents = await eventPaymentService.findById(id);
-      console.log(paymentEvents);
       if (!paymentEvents) {
         util.setError(404, 'Events Payment  Not Found');
         return util.send(res);
@@ -111,9 +110,6 @@ export default class EventPaymentController {
       const {
         eventPaymentId, userId, status, id,
       } = req.body;
-      console.log({
-        eventPaymentId, userId, status, id,
-      });
       const savedValidator = await eventPaymentService.updateEventValidator({
         id, eventPaymentId, userId, status,
       }, { id });

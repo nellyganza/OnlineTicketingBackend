@@ -33,7 +33,6 @@ export default class verifications {
     try {
       const decoded = await decodeToken(req.params.token);
       const { error } = tokenValid.validate(decoded);
-      console.log(error);
       if (error) {
         const Error = 'Invalid link';
         util.setError(400, Error);

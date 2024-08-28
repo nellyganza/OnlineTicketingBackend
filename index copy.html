@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        html {
+            -webkit-print-color-adjust: exact;
+            zoom: 0.75;
+        }
+
+        @import url('https://fonts.googleapis.com/css?family=Oswald');
+
+        * { 
+            box-sizing: border-box !important;
+        }
+
+        body {
+            background-color: #dadde6 !important;
+            font-family: arial !important;
+            height: 100px !important;
+        }
+
+        h1 {
+            text-transform: uppercase !important;
+            font-weight: 900 !important;
+            border-left: 10px solid #fec500 !important;
+            padding-left: 10px !important;
+            padding-bottom: 10px !important;
+        }
+
+        .mrow {
+            overflow: hidden; 
+            background-image: url(${process.env.HOST}/api/v1/files/${emailData.bgTicket}) !important;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover; 
+            /* adjust as needed */
+            border-radius: 10px;
+            box-shadow: #989898 2px;
+            border: 3px white solid;
+        }
+
+        .mcard { 
+            width: 50%;
+            right: 0 !important;
+            position: absolute;
+            background-color: #fff;
+            color: #989898;
+            border-radius: 4px;
+        }
+
+        .vericaltext {  
+            background-color: green !important;
+            height: 90% !important;
+            text-align: center !important;
+            color: white !important;
+            padding: 10px !important; 
+        }
+
+        .card-cont { 
+            font-size: 85% !important;
+            position: relative !important;
+            padding: 5px 5px 15px 15px !important;
+            border-right: 2px dashed #dadde6 !important;
+            border: 2px solid black !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-transform: uppercase !important;
+            font-family: 'Oswald', sans-serif !important;
+        }
+
+        .date { 
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .card-cont>h3 {
+            font: bold !important;
+        }
+
+        .card-cont>div>p {
+            padding: 5px 5px 0px 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div class="mrow" style="align-items: center !important;justify-content: center !important;display: flex !important;--bs-aspect-ratio: 12.8571428571%;position: relative;width: 100%;padding: 20px;" >
+            <div class="container" style="">
+                <div style="flex-direction: column !important; display: flex !important;margin-right: 1.5rem !important;margin-left: 1.5rem !important;">
+                    <div class="card-cont">
+                        <h3>${emailData.eventName}</h3>
+                        <div>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Price: ${emailData.price}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Date: ${emailData.date} ${emailData.time}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Venue: ${emailData.place}</p> 
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Category: ${emailData.type}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Seat: ${emailData.seat}</p>
+                            <p class="text-transform: uppercase !important;
+                            font-family: 'Oswald', sans-serif !important;">Badge ID: ${emailData.nationalId}</p>
+                        </div>
+                        <div class="vericaltext">
+                            ${emailData.type}
+                        </>
+                    </div>
+                    <div style="align-items: center !important;justify-content: center !important;flex-direction: column !important;display: flex !important;">
+                        <div>
+                            <p>www.eventicore.com</p>
+                        </div>
+                        <div>
+                            <img class="object-fit-contain" src="${emailData.fileName}" alt="" height="400" />
+                            <!-- <img class="object-fit-contain" src="./barcode.png" alt="" height="400" /> -->
+                        </div>
+                        <div>
+                            <p>From INTERCORE GROUP</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

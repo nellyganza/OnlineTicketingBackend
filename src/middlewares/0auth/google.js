@@ -27,7 +27,6 @@ const googleAuth = async (req, res) => {
     const encodedToken = Buffer.from(authToken).toString('base64');
     return res.redirect(`${process.env.FRONT_END_URL}/socialAuth/success/${encodedToken}`);
   }
-  console.log(currentUser);
   if (currentUser === null) {
     return usersController.socialSignup(req.user, res);
   }

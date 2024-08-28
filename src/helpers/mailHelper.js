@@ -51,7 +51,6 @@ export const sendNotification = async ({
   };
   return transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.log(error);
       return false;
     }
     console.log(`Email sent: ${info.response}`);

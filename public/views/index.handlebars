@@ -134,7 +134,7 @@
                             <div class="container">
                                 <div class="" style="margin-bottom: 10px;">
                                     <h2 class="">Hello , {{emailData.fullName}}</h2>
-                                    <p class="">Thank you for using Ticket rwanda application for buying your events,
+                                    <p class="">Thank you for using Eventicore web for buying your events,
                                         from below you will find
                                         all information about the event and ticket and you will be able to print your
                                         ticket.</p>
@@ -287,7 +287,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="ticket__body__info__item__content">
-                                                        <p>{{emailData.price}} Rwf</p>
+                                                        <p>{{emailData.price==0?'FREE':emailData.price+' RWF'}} Rwf</p>
                                                     </div>
                                                 </td>
                                             </tr>
