@@ -293,7 +293,7 @@ export default class ticketController {
         email: ticket.email,
         emailData: {
           eventName: Event.dataValues.title,
-          price: EventPayment.dataValues.price==0?'FREE':EventPayment.dataValues.price+' RWF',
+          price: EventPayment.dataValues.price === 0 ? 'FREE' : `${EventPayment.dataValues.price} RWF`,
           bgTicket: EventPayment.dataValues.bgTicket,
           date: moment(Event.dataValues.dateAndTimme).format('LL'),
           time: moment(Event.dataValues.dateAndTimme).format('LT'),
@@ -324,7 +324,7 @@ export default class ticketController {
       foundTicket.ticketImg = saveimg.secure_url;
       await foundTicket.save();
       const attach = { fileName: `${ticket.fullName}-ticket.png`, path: saveimg.secure_url, cid: 'ticket' };
-      sendNotification({
+      const resp = await sendNotification({
         to: ticketInfo.email,
         subject: 'Event - Ticket',
         template: 'index',
@@ -342,6 +342,11 @@ export default class ticketController {
         ],
         data: { ...ticketInfo.emailData },
       });
+      if(resp){
+        return 'Ticket Resend !'
+      }else {
+        throw new Error("Error occurred");
+      }
     } catch (error) {
       throw new Error(error.message);
     }
@@ -383,12 +388,14 @@ export default class ticketController {
       });
       const byteArrayBuffer = Buffer.from(pdf, 'base64');
       const saveimg = await new Promise((resolve) => {
-        cloudinary.uploader.upload_stream({ format: 'png',gravity: 'north', height: 1024,width:590, crop: 'crop' }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
+        cloudinary.uploader.upload_stream({
+          format: 'png', gravity: 'north', height: 1024, width: 590, crop: 'crop',
+        }, (error, uploadResult) => resolve(uploadResult)).end(byteArrayBuffer);
       });
       // foundTicket.ticketImg = saveimg.secure_url;
       // await foundTicket.save();
       const attach = { fileName: `${guest.fullName}-guest.png`, path: saveimg.secure_url, cid: 'ticket' };
-      sendNotification({
+      const resp =await  sendNotification({
         to: ticketInfo.email,
         subject: 'Event - Badge',
         template: 'index',
@@ -406,6 +413,11 @@ export default class ticketController {
         ],
         data: { ...ticketInfo.emailData },
       });
+      if(resp){
+        return 'Badge Resent'
+      }else {
+        throw new Error("Error occurred");
+      }
     } catch (error) {
       throw new Error(error.message);
     }

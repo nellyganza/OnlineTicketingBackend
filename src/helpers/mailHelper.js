@@ -49,16 +49,16 @@ export const sendNotification = async ({
       force: true,
     });
   };
-  return transporter.sendMail(mailOptions, (error, info) => {
+  return await new Promise((resolve,reject) => { 
+    transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return false;
-    }
-    console.log(`Email sent: ${info.response}`);
+       reject(error.message);
+    } 
     attachments.forEach((attach) => {
       if (!['favicon', 'ticket'].includes(attach.cid)) {
         deleteFileFromDisk(attach.path);
       }
     });
-    return true;
-  });
+    return resolve(true);
+  })});
 };

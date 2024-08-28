@@ -18,8 +18,8 @@ router.get('/resentemail/:guestId', isAuthenticated, allowedRoles(['manager', 'e
     const { guestId } = req.params;
     const foundGuest = await GuestService.findById(guestId);
     if (foundGuest) {
-      await ticketController.sendGuestBadgeEmail(foundGuest);
-      util.setSuccess(200, 'E-mail sent !');
+      const resp = await ticketController.sendGuestBadgeEmail(foundGuest);
+      util.setSuccess(200, resp);
       return util.send(res);
     }
 

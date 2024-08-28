@@ -31,8 +31,8 @@ router.get('/resentemail/:ticketId', isAuthenticated, allowedRoles(['manager', '
     const { ticketId } = req.params;
     const foundTicket = await TicketService.findById(ticketId);
     if (foundTicket) {
-      await ticketController.sendTicketEmail(foundTicket);
-      util.setSuccess(200, 'E-mail sent !');
+      const resp = await ticketController.sendTicketEmail(foundTicket);
+      util.setSuccess(200, resp);
       return util.send(res);
     }
 
